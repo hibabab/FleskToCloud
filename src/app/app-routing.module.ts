@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'accueil', component: AccueilComponent },
   { path: 'assurance-vie', component: AssuranceVieComponent },
   { path: 'assurance-auto', component: AssuranceAutoComponent },
+  { path: 'contrat', loadChildren: () => import('./contrat/contrat.module').then(m => m.ContratModule) },
   { path: 'espace-client', loadChildren: () => import('./espace-client/espace-client.module').then(m => m.EspaceClientModule) } // Lazy loading du module
 ];
 

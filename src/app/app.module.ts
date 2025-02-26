@@ -7,6 +7,8 @@ import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 import { AccueilComponent } from './accueil/accueil.component';
 import { AssuranceVieComponent } from './assurance-vie/assurance-vie.component';
 import { AssuranceAutoComponent } from './assurance-auto/assurance-auto.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { ContratModule } from './contrat/contrat.module';
 
 @NgModule({
   declarations: [
@@ -18,10 +20,12 @@ import { AssuranceAutoComponent } from './assurance-auto/assurance-auto.componen
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    ContratModule
   ],
   providers: [
-    provideHttpClient()
+    provideHttpClient(),
+    provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })
