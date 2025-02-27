@@ -1,0 +1,170 @@
+<div class="p-8 max-w-4xl mx-auto bg-white shadow-lg rounded-xl">
+  <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Souscrire à un contrat Assurance Auto</h1>
+
+  <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Vos Coordonnées</h2>
+  <form>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Nom -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nom</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">person</mat-icon>
+          <input type="text" name="assure_nom" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Prénom -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Prénom</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">person</mat-icon>
+          <input type="text" name="assure_prenom" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- CIN -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> CIN</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">badge</mat-icon>
+          <input type="text" name="assure_cin" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Adresse -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Adresse</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">home</mat-icon>
+          <input type="text" name="assure_adresse" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Code postal -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Code postal</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">location_on</mat-icon>
+          <input type="text" name="assure_code_postal" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Téléphone -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Téléphone</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">phone</mat-icon>
+          <input type="text" name="assure_telephone" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Email -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Email</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">email</mat-icon>
+          <input type="email" name="assure_email" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Votre Véhicule</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Type de véhicule -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Type</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">category</mat-icon>
+          <select name="vehicule_type" class="w-full bg-transparent focus:outline-none" required>
+            <option value="Tourisme">Tourisme</option>
+            <option value="Utilitaire">Utilitaire</option>
+          </select>
+        </div>
+      </div>
+      <!-- Marque -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Marque</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">directions_car</mat-icon>
+          <input type="text" name="vehicule_marque" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Valeur à neuf -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Valeur à neuf</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">money</mat-icon>
+          <input type="text" name="vehicule_valeur_neuf" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Modèle -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Modèle</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">build</mat-icon>
+          <input type="text" name="vehicule_modele" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Puissance -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Puissance</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">speed</mat-icon>
+          <input type="text" name="vehicule_puissance" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Année de mise en circulation -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Année de 1ère mise en circulation</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">calendar_today</mat-icon>
+          <input type="date" name="vehicule_annee_mise_en_circulation" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+      <!-- Immatriculation -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Immatriculation</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">confirmation_number</mat-icon>
+          <input type="text" name="vehicule_immatriculation" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Renseignements</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Nature du contrat -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nature du contrat</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">description</mat-icon>
+          <select name="contrat_nature" class="w-full bg-transparent focus:outline-none" required>
+            <option value="Renouvelable">Renouvelable</option>
+            <option value="Non">Non</option>
+          </select>
+        </div>
+      </div>
+      <!-- Nature de paiement -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nature de paiement</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">payment</mat-icon>
+          <select name="contrat_nature_paiement" class="w-full bg-transparent focus:outline-none" required>
+            <option value="Semestriel">Semestriel</option>
+            <option value="Annuel">Annuel</option>
+          </select>
+        </div>
+      </div>
+      <!-- Garantie -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Garantie</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">local_offer</mat-icon>
+          <select name="contrat_garantie" class="w-full bg-transparent focus:outline-none" required>
+            <option value="Pack au tiers">Pack au tiers</option>
+            <option value="Pack dommage & collision">Pack dommage & collision</option>
+            <option value="Pack tous les risques">Pack tous les risques</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-center mt-6">
+      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">SOUSCRIRE</button>
+    </div>
+  </form>
+</div>

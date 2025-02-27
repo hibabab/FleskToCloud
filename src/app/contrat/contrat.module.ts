@@ -3,15 +3,19 @@ import { CommonModule } from '@angular/common';
 import { ContratRoutingModule } from './contrat-routing.module';
 import { DeviComponent } from './devi/devi.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
 @NgModule({
   declarations: [
-    DeviComponent
+    DeviComponent,
+    CreationContratComponent
   ],
   imports: [
     CommonModule,
     ContratRoutingModule ,
     FormsModule,
     ReactiveFormsModule,
+    MatIconModule,
   ]
 })
 export class ContratModule { }
