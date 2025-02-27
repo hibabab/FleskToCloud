@@ -5,6 +5,7 @@ import { DeviComponent } from './devi/devi.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
+
 @NgModule({
   declarations: [
     DeviComponent,
@@ -12,9 +13,9 @@ import { CreationContratComponent } from './creation-contrat/creation-contrat.co
   ],
   imports: [
     CommonModule,
-    ContratRoutingModule ,
+    ContratRoutingModule,
     FormsModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule, // Importé ici
     MatIconModule,
   ]
 })
