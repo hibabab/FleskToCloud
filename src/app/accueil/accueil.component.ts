@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-accueil',
@@ -7,21 +7,42 @@ import { Component } from '@angular/core';
   styleUrl: './accueil.component.css'
 })
 export class AccueilComponent {
-  showOffres = true;
-  showDevis = false;
-  showClient = false;
+  isPlayingAuto = false; // Vidéo Auto en pause par défaut
+  isPlayingVie = false;  // Vidéo Vie en pause par défaut
 
-  toggleDescription(section: string) {
-    // Réinitialiser toutes les sections à false
-    this.showOffres = this.showDevis = this.showClient = false;
+  // Références aux éléments vidéo dans le template
+  @ViewChild('videoAuto') videoAuto!: ElementRef<HTMLVideoElement>;
+  @ViewChild('videoVie') videoVie!: ElementRef<HTMLVideoElement>;
 
-    // Afficher la section cliquée
-    if (section === 'offres') {
-      this.showOffres = true;
-    } else if (section === 'devis') {
-      this.showDevis = true;
-    } else if (section === 'client') {
-      this.showClient = true;
+  // Fonction pour mettre en pause ou reprendre la vidéo
+  toggleVideo(type: string) {
+    if (type === 'auto') {
+      const video = this.videoAuto.nativeElement;
+      if (video.paused) {
+        video.play();
+        this.isPlayingAuto = true;
+      } else {
+        video.pause();
+        this.isPlayingAuto = false;
+      }
+    } else if (type === 'vie') {
+      const video = this.videoVie.nativeElement;
+      if (video.paused) {
+        video.play();
+        this.isPlayingVie = true;
+      } else {
+        video.pause();
+        this.isPlayingVie = false;
+      }
     }
   }
+
+  // Après l'initialisation de la vue, assurez-vous que les vidéos sont en pause
+  ngAfterViewInit() {
+    this.videoAuto.nativeElement.pause();
+    this.videoVie.nativeElement.pause();
+  }
 }
+
+
+

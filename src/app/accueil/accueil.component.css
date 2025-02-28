@@ -1,4 +1,19 @@
-
+.shared-logo {
+            position: absolute;
+            left: 20px; /* Ajustez cette valeur pour positionner le logo à gauche */
+            top: 20px; /* Ajustez cette valeur pour positionner le logo verticalement */
+            z-index: 10;
+            width: 150px; /* Ajustez la largeur selon vos besoins */
+            height: auto; /* Maintient le ratio de l'image */
+        }
+        .navbar-container {
+            width: 80%; /* Ajustez cette valeur pour définir la largeur des barres de navigation */
+            margin: 0 auto; /* Centre le conteneur horizontalement */
+        }
+        .navbar {
+            width: 100%; /* Les barres de navigation prennent toute la largeur du conteneur */
+        }
+        
 .work-sans {
     font-family: 'Work Sans', sans-serif;
 }
