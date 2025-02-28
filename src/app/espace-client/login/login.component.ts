@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { AuthentificationDto } from '../models/authentificationDto';
+import { AuthentificationService } from '../../Core/Services/authentification.service';
 
-import { AuthentificationDto } from '../../models/authentification-dto';
-import { AuthService } from '../../services/authentification.service';
+
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ import { AuthService } from '../../services/authentification.service';
 export class LoginComponent {
   user: AuthentificationDto = {} as AuthentificationDto;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthentificationService) {}
 
   onSubmit() {
     // Validation of fields

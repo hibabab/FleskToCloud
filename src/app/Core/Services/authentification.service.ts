@@ -1,14 +1,14 @@
-import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthentificationDto } from '../models/authentification-dto';
-import { ResetPasswordDto } from '../models/reset-password-dto';
+import { AuthentificationDto } from '../../espace-client/models/authentificationDto';
 
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class AuthService {
+export class AuthentificationService {
+
   constructor(private http: HttpClient) {}
   readonly apiUrl = 'http://localhost:3000/auth';
 

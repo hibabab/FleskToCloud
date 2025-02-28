@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/authentification.service';
-import { AuthentificationDto } from '../../models/authentification-dto';
+import { AuthentificationService } from '../../Core/Services/authentification.service';
+import { AuthentificationDto } from '../models/authentificationDto';
 
 @Component({
   selector: 'app-register',
@@ -12,7 +12,7 @@ export class RegisterComponent {
   // Initialisation avec des valeurs par défaut pour l'objet user
   user: AuthentificationDto = {} as AuthentificationDto;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthentificationService) {}
 
   // Méthode pour soumettre le formulaire d'inscription
   onSubmit() {

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/authentification.service';
-import { AuthentificationDto } from '../../models/authentification-dto';
+
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthentificationDto } from '../models/authentificationDto';
+import { AuthentificationService } from '../../Core/Services/authentification.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -14,7 +15,7 @@ export class ResetPasswordComponent implements OnInit {
   resetToken: string = '';
 
   constructor(
-    private authService: AuthService,
+    private authService: AuthentificationService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
