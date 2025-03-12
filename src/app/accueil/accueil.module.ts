@@ -7,6 +7,7 @@ import { AssuranceVieComponent } from './assurance-vie/assurance-vie.component';
 import { AutoComponent } from './auto/auto.component';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
+import { AssistanceComponent } from './assistance/assistance.component';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { ContactComponent } from './contact/contact.component';
     AssuranceVieComponent,
     AutoComponent,
     AboutComponent,
-    ContactComponent
+    ContactComponent,
+    AssistanceComponent
   ],
   imports: [
     CommonModule,

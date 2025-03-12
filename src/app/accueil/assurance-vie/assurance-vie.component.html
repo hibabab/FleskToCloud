@@ -1,1 +1,69 @@
-<p>assurance-vie works!</p>
+<div class="bg-gray-100 py-12">
+  <!-- Section Hero avec image et introduction -->
+  <div class="relative h-[600px] overflow-hidden rounded-lg shadow-lg mb-12">
+    <!-- Image de fond -->
+    <img
+      src="assets/images/img6.jpg"
+      alt="Assurance Vie"
+      class="w-full h-full object-cover transform transition-transform duration-1000 hover:scale-105"
+    />
+
+    <!-- Overlay gradient pour améliorer la lisibilité du texte -->
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-600/50"></div>
+
+    <!-- Contenu texte centré -->
+    <div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
+      <h1 class="text-5xl font-bold mb-6 animate-fade-in-down">
+        Assurance Vie
+      </h1>
+      <p class="text-2xl max-w-3xl leading-relaxed mb-8 animate-fade-in-up">
+        L'assurance vie protège vos proches et sécurise votre avenir financier.
+      </p>
+    </div>
+  </div>
+
+  <!-- Section Contenu -->
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+      <!-- Temporaire décès -->
+      <div class="bg-white p-8 rounded-lg shadow-lg text-center transform transition-transform duration-300 hover:scale-105">
+        <div class="mb-4">
+          <img src="assets/images/coeur.jpg" alt="Temporaire décès" class="w-full h-150 object-cover rounded-lg">
+        </div>
+        <h2 class="text-3xl font-bold text-blue-900 mb-4">Temporaire Décès</h2>
+        <p class="text-gray-700 font-bold mb-4">
+          Protégez vos proches en cas de décès ou d’invalidité avec un contrat temporaire décès.
+        </p>
+        <!-- Bouton Savoir plus -->
+        <a routerLink="/tempdeces" class="inline-block">
+          <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center mx-auto">
+            <span>Savoir plus</span>
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </a>
+      </div>
+
+      <!-- Épargne individuelle -->
+      <div class="bg-white p-8 rounded-lg shadow-lg text-center transform transition-transform duration-300 hover:scale-105">
+        <div class="mb-4">
+          <img src="assets/images/tirelire.jpg" alt="Épargne individuelle" class="w-full h-150 object-cover rounded-lg">
+        </div>
+        <h2 class="text-3xl font-bold text-green-900 mb-4">Épargne Individuelle</h2>
+        <p class="text-gray-700 font-bold mb-4">
+          Épargner, c’est penser à soi mais aussi à nos proches. C’est préparer en douceur des projets importants : achat immobilier, études,...
+        </p>
+        <!-- Bouton Savoir plus -->
+        <a routerLink="/epargne" class="inline-block">
+          <button class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center mx-auto">
+            <span>Savoir plus</span>
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

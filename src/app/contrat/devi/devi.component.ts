@@ -362,6 +362,28 @@ export class DeviComponent {
       this.etape--;
     }
   }
+  loadImageAsBase64(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'blob';
+      xhr.onload = function() {
+        if (this.status === 200) {
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            resolve(reader.result as string);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(xhr.response);
+        } else {
+          reject(new Error('Failed to load image'));
+        }
+      };
+      xhr.onerror = reject;
+      xhr.send();
+    });
+  }
+
   soumettre() {
     const typeVoiture = this.formulaireEtape1.value.type;
     const bonusMalus = Number(this.formulaireEtape2.value.bonusMalus);
@@ -390,78 +412,104 @@ export class DeviComponent {
             return;
         }
     }
-        const garanties = this.calculateGaranties(packChoisi, this.formulaireEtape1.value, bonusMalus);
-        this.calculateCotisations(garanties);
+    const garanties = this.calculateGaranties(packChoisi, this.formulaireEtape1.value, bonusMalus);
+    this.calculateCotisations(garanties);
 
-        const formulaireComplet = {
-            ...this.formulaireEtape1.value,
-            ...this.formulaireEtape2.value,
-            ...this.formulaireEtape3.value,
-            cotisationNette: this.cotisationNette,
-            cotisationTotale: this.cotisationTotale,
-            garanties: garanties
-        };
+    const formulaireComplet = {
+        ...this.formulaireEtape1.value,
+        ...this.formulaireEtape2.value,
+        ...this.formulaireEtape3.value,
+        cotisationNette: this.cotisationNette,
+        cotisationTotale: this.cotisationTotale,
+        garanties: garanties
+    };
 
-        console.log('Données complètes du formulaire:', formulaireComplet);
+    console.log('Données complètes du formulaire:', formulaireComplet);
 
-        const doc = new jsPDF();
-        doc.setFontSize(18);
-        doc.text('Devi Flesk Cover', 10, 10);
+    const doc = new jsPDF();
+    doc.setFontSize(18);
 
-        // Informations de l'assuré
-        doc.setFontSize(14);
-        doc.text('Informations de l\'assuré:', 10, 20);
-        doc.setFontSize(12);
-        doc.text(`Nom: ${formulaireComplet.nom}`, 10, 30);
-        doc.text(`Prénom: ${formulaireComplet.prenom}`, 10, 40);
-        doc.text(`Bonus-Malus: ${formulaireComplet.bonusMalus}`, 10, 50);
-        doc.text(`CIN: ${formulaireComplet.CIN}`, 10, 60);
-        doc.text(`Téléphone: ${formulaireComplet.tel}`, 10, 70);
+this.loadImageAsBase64('assets/images/logoFC.png').then((logoBase64) => {
+  let yOffset = 10; // Position verticale initiale
 
+  // Ajouter l'image en haut à gauche
+  doc.addImage(logoBase64, 'PNG', 10, yOffset, 50, 50);
+  yOffset += 60; // Décalage après l'image
 
-        // Ajouter une ligne horizontale
-        doc.setLineWidth(0.5);
-        doc.line(10, 85, 200, 85);
+  // Titre du document
+  doc.text('Devi Flesk Cover', 70, 30);
+  yOffset += 10;
+ // Ajouter une ligne horizontale
+ doc.setLineWidth(0.5);
+ yOffset += 10;
 
-        // Informations de véhicule
-        doc.setFontSize(14);
-        doc.text('Informations de véhicule:', 10, 100);
-        doc.setFontSize(12);
-        doc.text(`Type de véhicule: ${formulaireComplet.type}`, 10, 110);
-        doc.text(`Puissance: ${formulaireComplet.puissance} chevaux`, 10, 120);
-        doc.text(`Date de mise en circulation: ${formulaireComplet.DPMC}`, 10, 130);
-        doc.text(`Age du véhicule: ${ageVehicule} ans`, 10, 140);
-        doc.text(`Matricule: ${formulaireComplet.Imat}`, 10, 80);
+ // Informations de l'assuré
+ doc.setFontSize(14);
+ doc.text('Informations de Visiteur :', 10, yOffset);
+ yOffset += 10;
+ doc.setFontSize(12);
+ doc.text(`Nom: ${formulaireComplet.nom}`, 10, yOffset);
+ yOffset += 10;
+ doc.text(`Prénom: ${formulaireComplet.prenom}`, 10, yOffset);
+ yOffset += 10;
+ doc.text(`Bonus-Malus: ${formulaireComplet.bonusMalus}`, 10, yOffset);
+ yOffset += 10;
+ doc.text(`CIN: ${formulaireComplet.CIN}`, 10, yOffset);
+ yOffset += 10;
+ doc.text(`Téléphone: ${formulaireComplet.tel}`, 10, yOffset);
+ yOffset += 15;
 
-        // Ajouter une ligne horizontale
-        doc.setLineWidth(0.5);
-        doc.line(10, 155, 200, 155);
+ // Ligne horizontale
+ doc.setLineWidth(0.5);
+ doc.line(10, yOffset, 200, yOffset);
+ yOffset += 10;
 
-        // Garanties et coûts
-        doc.setFontSize(14);
+ // Informations du véhicule
+ doc.setFontSize(14);
+ doc.text('Informations de véhicule:', 10, yOffset);
+ yOffset += 10;
+ doc.setFontSize(12);
+ doc.text(`Type de véhicule: ${formulaireComplet.type}`, 10, yOffset);
+ yOffset += 10;
+ doc.text(`Puissance: ${formulaireComplet.puissance} chevaux`, 10, yOffset);
+ yOffset += 10;
+ doc.text(`Age du véhicule: ${ageVehicule} ans`, 10, yOffset);
+ yOffset += 10;
+ doc.text(`Matricule: ${formulaireComplet.Imat}`, 10, yOffset);
+ yOffset += 15;
 
-        doc.text('Garanties et coûts:', 10, 170);
-        doc.setFontSize(12);
-        doc.text(`Pack Choisi: ${formulaireComplet.packChoisi}`, 10, 150);
-        // Ajouter les garanties dans un tableau
-         autoTable(doc, {
-         startY: 200,
-         head: [['Garantie', 'Coût']],
+ // Ligne horizontale
+ doc.setLineWidth(0.5);
+ doc.line(10, yOffset, 200, yOffset);
+ yOffset += 10;
+
+ // Garanties et coûts
+ doc.setFontSize(14);
+ doc.text('Garanties et coûts:', 10, yOffset);
+ yOffset += 10;
+ doc.setFontSize(12);
+ doc.text(`Pack Choisi: ${formulaireComplet.packChoisi}`, 10, yOffset);
+ yOffset += 15;
+      // Ajouter les garanties dans un tableau
+      autoTable(doc, {
+        startY: yOffset,
+        head: [['Garantie', 'Coût']],
         body: formulaireComplet.garanties.map((garantie: { type: string, cotisationNette: number }) => [
-           garantie.type, `${garantie.cotisationNette}DT`
-           ])
-        });
-        doc.setLineWidth(0.5);
-        doc.line(10, 195, 200, 195);
-        doc.text(`Cotisation Nette: ${formulaireComplet.cotisationNette}`, 10, 180);
-        doc.text(`Cotisation Totale: ${formulaireComplet.cotisationTotale}`, 10, 190);
+          garantie.type, `${garantie.cotisationNette}DT`
+        ])
+      });
 
-        // Enregistrer le fichier PDF généré
-        const pdfOutput = doc.output('blob');
-        const fileURL = URL.createObjectURL(pdfOutput);
+      doc.setLineWidth(0.5);
+  // Cotisations
+  doc.text(`Cotisation Nette: ${formulaireComplet.cotisationNette}`, 10, yOffset);
+  yOffset += 10;
+  doc.text(`Cotisation Totale: ${formulaireComplet.cotisationTotale}`, 10, yOffset);
 
-        // Afficher le PDF dans le navigateur
-        window.open(fileURL, '_blank');
-    }
-}
+      // Enregistrer le fichier PDF généré
+      const pdfOutput = doc.output('blob');
+      const fileURL = URL.createObjectURL(pdfOutput);
 
+      // Afficher le PDF dans le navigateur
+      window.open(fileURL, '_blank');
+    });
+  } }
