@@ -1,1 +1,255 @@
-<p>auto works!</p>
+<div class="bg-gray-100 py-12">
+  <!-- Section Hero avec image et introduction -->
+  <div class="relative h-[600px] overflow-hidden rounded-lg shadow-lg mb-12">
+    <!-- Image de fond -->
+    <img
+      src="assets/images/voiture.jpg"
+      alt="Assurance Auto"
+      class="w-full h-full object-cover transform transition-transform duration-1000 hover:scale-105"
+    />
+
+    <!-- Dégradé sur l'image -->
+    <div class="absolute inset-0 bg-gradient-to-r from-green-400/70 to-green-200/50"></div>
+
+
+    <!-- Contenu texte centré -->
+    <div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
+      <!-- Titre principal -->
+      <h1 class="text-5xl font-bold mb-6 animate-fade-in-down">
+        Nos Pack d’assurance Auto
+      </h1>
+      <!-- Sous-titre -->
+      <p class="text-2xl max-w-3xl leading-relaxed mb-8 animate-fade-in-up">
+         FLESK COVER vous offre une solution d’assurance automobile sur mesure pour une mobilité sans compromis.
+      </p>
+    </div>
+  </div>
+
+  <!-- Section Texte descriptif -->
+  <div class="container mx-auto px-6">
+    <div class=" text-gray-800 p-10 rounded-2xl shadow-xl mb-12 border-t-4 border-green-600">
+      <p class="leading-relaxed text-lg">
+        La voiture est un bien essentiel, voire indispensable, pour assurer votre mobilité. Il est donc important de bien la protéger, ainsi que ses occupants, avec la meilleure assurance qui soit.
+        <br><br>
+       Flesk Cover vous offre une large gamme de garanties et de services adaptés pour vous assurer une sécurité optimale et vous propose des études personnalisées pour vous assurer une sérénité et une tranquillité au quotidien.
+        <br><br>
+        Flesk Cover vous garantit une assistance 24h/24, 7j/7 même lorsque votre véhicule est garé devant votre domicile.
+        <br><br>
+        Flesk Cover vous offre également la mise à disposition d'un véhicule de remplacement pendant que le vôtre est immobilisé pour réparation. Pour cela, il vous suffit de vous rapprocher de l'un de nos garages agréés selon les normes des constructeurs.
+        <br><br>
+        En cas de sinistre, Flesk Cover couvre les accidents corporels du conducteur, vous protège contre les dommages causés par les événements climatiques et assure la réparation des dégâts causés à votre véhicule.
+      </p>
+    </div>
+  </div>
+
+  <!-- Section Formules d'Assurance -->
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+      <!-- Formule ESSENTIELLE -->
+      <div class="bg-white p-10 rounded-2xl shadow-2xl text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-lg h-110 flex flex-col justify-between">
+        <div class="text-green-600 mb-4 animate-bounce">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-green-900 mb-4  tracking-wide">Essentielle</h3>
+        <p class="text-gray-700 text-lg leading-relaxed">
+          Construisez votre assurance auto sur mesure avec une protection adaptée à vos besoins, alliant sécurité, confort et budget optimisé.
+        </p>
+      </div>
+
+      <!-- Formule DOMMAGES & COLLISION -->
+      <div class="bg-white p-10 rounded-2xl shadow-2xl text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-lg h-110 flex flex-col justify-between">
+        <div class="text-green-600 mb-4 animate-bounce">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-green-900 mb-4  tracking-wide">Dommages & Collision</h3>
+        <p class="text-gray-700 text-lg leading-relaxed">
+          Une couverture intermédiaire idéale pour protéger efficacement votre véhicule sans aller jusqu’à la formule Tous Risques.
+        </p>
+      </div>
+
+      <!-- Formule TOUS RISQUES -->
+      <div class="bg-white p-10 rounded-2xl shadow-2xl text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-lg h-110 flex flex-col justify-between">
+        <div class="text-green-600 mb-4 animate-bounce">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-green-900 mb-4  tracking-wide">Tous Risques</h3>
+        <p class="text-gray-700 text-lg leading-relaxed">
+          Optez pour une protection maximale avec une assurance complète, idéale pour les véhicules neufs et récents.
+        </p>
+      </div>
+    </div>
+
+   <!-- Section Comparatif formules -->
+<div class="py-10">
+  <h2 class="text-3xl font-bold text-center text-green-600 mb-8">Comparatif formules</h2>
+  <div class="container mx-auto px-6 bg-white rounded-lg shadow-lg overflow-hidden">
+    <table class="w-full border-collapse">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="p-4"></th>
+          <th class="p-4 text-center">Essentielle</th>
+          <th class="p-4 text-center">Dommages & Collision</th>
+          <th class="p-4 text-center">Tous Risques</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let garantie of garanties; let i = index" [ngClass]="{'bg-white': i % 2 === 0, 'bg-gray-100': i % 2 !== 0}" class="border-b">
+          <td class="p-4 font-semibold">{{ garantie.nom }}</td>
+          <td class="p-4 text-center">
+            <span *ngIf="garantie.essentielle" class="text-green-500 text-xl">✔️</span>
+            <span *ngIf="!garantie.essentielle" class="text-gray-400 text-xl">❌</span>
+          </td>
+          <td class="p-4 text-center">
+            <span *ngIf="garantie.dommagesCollision" class="text-green-500 text-xl">✔️</span>
+            <span *ngIf="!garantie.dommagesCollision" class="text-gray-400 text-xl">❌</span>
+          </td>
+          <td class="p-4 text-center">
+            <span *ngIf="garantie.tousRisques" class="text-green-500 text-xl">✔️</span>
+            <span *ngIf="!garantie.tousRisques" class="text-gray-400 text-xl">❌</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+    <!-- Section Questions Fréquentes -->
+    <div class=" p-8 rounded-lg shadow-lg">
+      <h2 class="text-3xl font-bold text-green-600 mb-6 animate-fade-in">Questions Fréquentes</h2>
+      <div class="space-y-4">
+        <!-- Question 1 -->
+        <div class="border-b border-gray-200 pb-4">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            (click)="toggleAnswer(1)"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              Quelles sont les pièces à fournir pour la souscription d’un contrat automobile ?
+            </h3>
+            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[1]}">
+              ▼
+            </span>
+          </div>
+          <div *ngIf="isOpen[1]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
+            Les pièces généralement requises incluent la carte grise, le permis de conduire, et une pièce d'identité.
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="border-b border-gray-200 pb-4">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            (click)="toggleAnswer(2)"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              Qu’est-ce que la garantie assistance ?
+            </h3>
+            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[2]}">
+              ▼
+            </span>
+          </div>
+          <div *ngIf="isOpen[2]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
+            La garantie assistance couvre les frais de dépannage, remorquage, et rapatriement de votre véhicule, ainsi que du conducteur et des passagers en cas d’accident ou de panne, 24H/24 et 7J/7.
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="border-b border-gray-200 pb-4">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            (click)="toggleAnswer(3)"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              Qu’est-ce que la garantie Responsabilité Civile ?
+            </h3>
+            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[3]}">
+              ▼
+            </span>
+          </div>
+          <div *ngIf="isOpen[3]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
+            La garantie Responsabilité Civile couvre les dommages que vous pourriez causer à autrui avec votre véhicule.
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="border-b border-gray-200 pb-4">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            (click)="toggleAnswer(4)"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              Que signifie « Usage privé trajet / travail » ?
+            </h3>
+            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[4]}">
+              ▼
+            </span>
+          </div>
+          <div *ngIf="isOpen[4]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
+            Cela signifie que le véhicule est utilisé pour des trajets personnels et professionnels.
+          </div>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="border-b border-gray-200 pb-4">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            (click)="toggleAnswer(5)"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              Comment est déterminée la valeur de mon véhicule suite à un sinistre ?
+            </h3>
+            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[5]}">
+              ▼
+            </span>
+          </div>
+          <div *ngIf="isOpen[5]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
+            La valeur est déterminée en fonction de l'âge, du kilométrage, et de l'état général du véhicule.
+          </div>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="border-b border-gray-200 pb-4">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            (click)="toggleAnswer(6)"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              Comment savoir si j’ai un bonus ou un malus ?
+            </h3>
+            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[6]}">
+              ▼
+            </span>
+          </div>
+          <div *ngIf="isOpen[6]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
+            Votre bonus ou malus est indiqué sur votre relevé d'informations ou votre contrat d'assurance.
+          </div>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="border-b border-gray-200 pb-4">
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            (click)="toggleAnswer(7)"
+          >
+            <h3 class="text-xl font-semibold text-gray-900">
+              En cas de changement de domicile, est-ce que je dois changer ma carte grise ?
+            </h3>
+            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[7]}">
+              ▼
+            </span>
+          </div>
+          <div *ngIf="isOpen[7]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
+            Oui, vous devez mettre à jour votre carte grise en cas de changement de domicile.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

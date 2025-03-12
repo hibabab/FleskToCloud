@@ -1,75 +1,87 @@
 <div class="p-8 max-w-4xl mx-auto bg-white shadow-lg rounded-xl">
   <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Souscrire à un contrat Assurance Auto</h1>
-
-  <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Vos Coordonnées</h2>
-  <form>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Nom -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nom</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">person</mat-icon>
-          <input type="text" name="assure_nom" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Prénom -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Prénom</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">person</mat-icon>
-          <input type="text" name="assure_prenom" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- CIN -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> CIN</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">badge</mat-icon>
-          <input type="text" name="assure_cin" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Adresse -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Adresse</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">home</mat-icon>
-          <input type="text" name="assure_adresse" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Code postal -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Code postal</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">location_on</mat-icon>
-          <input type="text" name="assure_code_postal" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Téléphone -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Téléphone</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">phone</mat-icon>
-          <input type="text" name="assure_telephone" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Email -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Email</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">email</mat-icon>
-          <input type="email" name="assure_email" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
+  <form [formGroup]="insuranceForm" (ngSubmit)="onSubmit()">
+    <!-- Partie Assuré -->
+    <!-- Partie Assuré -->
+<h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Vos Coordonnées</h2>
+<div formGroupName="assure" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <!-- Nom -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nom</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">person</mat-icon>
+      <input type="text" formControlName="nom" class="w-full bg-transparent focus:outline-none" required>
     </div>
+  </div>
+  <!-- Prénom -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Prénom</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">person</mat-icon>
+      <input type="text" formControlName="prenom" class="w-full bg-transparent focus:outline-none" required>
+    </div>
+  </div>
+  <!-- CIN -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> CIN</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">badge</mat-icon>
+      <input type="text" formControlName="CIN" class="w-full bg-transparent focus:outline-none" required>
+    </div>
+  </div>
+  <!-- Adresse -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Adresse</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">home</mat-icon>
+      <input type="text" formControlName="adresse" class="w-full bg-transparent focus:outline-none" required>
+    </div>
+  </div>
+  <!-- Code postal -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Code postal</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">location_on</mat-icon>
+      <input type="number" formControlName="codePostal" class="w-full bg-transparent focus:outline-none" required>
+    </div>
+  </div>
+  <!-- Téléphone -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Téléphone</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">phone</mat-icon>
+      <input type="text" formControlName="tel" class="w-full bg-transparent focus:outline-none" required>
+    </div>
+  </div>
+  <!-- Email -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Email</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">email</mat-icon>
+      <input type="email" formControlName="email" class="w-full bg-transparent focus:outline-none" required>
+    </div>
+  </div>
+  <!-- Bonus Malus -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Classe Bonus Malus</label>
+    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">grade</mat-icon>
+      <select formControlName="bonusMalus" class="w-full bg-transparent focus:outline-none">
+        <option *ngFor="let classe of [1,2,3,4,5,6,7,8,9,10,11]" [value]="classe">{{ classe }}</option>
+      </select>
+    </div>
+  </div>
+</div>
 
+    <!-- Partie Véhicule -->
     <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Votre Véhicule</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div formGroupName="vehicule" class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Type de véhicule -->
       <div class="flex flex-col">
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Type</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">category</mat-icon>
-          <select name="type" class="w-full bg-transparent focus:outline-none" required>
+          <select formControlName="type" class="w-full bg-transparent focus:outline-none" required>
             <option value="Tourisme">Tourisme</option>
             <option value="Utilitaire">Utilitaire</option>
           </select>
@@ -81,7 +93,7 @@
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Marque</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">directions_car</mat-icon>
-          <input type="text" name="marque" class="w-full bg-transparent focus:outline-none" required>
+          <input type="text" formControlName="marque" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
@@ -90,25 +102,31 @@
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Modèle</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">build</mat-icon>
-          <input type="text" name="model" class="w-full bg-transparent focus:outline-none" required>
+          <input type="text" formControlName="model" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
       <!-- Immatriculation -->
       <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Immatriculation</label>
+        <label class="text-gray-700 mb-1">
+          <span class="text-red-500">*</span> Immatriculation
+        </label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">confirmation_number</mat-icon>
-          <input type="text" name="Imat" class="w-full bg-transparent focus:outline-none" required>
+          <input type="text" formControlName="Imat" class="w-full bg-transparent focus:outline-none" required>
         </div>
+        <span class="text-red-500 text-sm" *ngIf="insuranceForm.get('vehicule.Imat')?.invalid && insuranceForm.get('vehicule.Imat')?.touched">
+          Le format doit être 4 chiffres + "TU" + 3 chiffres (ex: 1234TU567).
+        </span>
       </div>
+
 
       <!-- Énergie -->
       <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Énergie</label>
+        <label> Énergie</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">local_gas_station</mat-icon>
-          <input type="text" name="energie" class="w-full bg-transparent focus:outline-none" required>
+          <input type="text" formControlName="energie" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
@@ -117,25 +135,18 @@
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nombre de places</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">event_seat</mat-icon>
-          <input type="number" name="nbPlace" class="w-full bg-transparent focus:outline-none" required>
+          <input type="number" formControlName="nbPlace" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
-      <!-- Usage -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Usage</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">work</mat-icon>
-          <input type="text" name="usage" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
+
 
       <!-- Date de mise en circulation -->
       <div class="flex flex-col">
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Date de mise en circulation</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">calendar_today</mat-icon>
-          <input type="date" name="DPMC" class="w-full bg-transparent focus:outline-none" required>
+          <input type="date" formControlName="DPMC" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
@@ -144,16 +155,16 @@
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Cylindrée</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">speed</mat-icon>
-          <input type="text" name="cylindrée" class="w-full bg-transparent focus:outline-none" required>
+          <input type="text" formControlName="cylindree" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
       <!-- Charge utile -->
       <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Charge utile</label>
+        <label class="text-gray-700 mb-1"> Charge utile</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">weight</mat-icon>
-          <input type="number" name="chargeUtil" class="w-full bg-transparent focus:outline-none" required>
+          <input type="number" formControlName="chargeUtil" class="w-full bg-transparent focus:outline-none">
         </div>
       </div>
 
@@ -162,7 +173,7 @@
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Valeur à neuf</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">money</mat-icon>
-          <input type="number" name="valeurNeuf" class="w-full bg-transparent focus:outline-none" required>
+          <input type="number" formControlName="valeurNeuf" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
@@ -171,7 +182,7 @@
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Numéro de châssis</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">confirmation_number</mat-icon>
-          <input type="text" name="numChassis" class="w-full bg-transparent focus:outline-none" required>
+          <input type="text" formControlName="numChassis" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
 
@@ -180,35 +191,50 @@
         <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Poids à vide</label>
         <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
           <mat-icon class="text-blue-500 mr-2">fitness_center</mat-icon>
-          <input type="number" name="poidsVide" class="w-full bg-transparent focus:outline-none" required>
+          <input type="number" formControlName="poidsVide" class="w-full bg-transparent focus:outline-none" required>
+        </div>
+      </div>
+
+      <!-- Puissance -->
+      <div class="flex flex-col">
+        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Puissance</label>
+        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+          <mat-icon class="text-blue-500 mr-2">fitness_center</mat-icon>
+          <input type="number" formControlName="puissance" class="w-full bg-transparent focus:outline-none" required>
         </div>
       </div>
     </div>
 
+    <!-- Partie Contrat -->
     <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Renseignement</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div formGroupName="contrat" class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Champ Pack choisi -->
       <div class="space-y-2">
         <label class="block text-lg font-semibold text-gray-700">Pack choisi <span class="text-red-500">*</span></label>
         <select formControlName="packChoisi" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option >Tous les risques</option>
-          <option>Pack tier</option>
-          <option>Sécurité plus</option>
+          <option value="Pack1">Pack Essentille</option>
+          <option value="Pack2">Pack Dommage et Collision</option>
+          <option value="Pack3">Pack tous risques</option>
         </select>
-
       </div>
 
       <!-- Nature paiement -->
       <div class="space-y-2">
         <label class="block text-lg font-semibold text-gray-700">Nature de paiement <span class="text-red-500">*</span></label>
-        <select formControlName="pay" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option>Annuelle</option>
-          <option>Semestriel</option>
+        <select formControlName="typePaiement" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="Annuel">Annuel</option>
+          <option value="Semestriel">Semestriel</option>
         </select>
-
       </div>
-    </div>
-
+ <!-- Nature de contrat -->
+ <div class="space-y-2">
+  <label class="block text-lg font-semibold text-gray-700">Nature de contrat <span class="text-red-500">*</span></label>
+  <select formControlName="NatureContrat" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <option value="Renouvelable">Renouvelable</option>
+    <option value="Fermé">Fermé</option>
+  </select>
+</div>
+</div>
     <div class="flex justify-center mt-6">
       <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">SOUSCRIRE</button>
     </div>

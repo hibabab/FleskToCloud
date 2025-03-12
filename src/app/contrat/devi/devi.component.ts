@@ -1,6 +1,22 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+export enum TypeGaranties {
+  ResponsabiliteCivile = 'ResponsabiliteCivile',
+  RTI = 'RTI',
+  DefenseEtRecours = 'DefenseEtRecours',
+  Incendie = 'Incendie',
+  Vol = 'Vol',
+  PersonneTransportees = 'PersonneTransportees',
+  BrisDeGlaces = 'BrisDeGlaces',
+  Tierce = 'Tierce',
+  AssistanceAutomobile = 'AssistanceAutomobile',
+  IndividuelAccidentConducteur = 'IndividuelAccidentConducteur',
+  EVENEMENTCLIMATIQUE = 'Evènements climatiques',
+  GREVESEMEUTESETMOUVEMENTPOPULAIRE = 'Grèves Emeutes et Mouvements populaires',
+  DOMMAGEETCOLLIDION = 'Dommage et Collision'
+}
 @Component({
   selector: 'app-devi',
   standalone:false,
@@ -9,56 +25,324 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class DeviComponent {
   etape: number = 1;
-
-  // Formulaire réactif pour l'étape 1
   formulaireEtape1: FormGroup;
-
-  // Formulaire réactif pour l'étape 2
   formulaireEtape2: FormGroup;
-
-  // Formulaire réactif pour l'étape 3
   formulaireEtape3: FormGroup;
-
-  // Liste des classes Bonus/Malus
-  classesBonusMalus: string[] = [
-    'Classe 1', 'Classe 2', 'Classe 3', 'Classe 4', 'Classe 5',
-    'Classe 6', 'Classe 7', 'Classe 8', 'Classe 9', 'Classe 10', 'Classe 11'
-  ];
-
-  // Liste des packs
+  classesBonusMalus: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   packs: string[] = [
-    'Tous les risques', 'Pack tier', 'Sécurité plus'
-  ];
-
+    'Pack Essentille', 'Tous les risques', 'Pack dommage et Collision'];
+  cotisationNette: number = 0;
+  cotisationTotale: number = 0;
   constructor(private fb: FormBuilder) {
-    // Initialisation des formulaires
     this.formulaireEtape1 = this.fb.group({
-      typeVehicule: ['', Validators.required],
+      type: ['', Validators.required],
       valeurNeuf: ['', Validators.required],
-      valeurActuelle: ['', Validators.required],
       marque: ['', Validators.required],
-      modele: ['', Validators.required],
+      model: ['', Validators.required],
       puissance: ['', Validators.required],
-      anneeMiseCirculation: ['', Validators.required],
-      immatriculation: ['', Validators.required]
+      DPMC: ['', Validators.required],
+      Imat: ['', [Validators.required, Validators.pattern(/^\d{4}TU\d{2,3}$/)]]
     });
-
     this.formulaireEtape2 = this.fb.group({
       bonusMalus: ['', Validators.required],
       packChoisi: ['', Validators.required]
     });
-
     this.formulaireEtape3 = this.fb.group({
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
       adresse: ['', Validators.required],
       codePostal: ['', Validators.required],
-      age: ['', Validators.required],
-      telephone: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]]
+      tel: ['', Validators.required],
+      CIN:['', Validators.required]
     });
   }
+  calculateResponsabiliteCivile(type: string, bonusMalus: number, puissance: number): number {
+    let cotisation = 0;
+    if (type === 'Tourisme') {
+      switch (bonusMalus) {
+        case 11:
+          if (puissance === 4) cotisation = 385;
+          else if (puissance === 5) cotisation = 490;
+          else if (puissance === 6) cotisation = 490;
+          else if (puissance === 7) cotisation = 595;
+          break;
+        case 10:
+          if (puissance === 4) cotisation = 330;
+          else if (puissance === 5) cotisation = 420;
+          else if (puissance === 6) cotisation = 420;
+          else if (puissance === 7) cotisation = 510;
+          break;
+        case 9:
+          if (puissance === 4) cotisation = 275;
+          else if (puissance === 5) cotisation = 350;
+          else if (puissance === 6) cotisation = 350;
+          else if (puissance === 7) cotisation = 425;
+          break;
+        case 8:
+          if (puissance === 4) cotisation = 220;
+          else if (puissance === 5) cotisation = 280;
+          else if (puissance === 6) cotisation = 280;
+          else if (puissance === 7) cotisation = 340;
+          break;
+        case 7:
+          if (puissance === 4) cotisation = 176;
+          else if (puissance === 5) cotisation = 224;
+          else if (puissance === 6) cotisation = 224;
+          else if (puissance === 7) cotisation = 272;
+          break;
+        case 6:
+          if (puissance === 4) cotisation = 154;
+          else if (puissance === 5) cotisation = 196;
+          else if (puissance === 6) cotisation = 196;
+          else if (puissance === 7) cotisation = 238;
+          break;
+        case 5:
+          if (puissance === 4) cotisation = 132;
+          else if (puissance === 5) cotisation = 168;
+          else if (puissance === 6) cotisation = 168;
+          else if (puissance === 7) cotisation = 204;
+          break;
+        case 4:
+          if (puissance === 4) cotisation = 110;
+          else if (puissance === 5) cotisation = 140;
+          else if (puissance === 6) cotisation = 140;
+          else if (puissance === 7) cotisation = 170;
+          break;
+        case 3:
+          if (puissance === 4) cotisation = 99;
+          else if (puissance === 5) cotisation = 126;
+          else if (puissance === 6) cotisation = 126;
+          else if (puissance === 7) cotisation = 153;
+          break;
+        case 2:
+          if (puissance === 4) cotisation = 88;
+          else if (puissance === 5) cotisation = 112;
+          else if (puissance === 6) cotisation = 112;
+          else if (puissance === 7) cotisation = 136;
+          break;
+        case 1:
+          if (puissance === 4) cotisation = 77;
+          else if (puissance === 5) cotisation = 98;
+          else if (puissance === 6) cotisation = 98;
+          else if (puissance === 7) cotisation = 119;
+          break;
+        default:
+          cotisation = 0;
+      }
+    } else if (type === 'Utilitaire') {
+      switch (bonusMalus) {
+        case 7:
+          if (puissance >= 5 && puissance <= 6) cotisation = 428;
+          else if (puissance >= 7 && puissance <= 9) cotisation = 524;
+          else if (puissance >= 11 && puissance <= 12) cotisation = 676;
+          break;
+        case 6:
+          if (puissance >= 5 && puissance <= 6) cotisation = 363.8;
+          else if (puissance >= 7 && puissance <= 9) cotisation = 445.4;
+          else if (puissance >= 11 && puissance <= 12) cotisation = 574.6;
+          break;
+        case 5:
+          if (puissance >= 5 && puissance <= 6) cotisation = 321;
+          else if (puissance >= 7 && puissance <= 9) cotisation = 393;
+          else if (puissance >= 11 && puissance <= 12) cotisation = 507;
+          break;
+        case 4:
+          if (puissance >= 5 && puissance <= 6) cotisation = 256.8;
+          else if (puissance >= 7 && puissance <= 9) cotisation = 314.4;
+          else if (puissance >= 11 && puissance <= 12) cotisation = 405.6;
+          break;
+        case 3:
+          if (puissance >= 5 && puissance <= 6) cotisation = 214;
+          else if (puissance >= 7 && puissance <= 9) cotisation = 262;
+          else if (puissance >= 11 && puissance <= 12) cotisation = 338;
+          break;
+        case 2:
+          if (puissance >= 5 && puissance <= 6) cotisation = 192.6;
+          else if (puissance >= 7 && puissance <= 9) cotisation = 235.8;
+          else if (puissance >= 11 && puissance <= 12) cotisation = 304.2;
+          break;
+        case 1:
+          if (puissance >= 5 && puissance <= 6) cotisation = 171.2;
+          else if (puissance >= 7 && puissance <= 9) cotisation = 209.6;
+          else if (puissance >= 11 && puissance <= 12) cotisation = 270.4;
+          break;
+        default:
+          cotisation = 0;
+      }
+    }
+    return cotisation;
+  }
 
+  calculateGaranties(packChoisi: string, formulaireEtape1: any, bonusMalus: number): any[] {
+    const garanties: any[] = [];
+    const valeurNeuf = formulaireEtape1.valeurNeuf;
+    const puissance = formulaireEtape1.puissance;
+    const responsabiliteCivile = this.calculateResponsabiliteCivile(formulaireEtape1.type, bonusMalus,puissance);
+    if (packChoisi === 'Pack Essentille') {
+      garanties.push({
+        type: TypeGaranties.ResponsabiliteCivile,
+        cotisationNette: responsabiliteCivile
+      });
+      garanties.push({
+        type: TypeGaranties.RTI,
+        cotisationNette: 0
+      });
+      garanties.push({
+        type: TypeGaranties.DefenseEtRecours,
+        capital: 1000,
+        cotisationNette: 50.0
+      });
+      garanties.push({
+        type: TypeGaranties.Incendie,
+        capital: valeurNeuf,
+        cotisationNette: valeurNeuf / 220.115
+      });
+      garanties.push({
+        type: TypeGaranties.Vol,
+        capital: valeurNeuf,
+        cotisationNette: valeurNeuf / 336.446
+      });
+      garanties.push({
+        type: TypeGaranties.PersonneTransportees,
+        capital: 5000,
+        cotisationNette: 50.0
+      });
+      garanties.push({
+        type: TypeGaranties.BrisDeGlaces,
+        capital: valeurNeuf <= 30000 ? 500 : 600,
+        cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
+      });
+      garanties.push({
+        type: TypeGaranties.AssistanceAutomobile,
+        cotisationNette: 71.5
+      });
+      garanties.push({
+        type: TypeGaranties.IndividuelAccidentConducteur,
+        capital: 20000,
+        cotisationNette: 25.0
+      });
+    } else if (packChoisi === 'Pack dommage et Collision') {
+      garanties.push({
+        type: TypeGaranties.ResponsabiliteCivile,
+        cotisationNette: responsabiliteCivile
+      });
+      garanties.push({
+        type: TypeGaranties.RTI,
+        cotisationNette: 0
+      });
+      garanties.push({
+        type: TypeGaranties.DefenseEtRecours,
+        capital: 1000,
+        cotisationNette: 50.0
+      });
+      garanties.push({
+        type: TypeGaranties.Incendie,
+        capital: valeurNeuf,
+        cotisationNette: valeurNeuf / 220.115
+      });
+      garanties.push({
+        type: TypeGaranties.Vol,
+        capital: valeurNeuf,
+        cotisationNette: valeurNeuf / 336.446
+      });
+      garanties.push({
+        type: TypeGaranties.PersonneTransportees,
+        capital: 5000,
+        cotisationNette: 50.0
+      });
+      garanties.push({
+        type: TypeGaranties.BrisDeGlaces,
+        capital: valeurNeuf <= 30000 ? 500 : 600,
+        cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
+      });
+      garanties.push({
+        type: TypeGaranties.AssistanceAutomobile,
+        cotisationNette: 71.5
+      });
+      garanties.push({
+        type: TypeGaranties.IndividuelAccidentConducteur,
+        capital: 20000,
+        cotisationNette: 25.0
+      });
+      garanties.push({
+        type: TypeGaranties.EVENEMENTCLIMATIQUE,
+        cotisationNette: 25.0
+      });
+      garanties.push({
+        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
+        cotisationNette: 25.0
+      });
+      garanties.push({
+        type: TypeGaranties.DOMMAGEETCOLLIDION,
+        capital: valeurNeuf,
+        cotisationNette: valeurNeuf * 0.1
+      });
+    } else if (packChoisi === 'Tous les risques') {
+      garanties.push({
+        type: TypeGaranties.RTI,
+        cotisationNette: 0
+      });
+      garanties.push({
+        type: TypeGaranties.DefenseEtRecours,
+        capital: 1000,
+        cotisationNette: 50.0
+      });
+      garanties.push({
+        type: TypeGaranties.Incendie,
+        capital: valeurNeuf,
+        cotisationNette: valeurNeuf / 220.115
+      });
+      garanties.push({
+        type: TypeGaranties.Vol,
+        capital: valeurNeuf,
+        cotisationNette: valeurNeuf / 336.446
+      });
+      garanties.push({
+        type: TypeGaranties.PersonneTransportees,
+        capital: 5000,
+        cotisationNette: 50.0
+      });
+      garanties.push({
+        type: TypeGaranties.BrisDeGlaces,
+        capital: valeurNeuf <= 30000 ? 500 : 600,
+        cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
+      });
+      garanties.push({
+        type: TypeGaranties.AssistanceAutomobile,
+        cotisationNette: 71.5
+      });
+      garanties.push({
+        type: TypeGaranties.IndividuelAccidentConducteur,
+        capital: 20000,
+        cotisationNette: 25.0
+      });
+      garanties.push({
+        type: TypeGaranties.EVENEMENTCLIMATIQUE,
+        cotisationNette: 25.0
+      });
+      garanties.push({
+        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
+        cotisationNette: 25.0
+      });
+      garanties.push({
+        type: TypeGaranties.Tierce,
+        capital: valeurNeuf,
+        franchise: 0.2,
+        cotisationNette: valeurNeuf * 0.2
+      });
+      garanties.push({
+        type: TypeGaranties.ResponsabiliteCivile,
+        cotisationNette: responsabiliteCivile
+      });
+    }
+
+    return garanties;
+  }
+
+  calculateCotisations(garanties: any[]): void {
+    this.cotisationNette = garanties.reduce((sum: number, garantie: any) => sum + garantie.cotisationNette, 0);
+    this.cotisationTotale = this.cotisationNette + 70.000 + 3.800 + 0.800 + 10.000 + 3.000 + 1.000;
+  }
   suivant() {
     if (this.etape === 1 && this.formulaireEtape1.invalid) {
       this.formulaireEtape1.markAllAsTouched();
@@ -78,12 +362,106 @@ export class DeviComponent {
       this.etape--;
     }
   }
-
   soumettre() {
-    if (this.formulaireEtape3.invalid) {
-      this.formulaireEtape3.markAllAsTouched();
-      return;
+    const typeVoiture = this.formulaireEtape1.value.type;
+    const bonusMalus = Number(this.formulaireEtape2.value.bonusMalus);
+    const puissance = Number(this.formulaireEtape1.value.puissance);
+    const anneeCourante = new Date().getFullYear();
+    const ageVehicule = anneeCourante - Number(this.formulaireEtape1.value.DPMC);
+    const packChoisi = this.formulaireEtape2.value.packChoisi;
+
+    // Validate age and pack compatibility
+    if ((ageVehicule > 15 && packChoisi === 'Pack dommage et Collision') ||
+        (ageVehicule > 3 && packChoisi === 'Tous les risques')) {
+        window.alert(`Erreur : Un véhicule de ${ageVehicule} ans ne peut pas choisir le pack ${packChoisi}.`);
+        return;
     }
-    console.log('Formulaire soumis', this.formulaireEtape3.value);
-  }
+    // Validate for vehicle type "Utilitaire"
+    if (typeVoiture === 'Utilitaire') {
+        if (bonusMalus < 1 || bonusMalus > 7 || puissance < 5 || puissance > 12) {
+            window.alert("Erreur : Pour un véhicule utilitaire, le bonus-malus doit être entre 1 et 7 et la puissance entre 5 et 12.");
+            return;
+        }
+    }
+    // Validate for vehicle type "Tourisme"
+     if (typeVoiture === 'Tourisme') {
+        if (bonusMalus < 1 || bonusMalus > 11 || puissance < 4 || puissance > 7) {
+            window.alert("Erreur : Pour un véhicule de tourisme, le bonus-malus doit être entre 1 et 11 et la puissance entre 4 et 7.");
+            return;
+        }
+    }
+        const garanties = this.calculateGaranties(packChoisi, this.formulaireEtape1.value, bonusMalus);
+        this.calculateCotisations(garanties);
+
+        const formulaireComplet = {
+            ...this.formulaireEtape1.value,
+            ...this.formulaireEtape2.value,
+            ...this.formulaireEtape3.value,
+            cotisationNette: this.cotisationNette,
+            cotisationTotale: this.cotisationTotale,
+            garanties: garanties
+        };
+
+        console.log('Données complètes du formulaire:', formulaireComplet);
+
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text('Devi Flesk Cover', 10, 10);
+
+        // Informations de l'assuré
+        doc.setFontSize(14);
+        doc.text('Informations de l\'assuré:', 10, 20);
+        doc.setFontSize(12);
+        doc.text(`Nom: ${formulaireComplet.nom}`, 10, 30);
+        doc.text(`Prénom: ${formulaireComplet.prenom}`, 10, 40);
+        doc.text(`Bonus-Malus: ${formulaireComplet.bonusMalus}`, 10, 50);
+        doc.text(`CIN: ${formulaireComplet.CIN}`, 10, 60);
+        doc.text(`Téléphone: ${formulaireComplet.tel}`, 10, 70);
+
+
+        // Ajouter une ligne horizontale
+        doc.setLineWidth(0.5);
+        doc.line(10, 85, 200, 85);
+
+        // Informations de véhicule
+        doc.setFontSize(14);
+        doc.text('Informations de véhicule:', 10, 100);
+        doc.setFontSize(12);
+        doc.text(`Type de véhicule: ${formulaireComplet.type}`, 10, 110);
+        doc.text(`Puissance: ${formulaireComplet.puissance} chevaux`, 10, 120);
+        doc.text(`Date de mise en circulation: ${formulaireComplet.DPMC}`, 10, 130);
+        doc.text(`Age du véhicule: ${ageVehicule} ans`, 10, 140);
+        doc.text(`Matricule: ${formulaireComplet.Imat}`, 10, 80);
+
+        // Ajouter une ligne horizontale
+        doc.setLineWidth(0.5);
+        doc.line(10, 155, 200, 155);
+
+        // Garanties et coûts
+        doc.setFontSize(14);
+
+        doc.text('Garanties et coûts:', 10, 170);
+        doc.setFontSize(12);
+        doc.text(`Pack Choisi: ${formulaireComplet.packChoisi}`, 10, 150);
+        // Ajouter les garanties dans un tableau
+         autoTable(doc, {
+         startY: 200,
+         head: [['Garantie', 'Coût']],
+        body: formulaireComplet.garanties.map((garantie: { type: string, cotisationNette: number }) => [
+           garantie.type, `${garantie.cotisationNette}DT`
+           ])
+        });
+        doc.setLineWidth(0.5);
+        doc.line(10, 195, 200, 195);
+        doc.text(`Cotisation Nette: ${formulaireComplet.cotisationNette}`, 10, 180);
+        doc.text(`Cotisation Totale: ${formulaireComplet.cotisationTotale}`, 10, 190);
+
+        // Enregistrer le fichier PDF généré
+        const pdfOutput = doc.output('blob');
+        const fileURL = URL.createObjectURL(pdfOutput);
+
+        // Afficher le PDF dans le navigateur
+        window.open(fileURL, '_blank');
+    }
 }
+
