@@ -1,53 +1,144 @@
-<section class="min-h-screen flex box-border justify-center items-center">
-    <div class="bg-[#F5F5F5] rounded-2xl flex max-w-3xl p-5 items-center shadow-lg">
-
-        <div class="md:w-1/2 px-8">
-            <h2 class="font-bold text-3xl text-[#002D74]">Inscription</h2>
-            <p class="text-sm mt-4 text-[#002D74]">Créez un compte pour commencer votre aventure.</p>
-
-            <form #myform="ngForm"action="" (ngSubmit)="onSubmit()" #inscriptionForm="ngForm" class="flex flex-col gap-4">
-                <!-- Nom complet -->
-                <input required [(ngModel)]="user.name" #nomUtilisateur="ngModel" class="p-2 mt-8 rounded-xl border" type="text" name="fullname" placeholder="Nom complet">
-                <div class="text-red-500 text-sm mt-1" *ngIf="nomUtilisateur.touched && !nomUtilisateur.valid">
-                    <div *ngIf="nomUtilisateur.hasError('required')">Veuillez saisir votre nom complet.</div>
-                </div>
-                
-                <!-- Email -->
-                <input required [(ngModel)]="user.email" #email="ngModel" class="p-2 mt-4 rounded-xl border" type="email" name="email" placeholder="Email">
-                <div class="text-red-500 text-sm mt-1" *ngIf="email.touched && !email.valid">
-                    <div *ngIf="email.hasError('required')">L'email est requis.</div>
-              <div *ngIf="email.errors && email.hasError('pattern')">Veuillez saisir un email valide.</div>
-                </div>
-                
-                <!-- Mot de passe -->
-                <div class="relative">
-                    <input required [(ngModel)]="user.password" #password="ngModel" class="p-2 rounded-xl border w-full" type="password" name="password" id="password" placeholder="Mot de passe">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" id="togglePassword"
-                        class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer z-20 opacity-100"
-                        viewBox="0 0 16 16">
-                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"></path>
-                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"></path>
-                    </svg>
-                </div>
-                <div class="text-red-500 text-sm mt-1" *ngIf="password.touched && !password.valid">
-                    <div *ngIf="password.hasError('required')">Le mot de passe est requis.</div>
-                </div>
-
-                <button  [disabled]="myform.invalid" class="bg-[#002D74] text-white py-2 rounded-xl hover:scale-105 duration-300 hover:bg-[#206ab1] font-medium" type="submit" [disabled]="!inscriptionForm.valid">S'inscrire</button>
-            </form>
-
-
-            <div class="mt-4 text-sm flex justify-between items-center">
-                <p class="mr-3 md:mr-0">Vous avez déjà un compte ?</p>
-                <button routerLink="/espace-client/login" class="hover:border login text-white bg-[#002D74] hover:border-gray-400 rounded-xl py-2 px-5 hover:scale-110 hover:bg-[#002c7424] font-semibold duration-300"
->
-  Se connecter
-</button>
+<section class="min-h-screen flex items-center justify-center p-4">
+    <!-- Conteneur principal -->
+    <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-4xl p-5 w-full h-auto md:h-[125vh]">
+    
+      <!-- Partie centrale : Logo et titre -->
+      <div class="flex flex-col items-center mb-10 text-2xl font-semibold text-teal-800">
+        <i class="fas fa-umbrella w-8 h-8 mr-1 text-teal-800"></i>
+        <p>Flesk Cover</p>
+        <h2 class="font-semibold text-xl text-gray-700 mt-2">Bienvenue chez Flesk Cover</h2>
+        <p class="text-gray-500 text-sm text-center">Gérez vos contrats d'assurance auto et vie, constats et paiements en toute facilité</p>
+      </div>
+  
+      <!-- Partie du formulaire -->
+      <div class="w-full md:w-7/8 space-x-8 px-4 md:px-16">
+        <form #registerForm="ngForm" (ngSubmit)="onSubmit()" class="space-y-5 mt-6">
+        
+          <!-- Nom et Prénom (côte à côte) -->
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex-1">
+              <label for="nom" class="block mb-2 text-sm font-medium text-gray-700">Nom <span class="text-teal-800">*</span></label>
+              <input type="text" name="nom" id="nom" [(ngModel)]="user.nom" #nom="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre nom" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="nom.touched && nom.invalid">
+                <div *ngIf="nom.errors?.['required']">Le nom est requis.</div>
+              </div>
             </div>
-        </div>
-
-        <div class="md:block hidden w-1/2">
-            <img class="rounded-2xl w-full h-[450px] " src="assets/images/loginimage.jpg" alt="Login Image">
-        </div>
+            <div class="flex-1">
+              <label for="prenom" class="block mb-2 text-sm font-medium text-gray-700">Prénom <span class="text-teal-800">*</span></label>
+              <input type="text" name="prenom" id="prenom" [(ngModel)]="user.prenom" #prenom="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre prénom" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="prenom.touched && prenom.invalid">
+                <div *ngIf="prenom.errors?.['required']">Le prénom est requis.</div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- CIN et Langue (côte à côte) -->
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex-1">
+              <label for="cin" class="block mb-2 text-sm font-medium text-gray-700">CIN <span class="text-teal-800">*</span></label>
+              <input type="text" name="cin" id="cin" [(ngModel)]="user.Cin" #cin="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre CIN" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="cin.touched && cin.invalid">
+                <div *ngIf="cin.errors?.['required']">Le CIN est requis.</div>
+              </div>
+            </div>
+          
+            <!-- Date de naissance -->
+            <div class="flex-1">
+              <label for="dateNaissance" class="block mb-2 text-sm font-medium text-gray-700">Date de naissance <span class="text-teal-800">*</span></label>
+              <input type="date" name="dateNaissance" id="dateNaissance" [(ngModel)]="user.date_naissance" #dateNaissance="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="dateNaissance.touched && dateNaissance.invalid">
+                <div *ngIf="dateNaissance.errors?.['required']">La date de naissance est requise.</div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Email et Téléphone (côte à côte) -->
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex-1">
+              <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email <span class="text-teal-800">*</span></label>
+              <input type="email" name="email" id="email" [(ngModel)]="user.email" #email="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre email" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="email.touched && email.invalid">
+                <div *ngIf="email.errors?.['required']">L'email est requis.</div>
+                <div *ngIf="email.errors?.['email']">L'email doit être valide.</div>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label for="telephone" class="block mb-2 text-sm font-medium text-gray-700">Téléphone <span class="text-teal-800">*</span></label>
+              <input type="text" name="telephone" id="telephone" [(ngModel)]="user.telephone" #telephone="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre numéro de téléphone" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="telephone.touched && telephone.invalid">
+                <div *ngIf="telephone.errors?.['required']">Le numéro de téléphone est requis.</div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Mot de passe et Confirmer mot de passe (côte à côte) -->
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex-1">
+              <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Mot de passe <span class="text-teal-800">*</span></label>
+              <input type="password" name="password" id="password" [(ngModel)]="user.password" #password="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Au moins 8 caractères" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="password.touched && password.invalid">
+                <div *ngIf="password.errors?.['required']">Le mot de passe est requis.</div>
+                <div *ngIf="password.errors?.['minlength']">Le mot de passe doit contenir au moins 8 caractères.</div>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-700">Confirmer mot de passe <span class="text-teal-800">*</span></label>
+              <input type="password" name="confirmPassword" id="confirmPassword" [(ngModel)]="confirmPassword" #confirmPasswordModel="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Confirmer le mot de passe" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="confirmPasswordModel.touched && confirmPasswordModel.invalid">
+                <div *ngIf="confirmPasswordModel.errors?.['required']">La confirmation du mot de passe est requise.</div>
+                <div *ngIf="confirmPasswordModel.errors?.['match']">Les mots de passe ne correspondent pas.</div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Adresse et Pays (côte à côte) -->
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex-1">
+              <label for="adresse" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-teal-800">*</span></label>
+              <input type="text" name="adresse" id="adresse" [(ngModel)]="user.adresse.rue" #adresse="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre rue" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="adresse.touched && adresse.invalid">
+                <div *ngIf="adresse.errors?.['required']">L'adresse est requise.</div>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville <span class="text-teal-800">*</span></label>
+    <input type="text" name="ville" id="ville" [(ngModel)]="user.adresse.ville" #ville="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre ville" required />
+    <div class="text-red-500 text-sm mt-1" *ngIf="ville.touched && ville.invalid">
+      <div *ngIf="ville.errors?.['required']">La ville est requise.</div>
     </div>
-</section>
+            </div>
+          </div>
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex-1">
+              <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Pays <span class="text-teal-800">*</span></label>
+              <input type="text" name="rue" id="rue" [(ngModel)]="user.adresse.pays" #rue="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre rue" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="rue.touched && rue.invalid">
+                <div *ngIf="rue.errors?.['required']">Le pays est requise.</div>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label for="code" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-teal-800">*</span></label>
+              <input type="text" name=" code" id="code" [(ngModel)]="user.adresse.codePostal" #code="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre pays" required />
+              <div class="text-red-500 text-sm mt-1" *ngIf="code.touched && code.invalid">
+                <div *ngIf="code.errors?.['required']">Le code postal est requis.</div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Remarque -->
+          <div class="mt-4 text-sm text-gray-600">
+            <p><span class="text-teal-800">*</span> Champs obligatoires</p>
+          </div>
+  
+          <!-- Bouton -->
+          <button type="submit" class="w-full py-2 px-4 bg-teal-800 text-white rounded-lg mt-5 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800">
+            S'inscrire
+          </button>
+          <p class="text-sm font-light text-gray-500 mt-4">
+            Vous avez déjà un compte ? <a routerLink="/espace-client/login" class="font-medium text-teal-800 hover:underline">Se connecter</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+  

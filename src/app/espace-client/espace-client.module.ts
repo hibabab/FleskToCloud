@@ -7,6 +7,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { AssureModule } from '../assure/assure.module';
 
 
 @NgModule({
@@ -21,6 +22,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
     CommonModule,
     EspaceClientRoutingModule,
     FormsModule,
+    AssureModule
   ]
 })
 export class EspaceClientModule { }

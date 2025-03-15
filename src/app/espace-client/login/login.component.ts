@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
-import { AuthentificationDto } from '../models/authentificationDto';
-import { AuthentificationService } from '../../Core/Services/authentification.service';
+import { AuthentificationService } from '../services/authentification.service';
+import { Router } from '@angular/router'; // Importation du Router
+import { AuthentificationDto } from '../models/authentification-dto';
+import { jwtDecode } from 'jwt-decode';
+
 
 
 
@@ -8,29 +11,58 @@ import { AuthentificationService } from '../../Core/Services/authentification.se
   selector: 'app-login',
   standalone: false,
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'] // Fix typo here as 'styleUrl' should be 'styleUrls'
+  styleUrls: ['./login.component.css'] // Correction de 'styleUrl' à 'styleUrls'
 })
 export class LoginComponent {
   user: AuthentificationDto = {} as AuthentificationDto;
 
-  constructor(private authService: AuthentificationService) {}
+  constructor(
+    private authService: AuthentificationService,
+    private router: Router 
+  ) {}
 
   onSubmit() {
-    // Validation of fields
+    // Validation des champs
     if (!this.user.email || !this.user.password) {
       console.error('Tous les champs sont obligatoires.');
       return;
     }
 
-    // Calling the AuthService method to register the user
-    this.authService.login(this.user).subscribe(
+    // Appel de la méthode login dans le AuthentificationService
+    this.authService.login(this.user.email, this.user.password).subscribe(
       (response) => {
-        console.log('login réussie:', response);
-        // You can add a redirect or a success message here
+        console.log('Login réussi:', response);
+
+        // Récupération du token
+        const token = response.access_token;
+        console.log('Token reçu:', token);
+
+        // Enregistrement du token dans un cookie
+        document.cookie = `access_token=${token}; path=/; secure; SameSite=Strict`;
+
+        // Décodage du token JWT
+        const decoded: any = jwtDecode(token);
+        const id = decoded.sub;
+
+        // Vérification du rôle de l'utilisateur après décodage du token
+        this.authService.getRole(id).subscribe(
+          (roleResponse) => {
+            const role = roleResponse.name;
+            if (role === 'assure') {
+              this.router.navigate(['/dashboard-assure']); // Redirection vers le dashboard de l'assuré
+            } else {
+              // Redirection vers un autre tableau de bord
+            }
+          },
+          (error) => {
+            console.error('Erreur de récupération du rôle:', error);
+            // Gérer l'erreur ici
+          }
+        );
       },
       (error) => {
         console.error('Erreur de login:', error);
-        // Handle the error, show an error message, etc.
+        // Gérer l'erreur, afficher un message d'erreur, etc.
       }
     );
   }

@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AuthentificationDto } from '../../espace-client/models/authentificationDto';
+import { UserDto } from '../models/userDto';
+
 
 
 @Injectable({
@@ -15,13 +16,14 @@ export class AuthentificationService {
   // L'URL de l'API backend
 
   // Inscription (register)
-  register(signupData: AuthentificationDto): Observable<any> {
+  register(signupData: UserDto): Observable<any> {
     return this.http.post(`${this. apiUrl}/register`, signupData);
   }
 
   // Connexion (login)
-  login(credentials: AuthentificationDto): Observable<any> {
-    return this.http.post(`${this. apiUrl}/login`, credentials);
+  login(email: string,password:string): Observable<any> {
+    const body = {email,password}
+    return this.http.post(`${this. apiUrl}/login`, body);
   }
 
   forgotPassword(email: string): Observable<any> {
@@ -30,11 +32,14 @@ export class AuthentificationService {
   resetPassword(newPassword: string, resetToken: string): Observable<any> {
     const body = { newPassword, resetToken }; // Correction du nom de la propriété
   
-    return this.http.put(`${this.apiUrl}/reset-password`, body);
+    return this.http.post(`${this.apiUrl}/reset-password`, body);
   }
   
   getUsers(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
+  }
+  getRole(userId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/role/${userId}`);
   }
 
 }

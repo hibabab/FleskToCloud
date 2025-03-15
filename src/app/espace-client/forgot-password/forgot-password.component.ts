@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
-import { AuthentificationDto } from '../models/authentificationDto';
-import { AuthentificationService } from '../../Core/Services/authentification.service';
+import { Component, EventEmitter, Output } from '@angular/core';
+
+import { AuthentificationService } from '../services/authentification.service';
+import { UserDto } from '../models/userDto';
+
 
 
 @Component({
@@ -10,9 +12,12 @@ import { AuthentificationService } from '../../Core/Services/authentification.se
   styleUrl: './forgot-password.component.css'
 })
 export class ForgotPasswordComponent {
-   user: AuthentificationDto = {} as AuthentificationDto;
+  @Output() closeModal = new EventEmitter<void>();
+   user: UserDto = {} as UserDto;
 constructor(private authService: AuthentificationService) {}
-
+onClose() {
+  this.closeModal.emit();
+}
   onSubmit() {
     // Validation of fields
     if (!this.user.email ) {
@@ -25,6 +30,7 @@ constructor(private authService: AuthentificationService) {}
       (response) => {
         console.log('mot de passe oublié réussie:', response);
         // You can add a redirect or a success message here
+        this.onClose();
       },
       (error) => {
         console.error('Erreur de mot de passe oublié:', error);

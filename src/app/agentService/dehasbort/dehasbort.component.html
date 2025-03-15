@@ -1,0 +1,114 @@
+<div class="flex h-screen  font-roboto">
+   
+  
+    <aside id="default-sidebar" class="fixed top-20 bg-teal-600 z-40 w-60 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+      <div class="h-full mt-4 py-4 overflow-y-auto px-10">
+        <ul class="space-y-2 font-medium">
+          <!-- Accueil -->
+          <li>
+            <a href="#" class="flex items-center p-2 rounded-lg text-white bg-teal-700 hover:bg-teal-600 group">
+              <i class="fas fa-home w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Accueil</span>
+            </a>
+          </li>
+    
+          <!-- Mes Devis -->
+          <li>
+            <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+              <i class="fas fa-file-alt w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Mes devis</span>
+            </a>
+          </li>
+    
+          <!-- Mes Contrats -->
+          <li>
+            <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+              <i class="fas fa-scroll w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Mes Contrats</span>
+            </a>
+          </li>
+    
+          <!-- Mes Constats -->
+          <li>
+            <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+              <i class="fas fa-file-signature w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Mes Constats</span>
+            </a>
+          </li>
+    
+          <!-- Paiement -->
+          <li>
+            <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+              <i class="fas fa-credit-card w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Paiement</span>
+            </a>
+          </li>
+    
+          <!-- Demander Assistance -->
+          <li>
+            <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+              <i class="fas fa-headset w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Demander Assistance</span>
+            </a>
+          </li>
+        </ul>
+    
+        <!-- Ligne de séparation -->
+        <hr class="my-4 border-teal-500">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <p class="text-white text-sm text-center">Merci de votre visite !</p>
+          <p class="text-white text-xs text-center"> © 2025 Votre Entreprise </p>
+        </div>
+      </div>
+    </aside>
+    
+    
+    
+    
+    <nav class="bg-gray-50 text-gray-900 fixed top-0 left-0 w-full z-50 p-2 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center px-4">
+        <!-- Logo et message de bienvenue -->
+        <div class="flex items-center space-x-4 ml-4 sm:ml-6 md:ml-8 lg:ml-10 xl:ml-5">
+          <a routerLink="/" class="flex items-center text-2xl font-semibold text-teal-800">
+            <i class="fas fa-umbrella w-8 h-8 mr-2"></i>
+            Flesk Cover
+          </a>
+          <h2 class="text-lg font-medium text-gray-700">Roulez sereinement, vivez pleinement</h2>
+        </div>
+    
+        <!-- Profil et options -->
+        <div class="flex items-center space-x-4">
+          <!-- Icône Mail -->
+          <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+            <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.94 6.33a2 2 0 0 1 1.5-.66h11.12a2 2 0 0 1 1.5.66l-6.06 3.95-6.06-3.95zM2 7.67V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.67l-5.88 3.83a1 1 0 0 1-1.06 0L2 7.67z" />
+            </svg>
+          </button>
+        
+          <!-- Icône Notification -->
+          <button class="h-10 w-10 flex items-center justify-center rounded-full  border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+            <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
+            </svg>
+          </button>
+          
+          <!-- Photo de profil et informations -->
+          <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
+            <div class="flex flex-col">
+              <span class="text-teal-800 font-medium"> agent service</span>
+  
+              <div class="flex space-x-3 text-sm text-gray-600 mt-1">
+                <a [routerLink]="['/dashboard-assure/account']" class="hover:text-teal-600">Mon compte</a>
+                <a href="#" class="hover:text-red-600">Déconnexion</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    
+  
+         
+      </div>
+      
+    

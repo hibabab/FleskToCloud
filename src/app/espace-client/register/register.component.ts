@@ -1,35 +1,47 @@
 import { Component } from '@angular/core';
-import { AuthentificationService } from '../../Core/Services/authentification.service';
-import { AuthentificationDto } from '../models/authentificationDto';
+import { AuthentificationService } from '../services/authentification.service';
 
 @Component({
   selector: 'app-register',
-  standalone: false,
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrls: ['./register.component.css'],
+  standalone:false
 })
 export class RegisterComponent {
-  // Initialisation avec des valeurs par défaut pour l'objet user
-  user: AuthentificationDto = {} as AuthentificationDto;
+
+  // Déclaration des données de l'utilisateur
+  user = {
+    nom: "",
+    prenom: "",
+    Cin: "",
+    telephone: "",
+    email: "",
+    password: "",
+    adresse: {
+      rue: "",
+      ville: "",
+      codePostal: "",
+      pays: ""
+    },
+    date_naissance: new Date('1995-05-10')
+
+  };
+confirm_password: any;
+confirmPassword: any;
 
   constructor(private authService: AuthentificationService) {}
 
-  // Méthode pour soumettre le formulaire d'inscription
+  // Méthode pour inscrire l'utilisateur
   onSubmit() {
-    if (!this.user.email || !this.user.name || !this.user.password) {
-      console.error('Tous les champs sont obligatoires.');
-      return;
-    }
-
+    
     this.authService.register(this.user).subscribe(
       (response) => {
-        console.log('Inscription réussie:', response);
-        // Vous pouvez ajouter une redirection o
-        // u un message de succès ici
+        console.log('User registered:', response);
+        // Ajouter une logique de redirection ou d'affichage d'un message de succès
       },
       (error) => {
-        console.error('Erreur d\'inscription:', error);
-        // Affichage de l'erreur dans la console ou autre gestion
+        console.error('Error during registration:', error);
+        alert('Erreur lors de l\'inscription');
       }
     );
   }
