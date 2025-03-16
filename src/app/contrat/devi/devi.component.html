@@ -9,14 +9,14 @@
                [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'tourisme'"
                [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Tourisme'">
           <input type="radio" name="type" value="Tourisme" formControlName="type" class="hidden">
-          <i class="fas fa-car text-3xl text-blue-500"></i>
+          <i class="fas fa-car text-3xl text-teal-800"></i>
           <span class="text-lg font-semibold text-gray-700">Tourisme</span>
         </label>
         <label class="p-4 border-2 rounded-lg cursor-pointer flex flex-col items-center justify-center space-y-2 transition-all duration-300 hover:border-blue-500 hover:shadow-lg"
                [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'Utilitaire'"
                [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Utilitaire'">
           <input type="radio" name="type" value="Utilitaire" formControlName="type" class="hidden">
-          <i class="fas fa-truck text-3xl text-blue-500"></i>
+          <i class="fas fa-truck text-3xl text-teal-800"></i>
           <span class="text-lg font-semibold text-gray-700">Utilitaire</span>
         </label>
       </div>
@@ -66,7 +66,7 @@
       </div>
     </form>
     <div class="flex justify-end mt-8">
-      <button (click)="suivant()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+      <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
         Continuer
       </button>
     </div>
@@ -103,7 +103,7 @@
         <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
           Retour
         </button>
-        <button (click)="suivant()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
           Continuer
         </button>
       </div>
@@ -172,7 +172,7 @@
             <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
               Retour
             </button>
-            <button (click)="soumettre()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <button (click)="soumettre()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
               Soumettre
             </button>
           </div>
