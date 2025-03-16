@@ -31,12 +31,15 @@
 
           <!-- Menu déroulant -->
           <div class="relative group">
-              <button class="font-semibold">Qui nous sommes ?</button>
+            <button [routerLink]="['/accueil', 'about']" class="font-semibold">
+              Qui nous sommes ?
+            </button>
+            
              
           </div>
 
           <!-- Bouton RSE -->
-          <button class="bg-teal-500 text-white font-bold px-4 py-2 rounded-lg">Connexion</button>
+         
       </div>
   </nav>
     <!-- Ligne de séparation entre les deux menus -->
@@ -53,49 +56,44 @@
           <!-- Menu Item: Ma voiture -->
           <li class="relative group">
             <a href="#" class="text-teal-800 font-semibold">Ma voiture</a>
-    
+        
             <!-- Dropdown Menu for Ma voiture -->
-            <div class="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+            <div class="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
               <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg w-[500px]">
                 <div class="flex items-center">
-                  <!-- Section Nos produits -->
                   <div class="flex-1 pr-6">
-                    <h2 class="text-2xl font-bold text-teal-800 flex items-center gap-2">
-                      Nos produits
-                    </h2>
                     <div class="mt-2 flex items-center gap-2">
                       <!-- Icône de voiture -->
                       <i class="fas fa-car w-6 h-6 text-teal-800"></i>
-                      <h3 class="text-lg font-semibold text-teal-800">TRIK ESSLAMA</h3>
+                      <h2 class="text-lg font-semibold text-teal-800">
+                        <a [routerLink]="['/accueil/auto']">Nos produits</a>
+                      </h2>
+                      
                     </div>
                     <p class="text-sm text-gray-600">La solution d’assurance auto idéale pour une sécurité optimale !</p>
                   </div>
-    
+        
                   <!-- Ligne verticale -->
                   <div class="border-r-2 border-gray-300 h-24"></div>
-                  
+        
                   <!-- Section Démarches -->
                   <div class="flex-1 pl-6">
-                    <h2 class="text-2xl font-bold text-teal-800 flex items-center gap-2">
-                      Démarches
-                    </h2>
-                    <ul class="mt-4 space-y-2">
-                      <li class="flex items-center text-gray-700 text-sm">
-                        <!-- Icône de voiture accidentée -->
-                        <i class="fas fa-car-crash w-5 h-5 text-teal-800 mr-2"></i>
-                        Constat amiable d’accident automobile
-                      </li>
-                    </ul>
+                    <div class="mt-2 flex items-center gap-2">
+                      <!-- Icône de voiture -->
+                      <i class="fas fa-car-crash w-5 h-5 text-teal-800 mr-2"></i>
+                      <h2 class="text-lg font-semibold text-teal-800">Démarches</h2>
+                    </div>
+                    <p class="text-sm text-gray-600">Constat amiable d’accident automobile</p>
                   </div>
                 </div>
               </div>
             </div>
           </li>
-    
+        
           <!-- Menu Item: Ma prévoyance -->
           <li><a href="#" class="hover:text-teal-800">Ma prévoyance</a></li>
         </ul>
-    
+        
         <!-- Contact Info -->
         <div class="flex items-center space-x-6 mr-10 text-gray-500">
           <!-- Téléphone -->
@@ -223,7 +221,10 @@
       <svg class="w-4 h-4 text-teal-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
       </svg>
-      <span class="text-[0.65rem] text-teal-800 mt-0.5 font-semibold">Assitance</span>
+      <a [routerLink]="['/accueil', 'assistance']" class="text-[0.65rem] text-teal-800 mt-0.5 font-semibold">
+        Assistance
+      </a>
+      
     </div>
   
     <div class="bg-white border rounded-xl border-teal-800 shadow-md p-3 flex flex-col items-center hover:bg-teal-50 cursor-pointer transition duration-300">
