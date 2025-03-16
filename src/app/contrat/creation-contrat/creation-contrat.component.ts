@@ -33,10 +33,10 @@ export class CreationContratComponent {
       assure: this.fb.group({
         nom: ['', Validators.required],
         prenom: ['', Validators.required],
-        CIN: ['', Validators.required],
+        Cin: ['', Validators.required],
         adresse: ['', Validators.required],
         codePostal: ['', Validators.required],
-        tel: ['', Validators.required],
+        telephone: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         bonusMalus: ['', Validators.required]
       }),
