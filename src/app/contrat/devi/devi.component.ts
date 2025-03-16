@@ -341,7 +341,7 @@ export class DeviComponent {
 
   calculateCotisations(garanties: any[]): void {
     this.cotisationNette = garanties.reduce((sum: number, garantie: any) => sum + garantie.cotisationNette, 0);
-    this.cotisationTotale = this.cotisationNette + 70.000 + 3.800 + 0.800 + 10.000 + 3.000 + 1.000;
+    this.cotisationTotale = this.cotisationNette + 50.000 + 3.800 + 0.800 + 10.000 + 3.000 + 1.000;
   }
   suivant() {
     if (this.etape === 1 && this.formulaireEtape1.invalid) {

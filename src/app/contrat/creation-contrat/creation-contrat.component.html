@@ -3,7 +3,7 @@
   <h1 class="text-3xl font-bold text-center text-teal-800 mb-6">Souscrire à un contrat Assurance Auto</h1>
   <form [formGroup]="insuranceForm" (ngSubmit)="onSubmit()">
     <!-- Partie Assuré -->
-    <!-- Partie Assuré -->
+  <!-- Partie Assuré -->
 <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Vos Coordonnées</h2>
 <div formGroupName="assure" class="grid grid-cols-1 md:grid-cols-2 gap-6">
   <!-- Nom -->
@@ -30,22 +30,47 @@
       <input type="text" formControlName="Cin" class="w-full bg-transparent focus:outline-none" required>
     </div>
   </div>
-  <!-- Adresse -->
+  <!-- Date de Naissance -->
   <div class="flex flex-col">
-    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Adresse</label>
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Date Naissance</label>
     <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+      <input type="date" formControlName="dateNaissance" class="w-full bg-transparent focus:outline-none" required>
+    </div>
+  </div>
+
+  <!-- Pays -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Pays</label>
+    <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">location_on</mat-icon>
+      <input type="text" formControlName="pays" class="w-full bg-transparent focus:outline-none" placeholder="Pays" required />
+    </div>
+  </div>
+  <!-- Ville -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Ville</label>
+    <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">location_city</mat-icon>
+      <input type="text" formControlName="ville" class="w-full bg-transparent focus:outline-none" placeholder="Ville" required />
+    </div>
+  </div>
+  <!-- Rue -->
+  <div class="flex flex-col">
+    <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Rue</label>
+    <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
       <mat-icon class="text-blue-500 mr-2">home</mat-icon>
-      <input type="text" formControlName="adresse" class="w-full bg-transparent focus:outline-none" required>
+      <input type="text" formControlName="rue" class="w-full bg-transparent focus:outline-none" placeholder="Rue" required />
     </div>
   </div>
   <!-- Code postal -->
   <div class="flex flex-col">
     <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Code postal</label>
-    <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-      <mat-icon class="text-blue-500 mr-2">location_on</mat-icon>
-      <input type="number" formControlName="codePostal" class="w-full bg-transparent focus:outline-none" required>
+    <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
+      <mat-icon class="text-blue-500 mr-2">markunread_mailbox</mat-icon>
+      <input type="text" formControlName="codePostal" class="w-full bg-transparent focus:outline-none" placeholder="Code postal" required />
     </div>
   </div>
+
   <!-- Téléphone -->
   <div class="flex flex-col">
     <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Téléphone</label>
@@ -73,7 +98,6 @@
     </div>
   </div>
 </div>
-
     <!-- Partie Véhicule -->
     <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Votre Véhicule</h2>
     <div formGroupName="vehicule" class="grid grid-cols-1 md:grid-cols-2 gap-6">

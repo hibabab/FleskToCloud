@@ -34,11 +34,16 @@ export class CreationContratComponent {
         nom: ['', Validators.required],
         prenom: ['', Validators.required],
         Cin: ['', Validators.required],
-        adresse: ['', Validators.required],
-        codePostal: ['', Validators.required],
+        dateNaissance: ['', Validators.required],
         telephone: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
-        bonusMalus: ['', Validators.required]
+        bonusMalus: ['', Validators.required],
+        adresse: this.fb.group({
+          pays: ['', Validators.required],
+          ville: ['', Validators.required],
+          rue: ['', Validators.required],
+          codePostal: ['', Validators.required]
+        })
       }),
       vehicule: this.fb.group({
         type: ['', Validators.required],
@@ -58,11 +63,10 @@ export class CreationContratComponent {
       contrat: this.fb.group({
         packChoisi: ['', Validators.required],
         typePaiement: ['', Validators.required],
-        NatureContrat:['', Validators.required]
+        NatureContrat: ['', Validators.required]
       })
     });
   }
-
   onSubmit() {
     // Vérifier si le formulaire est valide
     if (this.insuranceForm.valid) {
@@ -388,7 +392,7 @@ export class CreationContratComponent {
     }
 
     const cotisationNette = garanties.reduce((sum, garantie) => sum + garantie.cotisationNette, 0);
-    const cotisationTotale = cotisationNette + 70.000 + 3.800 + 0.800 + 10.000 + 3.000 + 1.000;
+    const cotisationTotale = cotisationNette + 50.000 + 3.800 + 0.800 + 10.000 + 3.000 + 1.000;
     // Calcul du montantEcheance en fonction du type de paiement
     const montantEcheance = contratData.typePaiement === 'Semestriel' ? cotisationTotale / 2 : cotisationTotale;
 
