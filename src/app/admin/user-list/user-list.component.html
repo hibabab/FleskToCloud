@@ -1,9 +1,10 @@
 <div class="flex h-screen font-roboto">
+  <!-- Barre latérale -->
   <aside id="default-sidebar" class="fixed top-16 bg-teal-600 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
     <div class="h-full mt-2 py-2 overflow-y-auto px-3">
       <ul class="space-y-1 font-medium">
         <li>
-          <a [routerLink]="['/admin/listUser']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a [routerLink]="['/admin/interface']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>home</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Accueil</span>
           </a>
@@ -35,6 +36,7 @@
     </div>
   </aside>
 
+  <!-- Barre de navigation -->
   <nav class="bg-gray-50 text-gray-900 fixed top-0 left-0 w-full z-50 p-1 shadow-lg">
     <div class="container mx-auto flex justify-between items-center px-3">
       <div class="flex items-center space-x-2 ml-2">
@@ -69,4 +71,47 @@
       </div>
     </div>
   </nav>
+
+  <!-- Contenu principal -->
+  <div class="flex-1 p-4 sm:ml-64 mt-16">
+    <!-- Titre de la page -->
+    <h1 class="text-2xl font-semibold text-teal-800 mb-4">Liste des utilisateurs</h1>
+
+    <!-- Tableau des utilisateurs -->
+    <table class="min-w-full bg-white">
+      <thead>
+        <tr>
+          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Nom</th>
+          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Prénom</th>
+          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">CIN</th>
+          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Email</th>
+          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Statut</th>
+          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users" class="hover:bg-gray-50">
+          <td class="py-2 px-4 border-b border-teal-100">{{ user.nom }}</td>
+          <td class="py-2 px-4 border-b border-teal-100">{{ user.prenom }}</td>
+          <td class="py-2 px-4 border-b border-teal-100">{{ user.Cin }}</td>
+          <td class="py-2 px-4 border-b border-teal-100">{{ user.email }}</td>
+          <td class="py-2 px-4 border-b border-teal-100">
+            <span [ngClass]="{'text-red-600': user.isBlocked, 'text-green-600': !user.isBlocked}">
+              {{ user.isBlocked ? 'Bloqué' : 'Actif' }}
+            </span>
+          </td>
+          <td class="py-2 px-4 border-b border-teal-100">
+            <button
+              (click)="toggleBlockUser(user)"
+              [ngClass]="{'bg-red-500': !user.isBlocked, 'bg-green-500': user.isBlocked}"
+              class="text-white px-4 py-2 rounded"
+            >
+              {{ user.isBlocked ? 'Débloquer' : 'Bloquer' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
 </div>

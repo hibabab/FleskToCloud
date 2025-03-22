@@ -7,5 +7,13 @@ import { Component } from '@angular/core';
   styleUrl: './dehasbort.component.css'
 })
 export class DehasbortComponent {
+  homeIcon = 'Home';
+  usersIcon = 'Users';
+  briefcaseIcon = 'Briefcase';
+  userIcon = 'User';
+  showUserListFlag: boolean = false;
 
+  showUserList() {
+    this.showUserListFlag = true;
+  }
 }

@@ -1,15 +1,16 @@
 <div class="flex h-screen font-roboto">
+  <!-- Barre latérale -->
   <aside id="default-sidebar" class="fixed top-16 bg-teal-600 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
     <div class="h-full mt-2 py-2 overflow-y-auto px-3">
       <ul class="space-y-1 font-medium">
         <li>
-          <a [routerLink]="['/admin/listUser']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a href="#" class="flex items-center p-2 rounded-lg text-white bg-teal-700 hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>home</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Accueil</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a [routerLink]="['/admin/listExpert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>people</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Liste d'expert</span>
           </a>
@@ -35,6 +36,7 @@
     </div>
   </aside>
 
+  <!-- Barre de navigation -->
   <nav class="bg-gray-50 text-gray-900 fixed top-0 left-0 w-full z-50 p-1 shadow-lg">
     <div class="container mx-auto flex justify-between items-center px-3">
       <div class="flex items-center space-x-2 ml-2">
@@ -69,4 +71,54 @@
       </div>
     </div>
   </nav>
+
+  <!-- Contenu principal -->
+  <div class="flex-1 p-4 sm:ml-64 mt-16">
+    <!-- Titre de la page -->
+    <h1 class="text-3xl  text-center font-semibold text-teal-800 mb-4">Tableau de Bord Administrateur</h1>
+
+    <!-- Grille pour les cartes centrées et de largeur réduite -->
+    <div class="flex justify-center">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+        <!-- Carte "Ajouter Expert" -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="flex items-center justify-center mb-3">
+            <i class="fas fa-user-plus text-4xl text-teal-600"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-1">Ajouter Expert</h2>
+          <p class="text-gray-600 text-center text-sm">Ajoutez un nouvel expert à la plateforme.</p>
+          <div class="mt-4 flex justify-center">
+            <button
+            class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 hover:scale-105 transition-all"
+            (click)="navigateToAddExpert()"
+          >
+            <i class="fas fa-plus mr-2"></i>Ajouter
+          </button>
+          </div>
+        </div>
+
+        <!-- Carte "Ajouter Agent de Service" -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div class="flex items-center justify-center mb-3">
+            <i class="fas fa-user-tie text-4xl text-teal-600"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-1">Ajouter Agent de Service</h2>
+          <p class="text-gray-600 text-center text-sm">Ajoutez un nouvel agent de service à la plateforme.</p>
+          <div class="mt-4 flex justify-center">
+            <button class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 hover:scale-105 transition-all" (click)="navigateToAddAgent()">
+              <i class="fas fa-plus mr-2"></i>Ajouter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image admin.jpg en bas à droite -->
+    <div class="fixed bottom-4 right-4">
+      <img src="assets/images/admin.jpg" alt="Admin" class="w-100 h-100 rounded-full shadow-lg">
+    </div>
+
+    <!-- Zone d'affichage des composants routés -->
+    <router-outlet></router-outlet>
+  </div>
 </div>
