@@ -92,24 +92,46 @@
       <div class="space-y-2">
         <label class="block text-lg font-semibold text-gray-700">Pack choisi <span class="text-red-500">*</span></label>
         <select formControlName="packChoisi" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue">
-            <option *ngFor="let pack of packs" [value]="pack">{{ pack }}</option>
-          </select>
-          <div *ngIf="formulaireEtape2.get('packChoisi')?.invalid && formulaireEtape2.get('packChoisi')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
-          </div>
+          <option *ngFor="let pack of packs" [value]="pack">{{ pack }}</option>
+        </select>
+        <div *ngIf="formulaireEtape2.get('packChoisi')?.invalid && formulaireEtape2.get('packChoisi')?.touched" class="text-red-500 text-sm">
+          Ce champ est obligatoire.
         </div>
-      </form>
-      <div class="flex justify-end mt-8">
-        <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
-          Retour
-        </button>
-        <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-          Continuer
-        </button>
       </div>
+    </form>
+
+    <!-- Informations supplémentaires -->
+    <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Informations importantes</h2>
+      <ul class="space-y-3 text-gray-700">
+        <li>
+          <span class="font-medium">Bonus/Malus :</span>
+          <ul class="list-disc list-inside ml-4">
+            <li>Si c'est votre première fois d'assurer un véhicule de type <strong>tourisme</strong>, votre Bonus/Malus est de <strong>8</strong>.</li>
+            <li>Si ce n'est pas votre première fois, votre Bonus/Malus est celui indiqué dans votre <strong>ancien contrat automobile</strong>.</li>
+          </ul>
+        </li>
+        <li>
+          <span class="font-medium">Packs disponibles :</span>
+          <ul class="list-disc list-inside ml-4">
+            <li>Le pack <strong>Tous les risques</strong> est disponible pour les véhicules de <strong>3 ans ou moins</strong>.</li>
+            <li>Le pack <strong>Dommage et Collision</strong> est disponible pour les véhicules de <strong>15 ans ou moins</strong>.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Boutons de navigation -->
+    <div class="flex justify-end mt-8">
+      <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
+        Retour
+      </button>
+      <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        Continuer
+      </button>
     </div>
   </div>
-
+</div>
   <!-- Étape 3 -->
   <div *ngIf="etape === 3" class="p-8 bg-gray-100 min-h-screen">
     <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">

@@ -427,7 +427,7 @@ export class DeviComponent {
     console.log('Données complètes du formulaire:', formulaireComplet);
 
     const doc = new jsPDF();
-    doc.setFontSize(18);
+doc.setFontSize(18);
 
 this.loadImageAsBase64('assets/images/logoFC.png').then((logoBase64) => {
   let yOffset = 10; // Position verticale initiale
@@ -439,77 +439,86 @@ this.loadImageAsBase64('assets/images/logoFC.png').then((logoBase64) => {
   // Titre du document
   doc.text('Devi Flesk Cover', 70, 30);
   yOffset += 10;
- // Ajouter une ligne horizontale
- doc.setLineWidth(0.5);
- yOffset += 10;
 
- // Informations de l'assuré
- doc.setFontSize(14);
- doc.text('Informations de Visiteur :', 10, yOffset);
- yOffset += 10;
- doc.setFontSize(12);
- doc.text(`Nom: ${formulaireComplet.nom}`, 10, yOffset);
- yOffset += 10;
- doc.text(`Prénom: ${formulaireComplet.prenom}`, 10, yOffset);
- yOffset += 10;
- doc.text(`Bonus-Malus: ${formulaireComplet.bonusMalus}`, 10, yOffset);
- yOffset += 10;
- doc.text(`CIN: ${formulaireComplet.CIN}`, 10, yOffset);
- yOffset += 10;
- doc.text(`Téléphone: ${formulaireComplet.tel}`, 10, yOffset);
- yOffset += 15;
+  // Informations de l'assuré en haut à droite
+  doc.setFontSize(10); // Taille de police plus petite
+  doc.text(`Nom: ${formulaireComplet.nom}`, 150, 20);
+  doc.text(`Prénom: ${formulaireComplet.prenom}`, 150, 25);
+  doc.text(`Bonus-Malus: ${formulaireComplet.bonusMalus}`, 150, 30);
+  doc.text(`CIN: ${formulaireComplet.CIN}`, 150, 35);
+  doc.text(`Téléphone: ${formulaireComplet.tel}`, 150, 40);
 
- // Ligne horizontale
- doc.setLineWidth(0.5);
- doc.line(10, yOffset, 200, yOffset);
- yOffset += 10;
-
- // Informations du véhicule
- doc.setFontSize(14);
- doc.text('Informations de véhicule:', 10, yOffset);
- yOffset += 10;
- doc.setFontSize(12);
- doc.text(`Type de véhicule: ${formulaireComplet.type}`, 10, yOffset);
- yOffset += 10;
- doc.text(`Puissance: ${formulaireComplet.puissance} chevaux`, 10, yOffset);
- yOffset += 10;
- doc.text(`Age du véhicule: ${ageVehicule} ans`, 10, yOffset);
- yOffset += 10;
- doc.text(`Matricule: ${formulaireComplet.Imat}`, 10, yOffset);
- yOffset += 15;
-
- // Ligne horizontale
- doc.setLineWidth(0.5);
- doc.line(10, yOffset, 200, yOffset);
- yOffset += 10;
-
- // Garanties et coûts
- doc.setFontSize(14);
- doc.text('Garanties et coûts:', 10, yOffset);
- yOffset += 10;
- doc.setFontSize(12);
- doc.text(`Pack Choisi: ${formulaireComplet.packChoisi}`, 10, yOffset);
- yOffset += 15;
-      // Ajouter les garanties dans un tableau
-      autoTable(doc, {
-        startY: yOffset,
-        head: [['Garantie', 'Coût']],
-        body: formulaireComplet.garanties.map((garantie: { type: string, cotisationNette: number }) => [
-          garantie.type, `${garantie.cotisationNette}DT`
-        ])
-      });
-
-      doc.setLineWidth(0.5);
-  // Cotisations
-  doc.text(`Cotisation Nette: ${formulaireComplet.cotisationNette}`, 10, yOffset);
+  // Ligne horizontale
+  doc.setLineWidth(0.5);
+  doc.line(10, yOffset, 200, yOffset);
   yOffset += 10;
-  doc.text(`Cotisation Totale: ${formulaireComplet.cotisationTotale}`, 10, yOffset);
 
-      // Enregistrer le fichier PDF généré
-      const pdfOutput = doc.output('blob');
-      const fileURL = URL.createObjectURL(pdfOutput);
+  // Informations du véhicule
+  doc.setFontSize(14);
+  doc.text('Informations de véhicule:', 10, yOffset);
+  yOffset += 10;
 
-      // Afficher le PDF dans le navigateur
+  // Réduire la taille de la police pour les détails
+  doc.setFontSize(10);
+
+  // Ligne 1 : Type de véhicule et Puissance
+  doc.text(`Type: ${formulaireComplet.type}`, 10, yOffset);
+  doc.text(`Puissance: ${formulaireComplet.puissance} chevaux`, 100, yOffset);
+  yOffset += 10;
+
+  // Ligne 2 : Âge du véhicule et Matricule
+  doc.text(`Âge: ${ageVehicule} ans`, 10, yOffset);
+  doc.text(`Matricule: ${formulaireComplet.Imat}`, 100, yOffset);
+  yOffset += 15;
+
+  // Ligne horizontale
+  doc.setLineWidth(0.5);
+  doc.line(10, yOffset, 200, yOffset);
+  yOffset += 10;
+
+  // Garanties et coûts
+  doc.setFontSize(14);
+  doc.text('Garanties et coûts:', 10, yOffset);
+  yOffset += 10;
+  doc.setFontSize(12);
+  doc.text(`Pack Choisi: ${formulaireComplet.packChoisi}`, 10, yOffset);
+  yOffset += 15;
+
+  // Ajouter les garanties dans un tableau avec lignes alternées
+  autoTable(doc, {
+    startY: yOffset,
+    head: [['Garantie', 'Coût']],
+    body: formulaireComplet.garanties.map((garantie: { type: string, cotisationNette: number }) => [
+      garantie.type, `${garantie.cotisationNette}DT`
+    ]),
+    styles: {
+      fillColor: [255, 255, 255], // Couleur de fond par défaut (blanc)
+      textColor: [0, 0, 0], // Couleur du texte par défaut (noir)
+    },
+    alternateRowStyles: {
+      fillColor: [240, 240, 240], // Couleur de fond pour les lignes paires (gris clair)
+    },
+  });
+
+  // Cotisation totale en rouge et en gras
+  yOffset = (doc as any).lastAutoTable.finalY + 10; // Position après le tableau
+  doc.setFontSize(12);
+  doc.setTextColor(255, 0, 0); // Rouge
+  doc.setFont('helvetica', 'bold'); // Texte en gras
+  doc.text(`Cotisation Totale: ${formulaireComplet.cotisationTotale.toFixed(2)}DT`, 10, yOffset);
+  doc.setTextColor(0, 0, 0); // Réinitialiser la couleur du texte
+  doc.setFont('helvetica', 'normal'); // Réinitialiser la police
+
+  // Section "Pour nous contacter"
+  doc.setFontSize(12);
+  doc.text('Pour nous contacter :', 10, yOffset + 20);
+  doc.text('Email: fleskcover@gmail.com', 10, yOffset + 25);
+  doc.text('Téléphone: 24051646', 10, yOffset + 30);
+
+  // Enregistrer le fichier PDF généré
+  const pdfOutput = doc.output('blob');
+  const fileURL = URL.createObjectURL(pdfOutput);
+   // Afficher le PDF dans le navigateur
       window.open(fileURL, '_blank');
-    });
+    }); 
   } }

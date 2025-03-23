@@ -142,13 +142,61 @@
         <!-- Mot de passe -->
         <div>
           <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Mot de passe <span class="text-red-500">*</span></label>
-          <input id="password" type="password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le mot de passe" required>
+          <input id="password" type="password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre mot de passe" required>
           <div *ngIf="agentServiceForm.get('password')?.invalid && agentServiceForm.get('password')?.touched" class="text-red-500 text-sm mt-1">
-            Le mot de passe est requis.
+            <div *ngIf="agentServiceForm.get('password')?.errors?.['required']">Le mot de passe est requis.</div>
+            <div *ngIf="agentServiceForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères.</div>
+          </div>
+        </div>
+
+        <!-- Confirmation de mot de passe -->
+        <div>
+          <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-700">Confirmer le mot de passe <span class="text-red-500">*</span></label>
+          <input id="confirmPassword" type="password" formControlName="confirmPassword" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Confirmez le mot de passe" required>
+          <div *ngIf="agentServiceForm.get('confirmPassword')?.invalid && agentServiceForm.get('confirmPassword')?.touched" class="text-red-500 text-sm mt-1">
+            <div *ngIf="agentServiceForm.get('confirmPassword')?.errors?.['required']">La confirmation du mot de passe est requise.</div>
+            <div *ngIf="agentServiceForm.get('confirmPassword')?.errors?.['passwordMismatch']">Les mots de passe ne correspondent pas.</div>
           </div>
         </div>
       </div>
-      
+ <!-- Adresse -->
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Rue -->
+  <div>
+    <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-red-500">*</span></label>
+    <input id="rue" type="text" formControlName="rue" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez la rue" required>
+    <div *ngIf="agentServiceForm.get('rue')?.invalid && agentServiceForm.get('rue')?.touched" class="text-red-500 text-sm mt-1">
+      La rue est requise.
+    </div>
+  </div>
+
+  <!-- Ville -->
+  <div>
+    <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
+    <input id="ville" type="text" formControlName="ville" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez la ville" required>
+    <div *ngIf="agentServiceForm.get('ville')?.invalid && agentServiceForm.get('ville')?.touched" class="text-red-500 text-sm mt-1">
+      La ville est requise.
+    </div>
+  </div>
+
+  <!-- Code postal -->
+  <div>
+    <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-red-500">*</span></label>
+    <input id="codePostal" type="text" formControlName="codePostal" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le code postal" required>
+    <div *ngIf="agentServiceForm.get('codePostal')?.invalid && agentServiceForm.get('codePostal')?.touched" class="text-red-500 text-sm mt-1">
+      Le code postal est requis.
+    </div>
+  </div>
+
+  <!-- Pays -->
+  <div>
+    <label for="pays" class="block mb-2 text-sm font-medium text-gray-700">Pays <span class="text-red-500">*</span></label>
+    <input id="pays" type="text" formControlName="pays" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le pays" required>
+    <div *ngIf="agentServiceForm.get('pays')?.invalid && agentServiceForm.get('pays')?.touched" class="text-red-500 text-sm mt-1">
+      Le pays est requis.
+    </div>
+  </div>
+</div>
 
       <!-- Informations spécifiques à l'agent de service -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

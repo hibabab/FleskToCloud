@@ -10,13 +10,13 @@
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a  [routerLink]="['/admin/listExpert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>people</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Liste d'expert</span>
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a  [routerLink]="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>engineering</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Agent de service</span>
           </a>
@@ -72,46 +72,81 @@
     </div>
   </nav>
 
-  <!-- Contenu principal -->
-  <div class="flex-1 p-4 sm:ml-64 mt-16">
-    <!-- Titre de la page -->
-    <h1 class="text-2xl font-semibold text-teal-800 mb-4">Liste des utilisateurs</h1>
+ <!-- Contenu principal -->
+ <div class="flex-1 p-6 sm:ml-64 mt-16">
+  <!-- Titre de la page -->
+  <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des utilisateurs</h1>
 
-    <!-- Tableau des utilisateurs -->
-    <table class="min-w-full bg-white">
-      <thead>
+  <!-- Tableau des utilisateurs actifs -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <h2 class="text-xl font-semibold text-teal-800 p-4 bg-teal-50">Utilisateurs Actifs</h2>
+    <table class="min-w-full">
+      <thead class="bg-teal-700">
         <tr>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Nom</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Prénom</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">CIN</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Email</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Statut</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Action</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Statut</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of users" class="hover:bg-gray-50">
-          <td class="py-2 px-4 border-b border-teal-100">{{ user.nom }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ user.prenom }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ user.Cin }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ user.email }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">
-            <span [ngClass]="{'text-red-600': user.isBlocked, 'text-green-600': !user.isBlocked}">
-              {{ user.isBlocked ? 'Bloqué' : 'Actif' }}
-            </span>
+        <tr *ngFor="let user of activeUsers" class="hover:bg-gray-50 transition duration-200">
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.nom }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.prenom }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.Cin }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.email }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">
+            <span class="text-green-600 font-medium">Actif</span>
           </td>
-          <td class="py-2 px-4 border-b border-teal-100">
+          <td class="py-3 px-4 border-b border-gray-100">
             <button
               (click)="toggleBlockUser(user)"
-              [ngClass]="{'bg-red-500': !user.isBlocked, 'bg-green-500': user.isBlocked}"
-              class="text-white px-4 py-2 rounded"
+              class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
             >
-              {{ user.isBlocked ? 'Débloquer' : 'Bloquer' }}
+              Bloquer
             </button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-  
+
+  <!-- Tableau des utilisateurs bloqués -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <h2 class="text-xl font-semibold text-teal-800 p-4 bg-teal-50">Utilisateurs Bloqués</h2>
+    <table class="min-w-full">
+      <thead class="bg-teal-700">
+        <tr>
+          <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Statut</th>
+          <th class="py-3 px-4 text-left text-white font-semibold">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of blockedUsers" class="hover:bg-gray-50 transition duration-200">
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.nom }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.prenom }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.Cin }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">{{ user.email }}</td>
+          <td class="py-3 px-4 border-b border-gray-100">
+            <span class="text-red-600 font-medium">Bloqué</span>
+          </td>
+          <td class="py-3 px-4 border-b border-gray-100">
+            <button
+              (click)="toggleBlockUser(user)"
+              class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200"
+            >
+              Débloquer
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 </div>

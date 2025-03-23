@@ -7,6 +7,7 @@ import { UserListComponent } from './user-list/user-list.component';
 import { ExpertFormComponent } from './expert-form/expert-form.component';
 import { AgentServiceFormComponent } from './agent-service-form/agent-service-form.component';
 import { ListExpertComponent } from './expert-list/expert-list.component';
+import { ListAgentServiceComponent } from './list-agent-service/list-agent-service.component';
 
 
 const routes: Routes = [ { path: '', component: DehasbortComponent } ,
@@ -18,6 +19,8 @@ const routes: Routes = [ { path: '', component: DehasbortComponent } ,
     component: AgentServiceFormComponent
   },
   { path: 'listExpert', component: ListExpertComponent },
+  { path: 'listAgentService', component: ListAgentServiceComponent },
+
 ];
 
 @NgModule({

@@ -4,81 +4,82 @@
 
   <!-- Contenu principal -->
   <div class="flex-1 p-4 md:p-8 bg-gray-100 min-h-screen">
-<div *ngIf="etape === 1" class="p-8 bg-gray-100 min-h-screen">
-  <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
-    <h1 class="text-3xl font-bold text-gray-800 mb-4">Votre véhicule</h1>
-    <h2 class="text-xl text-gray-600 mb-8">Type de véhicule</h2>
-    <form [formGroup]="formulaireEtape1" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <label class="p-4 border-2 rounded-lg cursor-pointer flex flex-col items-center justify-center space-y-2 transition-all duration-300 hover:border-blue-500 hover:shadow-lg"
-               [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'tourisme'"
-               [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Tourisme'">
-          <input type="radio" name="type" value="Tourisme" formControlName="type" class="hidden">
-          <i class="fas fa-car text-3xl text-teal-800"></i>
-          <span class="text-lg font-semibold text-gray-700">Tourisme</span>
-        </label>
-        <label class="p-4 border-2 rounded-lg cursor-pointer flex flex-col items-center justify-center space-y-2 transition-all duration-300 hover:border-blue-500 hover:shadow-lg"
-               [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'Utilitaire'"
-               [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Utilitaire'">
-          <input type="radio" name="type" value="Utilitaire" formControlName="type" class="hidden">
-          <i class="fas fa-truck text-3xl text-teal-800"></i>
-          <span class="text-lg font-semibold text-gray-700">Utilitaire</span>
-        </label>
+    <!-- Étape 1 -->
+    <div *ngIf="etape === 1" class="p-8 bg-gray-100 min-h-screen">
+      <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Votre véhicule</h1>
+        <h2 class="text-xl text-gray-600 mb-8">Type de véhicule</h2>
+        <form [formGroup]="formulaireEtape1" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <label class="p-4 border-2 rounded-lg cursor-pointer flex flex-col items-center justify-center space-y-2 transition-all duration-300 hover:border-blue-500 hover:shadow-lg"
+                   [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'tourisme'"
+                   [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Tourisme'">
+              <input type="radio" name="type" value="Tourisme" formControlName="type" class="hidden">
+              <i class="fas fa-car text-3xl text-teal-800"></i>
+              <span class="text-lg font-semibold text-gray-700">Tourisme</span>
+            </label>
+            <label class="p-4 border-2 rounded-lg cursor-pointer flex flex-col items-center justify-center space-y-2 transition-all duration-300 hover:border-blue-500 hover:shadow-lg"
+                   [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'Utilitaire'"
+                   [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Utilitaire'">
+              <input type="radio" name="type" value="Utilitaire" formControlName="type" class="hidden">
+              <i class="fas fa-truck text-3xl text-teal-800"></i>
+              <span class="text-lg font-semibold text-gray-700">Utilitaire</span>
+            </label>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Valeur à neuf (en Dinars) <span class="text-red-500">*</span></label>
+              <input type="number" formControlName="valeurNeuf" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape1.get('valeurNeuf')?.invalid && formulaireEtape1.get('valeurNeuf')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Marque <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="marque" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape1.get('marque')?.invalid && formulaireEtape1.get('marque')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Modèle <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="model" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape1.get('model')?.invalid && formulaireEtape1.get('model')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Puissance <span class="text-red-500">*</span></label>
+              <input type="number" formControlName="puissance" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape1.get('puissance')?.invalid && formulaireEtape1.get('puissance')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Année de 1ère mise en circulation <span class="text-red-500">*</span></label>
+              <input type="number" formControlName="DPMC" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape1.get('DPMC')?.invalid && formulaireEtape1.get('DPMC')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Immatriculation <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="Imat" class="border p-3 rounded-lg w-full col-span-1 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape1.get('Imat')?.invalid && formulaireEtape1.get('Imat')?.touched" class="text-red-500 text-sm">
+                Le format de l'immatriculation doit être : 4 chiffres + "TU" + 3  ou 2 chiffres (ex: 1234TU567)
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="flex justify-end mt-8">
+          <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            Continuer
+          </button>
+        </div>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Valeur à neuf (en Dinars) <span class="text-red-500">*</span></label>
-          <input type="number" formControlName="valeurNeuf" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape1.get('valeurNeuf')?.invalid && formulaireEtape1.get('valeurNeuf')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Marque <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="marque" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape1.get('marque')?.invalid && formulaireEtape1.get('marque')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Modèle <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="model" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape1.get('model')?.invalid && formulaireEtape1.get('model')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Puissance <span class="text-red-500">*</span></label>
-          <input type="number" formControlName="puissance" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape1.get('puissance')?.invalid && formulaireEtape1.get('puissance')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Année de 1ère mise en circulation <span class="text-red-500">*</span></label>
-          <input type="number" formControlName="DPMC" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape1.get('DPMC')?.invalid && formulaireEtape1.get('DPMC')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Immatriculation <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="Imat" class="border p-3 rounded-lg w-full col-span-1 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape1.get('Imat')?.invalid && formulaireEtape1.get('Imat')?.touched" class="text-red-500 text-sm">
-            Le format de l'immatriculation doit être : 4 chiffres + "TU" + 3  ou 2 chiffres (ex: 1234TU567)
-          </div>
-        </div>
-      </div>
-    </form>
-    <div class="flex justify-end mt-8">
-      <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-        Continuer
-      </button>
     </div>
-  </div>
-</div>
 
-<!-- Étape 2 -->
+   <!-- Étape 2 -->
 <div *ngIf="etape === 2" class="p-8 bg-gray-100 min-h-screen">
   <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
     <h1 class="text-3xl font-bold text-gray-800 mb-4">Renseignements</h1>
@@ -97,72 +98,99 @@
       <div class="space-y-2">
         <label class="block text-lg font-semibold text-gray-700">Pack choisi <span class="text-red-500">*</span></label>
         <select formControlName="packChoisi" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue">
-            <option *ngFor="let pack of packs" [value]="pack">{{ pack }}</option>
-          </select>
-          <div *ngIf="formulaireEtape2.get('packChoisi')?.invalid && formulaireEtape2.get('packChoisi')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
-          </div>
+          <option *ngFor="let pack of packs" [value]="pack">{{ pack }}</option>
+        </select>
+        <div *ngIf="formulaireEtape2.get('packChoisi')?.invalid && formulaireEtape2.get('packChoisi')?.touched" class="text-red-500 text-sm">
+          Ce champ est obligatoire.
         </div>
-      </form>
-      <div class="flex justify-end mt-8">
-        <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
-          Retour
-        </button>
-        <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-          Continuer
-        </button>
       </div>
+    </form>
+
+    <!-- Informations supplémentaires -->
+    <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Informations importantes</h2>
+      <ul class="space-y-3 text-gray-700">
+        <li>
+          <span class="font-medium">Bonus/Malus :</span>
+          <ul class="list-disc list-inside ml-4">
+            <li>Si c'est votre première fois d'assurer un véhicule de type <strong>tourisme</strong>, votre Bonus/Malus est de <strong>8</strong>.</li>
+            <li>Si ce n'est pas votre première fois, votre Bonus/Malus est celui indiqué dans votre <strong>ancien contrat automobile</strong>.</li>
+          </ul>
+        </li>
+        <li>
+          <span class="font-medium">Packs disponibles :</span>
+          <ul class="list-disc list-inside ml-4">
+            <li>Le pack <strong>Tous les risques</strong> est disponible pour les véhicules de <strong>3 ans ou moins</strong>.</li>
+            <li>Le pack <strong>Dommage et Collision</strong> est disponible pour les véhicules de <strong>15 ans ou moins</strong>.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Boutons de navigation -->
+    <div class="flex justify-end mt-8">
+      <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
+        Retour
+      </button>
+      <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        Continuer
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- Étape 3 -->
-  <div *ngIf="etape === 3" class="p-8 bg-gray-100 min-h-screen">
-    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
-      <h1 class="text-3xl font-bold text-gray-800 mb-4">Vos coordonnées</h1>
-      <h2 class="text-xl text-gray-600 mb-8">Veuillez saisir vos informations personnelles.</h2>
-      <form [formGroup]="formulaireEtape3" class="space-y-6">
-        <!-- Champ Nom -->
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Nom <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="nom" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape3.get('nom')?.invalid && formulaireEtape3.get('nom')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
+    <!-- Étape 3 -->
+    <div *ngIf="etape === 3" class="p-8 bg-gray-100 min-h-screen">
+      <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Vos coordonnées</h1>
+        <h2 class="text-xl text-gray-600 mb-8">Veuillez saisir vos informations personnelles.</h2>
+        <form [formGroup]="formulaireEtape3" class="space-y-6">
+          <!-- Champ Nom -->
+          <div class="space-y-2">
+            <label class="block text-lg font-semibold text-gray-700">Nom <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="nom" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div *ngIf="formulaireEtape3.get('nom')?.invalid && formulaireEtape3.get('nom')?.touched" class="text-red-500 text-sm">
+              Ce champ est obligatoire.
+            </div>
           </div>
-        </div>
 
-        <!-- Champ Prénom -->
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Prénom <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="prenom" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape3.get('prenom')?.invalid && formulaireEtape3.get('prenom')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
+          <!-- Champ Prénom -->
+          <div class="space-y-2">
+            <label class="block text-lg font-semibold text-gray-700">Prénom <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="prenom" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div *ngIf="formulaireEtape3.get('prenom')?.invalid && formulaireEtape3.get('prenom')?.touched" class="text-red-500 text-sm">
+              Ce champ est obligatoire.
+            </div>
           </div>
-        </div>
 
-        <!-- Champ Adresse -->
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Adresse <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="adresse" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape3.get('adresse')?.invalid && formulaireEtape3.get('adresse')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
+          <!-- Champ Adresse -->
+          <div class="space-y-2">
+            <label class="block text-lg font-semibold text-gray-700">Adresse <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="adresse" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div *ngIf="formulaireEtape3.get('adresse')?.invalid && formulaireEtape3.get('adresse')?.touched" class="text-red-500 text-sm">
+              Ce champ est obligatoire.
+            </div>
           </div>
-        </div>
 
-        <!-- Champ Code Postal -->
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Code Postal <span class="text-red-500">*</span></label>
-          <input type="number" formControlName="codePostal" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape3.get('codePostal')?.invalid && formulaireEtape3.get('codePostal')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
+          <!-- Champ Code Postal -->
+          <div class="space-y-2">
+            <label class="block text-lg font-semibold text-gray-700">Code Postal <span class="text-red-500">*</span></label>
+            <input type="number" formControlName="codePostal" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div *ngIf="formulaireEtape3.get('codePostal')?.invalid && formulaireEtape3.get('codePostal')?.touched" class="text-red-500 text-sm">
+              Ce champ est obligatoire.
+            </div>
           </div>
-        </div>
-        <!-- Champ Téléphone -->
-        <div class="space-y-2">
-          <label class="block text-lg font-semibold text-gray-700">Téléphone <span class="text-red-500">*</span></label>
-          <input type="text" formControlName="tel" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <div *ngIf="formulaireEtape3.get('tel')?.invalid && formulaireEtape3.get('telephone')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
+
+          <!-- Champ Téléphone -->
+          <div class="space-y-2">
+            <label class="block text-lg font-semibold text-gray-700">Téléphone <span class="text-red-500">*</span></label>
+            <input type="text" formControlName="tel" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div *ngIf="formulaireEtape3.get('tel')?.invalid && formulaireEtape3.get('tel')?.touched" class="text-red-500 text-sm">
+              Ce champ est obligatoire.
+            </div>
           </div>
+
+          <!-- Champ CIN -->
           <div class="flex flex-col">
             <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> CIN</label>
             <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
@@ -173,6 +201,8 @@
               </div>
             </div>
           </div>
+
+          <!-- Boutons de navigation -->
           <div class="flex justify-end mt-8">
             <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
               Retour
@@ -181,4 +211,8 @@
               Soumettre
             </button>
           </div>
-        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -16,7 +16,7 @@
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a  [routerLink]="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>engineering</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Agent de service</span>
           </a>
@@ -72,42 +72,96 @@
     </div>
   </nav>
 
-  <!-- Contenu principal -->
-  <div class="flex-1 p-4 sm:ml-64 mt-16">
+  <div class="flex-1 p-6 sm:ml-64 mt-16">
     <!-- Titre de la page -->
-    <h1 class="text-3xl  text-center font-semibold text-teal-800 mb-4">Tableau de Bord Administrateur</h1>
+    <h1 class="text-3xl text-center font-semibold text-teal-800 mb-8">Tableau de Bord Administrateur</h1>
 
-    <!-- Grille pour les cartes centrées et de largeur réduite -->
+    <!-- Grille pour les cartes -->
     <div class="flex justify-center">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl">
         <!-- Carte "Ajouter Expert" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-          <div class="flex items-center justify-center mb-3">
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+          <div class="flex items-center justify-center mb-4">
             <i class="fas fa-user-plus text-4xl text-teal-600"></i>
           </div>
-          <h2 class="text-xl font-semibold text-teal-800 text-center mb-1">Ajouter Expert</h2>
-          <p class="text-gray-600 text-center text-sm">Ajoutez un nouvel expert à la plateforme.</p>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Ajouter Expert</h2>
+          <p class="text-gray-600 text-center text-sm mb-4">Ajoutez un nouvel expert à la plateforme.</p>
           <div class="mt-4 flex justify-center">
             <button
-            class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 hover:scale-105 transition-all"
-            (click)="navigateToAddExpert()"
-          >
-            <i class="fas fa-plus mr-2"></i>Ajouter
-          </button>
+              class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition-all"
+              (click)="navigateToAddExpert()"
+            >
+              <i class="fas fa-plus mr-2"></i>Ajouter
+            </button>
           </div>
         </div>
 
         <!-- Carte "Ajouter Agent de Service" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-          <div class="flex items-center justify-center mb-3">
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+          <div class="flex items-center justify-center mb-4">
             <i class="fas fa-user-tie text-4xl text-teal-600"></i>
           </div>
-          <h2 class="text-xl font-semibold text-teal-800 text-center mb-1">Ajouter Agent de Service</h2>
-          <p class="text-gray-600 text-center text-sm">Ajoutez un nouvel agent de service à la plateforme.</p>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Ajouter Agent de Service</h2>
+          <p class="text-gray-600 text-center text-sm mb-4">Ajoutez un nouvel agent de service à la plateforme.</p>
           <div class="mt-4 flex justify-center">
-            <button class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 hover:scale-105 transition-all" (click)="navigateToAddAgent()">
+            <button
+              class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition-all"
+              (click)="navigateToAddAgent()"
+            >
               <i class="fas fa-plus mr-2"></i>Ajouter
             </button>
+          </div>
+        </div>
+
+        <!-- Carte "Statistiques Utilisateurs" -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+          <div class="flex items-center justify-center mb-4">
+            <i class="fas fa-users text-4xl text-teal-600"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Utilisateurs</h2>
+          <p class="text-gray-600 text-center text-sm mb-4">Nombre total d'utilisateurs inscrits.</p>
+          <div class="mt-4 flex justify-center">
+            <span class="text-2xl font-bold text-teal-800">{{  usersCount }}</span>
+          </div>
+        </div>
+
+        <!-- Carte "Statistiques Experts" -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+          <div class="flex items-center justify-center mb-4">
+            <i class="fas fa-user-md text-4xl text-teal-600"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Experts</h2>
+          <p class="text-gray-600 text-center text-sm mb-4">Nombre total d'experts enregistrés.</p>
+          <div class="mt-4 flex justify-center">
+            <span class="text-2xl font-bold text-teal-800">{{ expertsCount }}</span>
+          </div>
+        </div>
+
+        <!-- Carte "Statistiques Agents de Service" -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+          <div class="flex items-center justify-center mb-4">
+            <i class="fas fa-user-cog text-4xl text-teal-600"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Agents de Service</h2>
+          <p class="text-gray-600 text-center text-sm mb-4">Nombre total d'agents de service.</p>
+          <div class="mt-4 flex justify-center">
+            <span class="text-2xl font-bold text-teal-800">{{  agentsCount }}</span>
+          </div>
+        </div>
+
+        <!-- Carte "Dernières Activités" -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow transform hover:scale-105">
+          <div class="flex items-center justify-center mb-4">
+            <i class="fas fa-history text-4xl text-teal-600"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Dernières Activités</h2>
+          <p class="text-gray-600 text-center text-sm mb-4">Aperçu des dernières actions sur la plateforme.</p>
+          <div class="mt-4">
+            <ul class="text-sm text-gray-600">
+              <li class="mb-2">- Nouvel expert ajouté</li>
+              <li class="mb-2">- Utilisateur bloqué</li>
+              <li class="mb-2">- Agent de service mis à jour</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -115,10 +169,9 @@
 
     <!-- Image admin.jpg en bas à droite -->
     <div class="fixed bottom-4 right-4">
-      <img src="assets/images/admin.jpg" alt="Admin" class="w-100 h-100 rounded-full shadow-lg">
+      <img src="assets/images/admin.jpg" alt="Admin" class="w-24 h-24 rounded-full shadow-lg">
     </div>
 
     <!-- Zone d'affichage des composants routés -->
     <router-outlet></router-outlet>
   </div>
-</div>

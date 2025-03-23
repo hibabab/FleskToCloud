@@ -1,21 +1,22 @@
 <div class="flex h-screen font-roboto">
+  <!-- Barre latérale -->
   <aside id="default-sidebar" class="fixed top-16 bg-teal-600 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
     <div class="h-full mt-2 py-2 overflow-y-auto px-3">
       <ul class="space-y-1 font-medium">
         <li>
-          <a [routerLink]="['/admin/listUser']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a [routerLink]="['/admin/interface']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>home</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Accueil</span>
           </a>
         </li>
         <li>
-          <a href="['/admin/listExpert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a [routerLink]="['/admin/listExpert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>people</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Liste d'expert</span>
           </a>
         </li>
         <li>
-          <a href="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a [routerLink]="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>engineering</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Agent de service</span>
           </a>
@@ -35,6 +36,7 @@
     </div>
   </aside>
 
+  <!-- Barre de navigation -->
   <nav class="bg-gray-50 text-gray-900 fixed top-0 left-0 w-full z-50 p-1 shadow-lg">
     <div class="container mx-auto flex justify-between items-center px-3">
       <div class="flex items-center space-x-2 ml-2">
@@ -69,4 +71,36 @@
       </div>
     </div>
   </nav>
+
+  <!-- Contenu principal -->
+  <div class="flex-1 p-6 sm:ml-64 mt-16">
+    <!-- Titre de la page -->
+    <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des agents de service</h1>
+
+    <!-- Tableau des agents de service -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <table class="min-w-full">
+        <thead class="bg-teal-700">
+          <tr>
+            <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Téléphone</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Spécialité</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let agent of agentServices" class="hover:bg-gray-50 transition duration-200">
+            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.nom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.prenom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.Cin }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.email }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.telephone }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ agent.specialite }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

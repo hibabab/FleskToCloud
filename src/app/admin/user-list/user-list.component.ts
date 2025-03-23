@@ -35,7 +35,9 @@ export interface RoleEntity {
   styleUrls: ['./user-list.component.css'],
 })
 export class UserListComponent implements OnInit {
-  users: User[] = []; // Tableau pour stocker les utilisateurs
+  users: User[] = []; // Tableau pour stocker tous les utilisateurs
+  activeUsers: User[] = []; // Tableau pour stocker les utilisateurs actifs
+  blockedUsers: User[] = []; // Tableau pour stocker les utilisateurs bloqués
   errorMessage: string = ''; // Propriété pour stocker le message d'erreur
 
   constructor(private http: HttpClient) {} // Injectez HttpClient
@@ -51,6 +53,10 @@ export class UserListComponent implements OnInit {
     this.http.get<User[]>(apiUrl).subscribe(
       (data: User[]) => {
         this.users = data; // Affectez les données reçues au tableau users
+
+        // Séparer les utilisateurs actifs et bloqués
+        this.activeUsers = this.users.filter(user => !user.isBlocked);
+        this.blockedUsers = this.users.filter(user => user.isBlocked);
       },
       (error) => {
         this.errorMessage = 'Erreur lors de la récupération des utilisateurs.'; // Message d'erreur
@@ -58,6 +64,7 @@ export class UserListComponent implements OnInit {
       }
     );
   }
+
   toggleBlockUser(user: User): void {
     if (!user || !user.id) {
       console.error("L'utilisateur ou son ID est invalide.");
@@ -71,6 +78,16 @@ export class UserListComponent implements OnInit {
       next: (updatedUser) => {
         if (updatedUser) {
           user.isBlocked = updatedUser.isBlocked; // Mettre à jour le statut local
+
+          // Mettre à jour les tableaux activeUsers et blockedUsers
+          if (updatedUser.isBlocked) {
+            this.activeUsers = this.activeUsers.filter(u => u.id !== updatedUser.id);
+            this.blockedUsers.push(updatedUser);
+          } else {
+            this.blockedUsers = this.blockedUsers.filter(u => u.id !== updatedUser.id);
+            this.activeUsers.push(updatedUser);
+          }
+
           console.log(
             `Utilisateur ${updatedUser.nom} ${updatedUser.prenom} a été ${updatedUser.isBlocked ? 'bloqué' : 'débloqué'}.`
           );

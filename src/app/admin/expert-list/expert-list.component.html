@@ -16,7 +16,7 @@
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a [routerLink]="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>engineering</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Agent de service</span>
           </a>
@@ -72,40 +72,41 @@
     </div>
   </nav>
 
-  <!-- Contenu principal -->
-  <div class="flex-1 p-4 sm:ml-64 mt-16">
+  <div class="flex-1 p-6 sm:ml-64 mt-16">
     <!-- Titre de la page -->
-    <h1 class="text-2xl font-semibold text-teal-800 mb-4">Liste des experts</h1>
+    <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des experts</h1>
 
     <!-- Tableau des experts -->
-    <table class="min-w-full bg-white">
-      <thead>
-        <tr>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Nom</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Prénom</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">CIN</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Email</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">téléphone</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Disponibilité</th>
-          <th class="py-2 px-4 border-b-2 border-teal-600 text-left text-teal-800">Années d'expérience</th>
-
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let expert of experts" class="hover:bg-gray-50">
-          <td class="py-2 px-4 border-b border-teal-100">{{ expert.user.nom }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ expert.user.prenom }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ expert.user.Cin }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ expert.user.email }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ expert.user.telephone }}</td>
-          <td class="py-2 px-4 border-b border-teal-100">
-            <span [ngClass]="{'text-green-600': expert.disponibilite, 'text-red-600': !expert.disponibilite}">
-              {{ expert.disponibilite ? 'Disponible' : 'Non disponible' }}
-            </span>
-          </td>
-          <td class="py-2 px-4 border-b border-teal-100">{{ expert.nbAnneeExperience }} ans</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <table class="min-w-full">
+        <thead class="bg-teal-700">
+          <tr>
+            <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Téléphone</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Disponibilité</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Spécialité</th> <!-- Nouvelle colonne -->
+            <th class="py-3 px-4 text-left text-white font-semibold">Années d'expérience</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let expert of experts" class="hover:bg-gray-50 transition duration-200">
+            <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.nom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.prenom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.Cin }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.email }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.telephone }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">
+              <span [ngClass]="{'text-green-600': expert.disponibilite, 'text-red-600': !expert.disponibilite}" class="font-medium">
+                {{ expert.disponibilite ? 'Disponible' : 'Non disponible' }}
+              </span>
+            </td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ expert.specialite }}</td> <!-- Nouvelle colonne -->
+            <td class="py-3 px-4 border-b border-gray-100">{{ expert.nbAnneeExperience }} ans</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
