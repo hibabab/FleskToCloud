@@ -89,6 +89,7 @@ export class ExpertFormComponent {
       email: this.expertForm.value.email,
       date_naissance: this.expertForm.value.dateNaissance,
       password: this.expertForm.value.password,
+      role:"expert",
       adresse: {
         rue: this.expertForm.value.rue,
         ville: this.expertForm.value.ville,
@@ -126,6 +127,7 @@ export class ExpertFormComponent {
         );
       },
       (userError) => {
+        window.alert("verifier vos information ");
         console.error('Erreur lors de la création de l\'utilisateur:', userError);
       },
     );

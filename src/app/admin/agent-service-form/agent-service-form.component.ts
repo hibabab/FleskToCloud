@@ -73,6 +73,7 @@ export class AgentServiceFormComponent implements OnInit {
       email: this.agentServiceForm.value.email,
       date_naissance: this.agentServiceForm.value.dateNaissance,
       password: this.agentServiceForm.value.password,
+      role:"agent service",
       adresse: {
         rue: this.agentServiceForm.value.rue,
         ville: this.agentServiceForm.value.ville,
@@ -106,6 +107,7 @@ export class AgentServiceFormComponent implements OnInit {
       },
       (userError) => {
         console.error('Erreur lors de la création de l\'utilisateur:', userError);
+        window.alert("verifier vos information ");
       },
     );
   }
