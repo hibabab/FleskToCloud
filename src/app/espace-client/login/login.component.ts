@@ -18,7 +18,7 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthentificationService,
-    private router: Router 
+    private router: Router
   ) {}
 
   onSubmit() {
@@ -47,11 +47,17 @@ export class LoginComponent {
         // Vérification du rôle de l'utilisateur après décodage du token
         this.authService.getRole(id).subscribe(
           (roleResponse) => {
-            const role = roleResponse.name;
+            const role =  roleResponse.role;
             if (role === 'assure') {
               this.router.navigate(['/dashboard-assure']); // Redirection vers le dashboard de l'assuré
-            } else {
-              // Redirection vers un autre tableau de bord
+            }   else if (role === 'agent service') {
+              this.router.navigate(['/agent/dashbort-agent']); // Redirection vers le dashboard de l'assuré
+            }
+            else if (role === 'expert') {
+              this.router.navigate(['/dashboard-expert']); // Redirection vers le dashboard de l'assuré
+            }
+            else if (role === 'admin') {
+              this.router.navigate(['/admin/interface']); // Redirection vers le dashboard de l'assuré
             }
           },
           (error) => {

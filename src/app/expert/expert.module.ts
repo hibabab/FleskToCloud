@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 
 import { ExpertRoutingModule } from './expert-routing.module';
 import { ExpertComponent } from './expert.component';
-import { DehasbortComponent } from './dehasbort/dehasbort.component';
+import { DehasbortExpertComponent } from './dehasbort/dehasbort.component';
+
 
 
 @NgModule({
   declarations: [
     ExpertComponent,
-    DehasbortComponent
+    DehasbortExpertComponent
   ],
   imports: [
     CommonModule,

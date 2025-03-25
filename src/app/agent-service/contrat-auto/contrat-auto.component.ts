@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 export enum TypeGaranties {
   ResponsabiliteCivile = 'ResponsabiliteCivile',
@@ -17,48 +18,77 @@ export enum TypeGaranties {
   GREVESEMEUTESETMOUVEMENTPOPULAIRE = 'Grèves Emeutes et Mouvements populaires',
   DOMMAGEETCOLLIDION = 'Dommage et Collision'
 }
+interface AssureDto {
+  bonusMalus: number;
+}
 
+interface CreateVehiculeDto {
+  type: string;
+  marque: string;
+  model: string;
+  Imat: string;
+  energie: string;
+  nbPlace: number;
+  DPMC: string;
+  cylindree: string;
+  chargeUtil?: string;
+  valeurNeuf: number;
+  numChassis: string;
+  poidsVide: number;
+  puissance: number;
+}
+interface CreateGarantiesDto {
+  type: TypeGaranties;
+  capital?: number;
+  cotisationNette: number;
+  franchise?: number;
+}
+interface ContratAutoDto {
+  dateSouscription: string;
+  dateExpiration: string;
+  NatureContrat: string;
+  typePaiement: string;
+  echeances: string;
+  cotisationNette: number;
+  packChoisi?: string;
+  cotisationTotale: number;
+  montantEcheance: number;
+  garanties?: CreateGarantiesDto[];
+}
 @Component({
-  selector: 'app-creation-contrat',
+  selector: 'app-contrat-auto',
   standalone:false,
-  templateUrl: './creation-contrat.component.html',
-  styleUrls: ['./creation-contrat.component.css'],
+  templateUrl: './contrat-auto.component.html',
+  styleUrls: ['./contrat-auto.component.css']
 })
-export class CreationContratComponent implements OnInit {
+export class ContratAutoComponent implements OnInit {
+  currentStep = 1;
+  Cin = '';
+  cinError = '';
   insuranceForm: FormGroup;
   templateGaranties: any[] = [];
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.insuranceForm = this.fb.group({
-      assure: this.fb.group({
-        nom: ['', Validators.required],
-        prenom: ['', Validators.required],
-        Cin: ['', Validators.required],
-        dateNaissance: ['', Validators.required],
-        telephone: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        bonusMalus: ['', Validators.required],
-        adresse: this.fb.group({
-          pays: ['', Validators.required],
-          ville: ['', Validators.required],
-          rue: ['', Validators.required],
-          codePostal: ['', Validators.required]
-        })
-      }),
+      bonusMalus: ['', [Validators.required, Validators.min(0)]],
       vehicule: this.fb.group({
         type: ['', Validators.required],
         marque: ['', Validators.required],
         model: ['', Validators.required],
-        Imat: ['', [Validators.required, Validators.pattern(/^\d{4}TU\d{2,3}$/)]],
+        Imat: ['', [Validators.required, this.validateImmatriculation]],
         energie: ['', Validators.required],
-        nbPlace: ['', Validators.required],
+        nbPlace: ['', [Validators.required, Validators.min(1)]],
         DPMC: ['', Validators.required],
         cylindree: ['', Validators.required],
         chargeUtil: [''],
-        valeurNeuf: ['', Validators.required],
+        valeurNeuf: ['', [Validators.required, Validators.min(0)]],
         numChassis: ['', Validators.required],
-        poidsVide: ['', Validators.required],
-        puissance: ['', Validators.required]
+        poidsVide: ['', [Validators.required, Validators.min(0)]],
+        puissance: ['', [Validators.required, Validators.min(0)]]
       }),
       contrat: this.fb.group({
         packChoisi: ['', Validators.required],
@@ -70,10 +100,6 @@ export class CreationContratComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTemplateGaranties();
-  }
-
-  private roundToThreeDecimals(value: number): number {
-    return parseFloat(value.toFixed(3));
   }
 
   private loadTemplateGaranties(): void {
@@ -92,8 +118,39 @@ export class CreationContratComponent implements OnInit {
       });
   }
 
-  private getGarantieFromTemplate(type: string): any {
-    return this.templateGaranties.find(g => g.type === type) || {};
+  private roundToThreeDecimals(value: number): number {
+    return parseFloat(value.toFixed(3));
+  }
+
+  validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
+    const pattern = /^\d{4}TU\d{3}$/;
+    if (control.value && !pattern.test(control.value)) {
+      return { 'invalidImmatriculation': true };
+    }
+    return null;
+  }
+
+  verifyCin(): void {
+    if (!this.Cin) {
+      this.cinError = 'Le numéro CIN est requis';
+      return;
+    }
+
+    if (this.Cin.length < 8) {
+      this.cinError = 'Le numéro CIN doit contenir au moins 8 caractères';
+      return;
+    }
+
+    this.currentStep = 2;
+    this.cinError = '';
+  }
+
+  previousStep(): void {
+    this.currentStep = 1;
+  }
+
+  redirectToRegistration(): void {
+    this.router.navigate(['/inscription']);
   }
 
   calculateResponsabiliteCivile(typeVehicule: string, bonusMalus: number, puissance: number): number {
@@ -201,6 +258,10 @@ export class CreationContratComponent implements OnInit {
       }
     }
     return this.roundToThreeDecimals(cotisation);
+  }
+
+  getGarantieFromTemplate(type: TypeGaranties): any {
+    return this.templateGaranties.find(g => g.type === type) || {};
   }
 
   calculateGaranties(packChoisi: string, vehiculeData: any, bonusMalus: number): any[] {
@@ -418,7 +479,18 @@ export class CreationContratComponent implements OnInit {
     return garanties;
   }
 
-  createContratAuto(assureData: any, vehiculeData: any, contratData: any, garanties: any[]): any {
+  prepareContratData(): any {
+    const formValue = this.insuranceForm.value;
+    const bonusMalus = Number(formValue.bonusMalus);
+    const vehiculeData = formValue.vehicule;
+    const contratData = formValue.contrat;
+
+    const garanties = this.calculateGaranties(
+      contratData.packChoisi,
+      vehiculeData,
+      bonusMalus
+    );
+
     const today = new Date();
     const dateSouscription = today.toISOString().split('T')[0];
     const dateExpiration = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().split('T')[0];
@@ -436,78 +508,61 @@ export class CreationContratComponent implements OnInit {
       ? this.roundToThreeDecimals(cotisationTotale / 2)
       : cotisationTotale;
 
+    // Préparation des données pour le backend
+    const dtoA: AssureDto = { bonusMalus };
+    const Cin = this.Cin;
+    const dtoV: CreateVehiculeDto = vehiculeData;
+    const dtoC: ContratAutoDto = {
+      dateSouscription,
+      dateExpiration,
+      NatureContrat: contratData.NatureContrat,
+      typePaiement: contratData.typePaiement,
+      echeances,
+      cotisationNette,
+      packChoisi: contratData.packChoisi,
+      cotisationTotale,
+      montantEcheance,
+      garanties
+    };
+
+    // Ajout des logs pour vérifier les données
+    console.log('Données à envoyer au backend:', {
+      dtoA,
+      Cin,
+      dtoV,
+      dtoC
+    });
+
     return {
-      user: {
-        nom: assureData.nom,
-        prenom: assureData.prenom,
-        email: assureData.email,
-        Cin: assureData.Cin,
-        telephone: assureData.telephone,
-        date_naissance: assureData.dateNaissance,
-        password: "",  // À gérer côté backend
-        adresse: {
-          rue: assureData.adresse.rue,
-          ville: assureData.adresse.ville,
-          codePostal: assureData.adresse.codePostal,
-          pays: assureData.adresse.pays,
-        },
-        assure: {
-          bonusMalus: assureData.bonusMalus
-        }
-      },
-      vehicule: vehiculeData,
-      contrat: {
-        ...contratData,
-        dateSouscription,
-        dateExpiration,
-        echeances,
-        cotisationNette,
-        cotisationTotale,
-        montantEcheance,
-        garanties
-      }
+      dtoA,
+      Cin,
+      dtoV,
+      dtoC
     };
   }
-
-  onSubmit() {
-    if (this.insuranceForm.valid) {
-      const assureData = this.insuranceForm.get('assure')?.value;
-      const vehiculeData = this.insuranceForm.get('vehicule')?.value;
-      const contratData = this.insuranceForm.get('contrat')?.value;
-
-      assureData.bonusMalus = Number(assureData.bonusMalus);
-
-      const garanties = this.calculateGaranties(
-        contratData.packChoisi,
-        vehiculeData,
-        assureData.bonusMalus
-      );
-
-      const contratAuto = this.createContratAuto(
-        assureData,
-        vehiculeData,
-        contratData,
-        garanties
-      );
-
-      console.log('Données envoyées:', contratAuto);
-
-      this.http.post('http://localhost:3000/contrat-auto-geteway/createCA', contratAuto)
-        .subscribe({
-          next: (response) => {
-            console.log('Contrat créé avec succès:', response);
-            // Ajouter ici une notification à l'utilisateur
-          },
-          error: (error) => {
-            console.error('Erreur lors de la création du contrat:', error);
-            // Ajouter ici une notification d'erreur
-          }
-        });
-    } else {
-      console.error('Formulaire invalide');
-      // Marquer tous les champs comme touchés pour afficher les erreurs
+  onSubmit(): void {
+    if (this.insuranceForm.invalid) {
       this.markFormGroupTouched(this.insuranceForm);
+      console.error('Le formulaire est invalide');
+      return;
     }
+
+    const requestData = this.prepareContratData();
+    console.log('Envoi des données au backend:', requestData);
+
+    // Appeler l'API pour créer le contrat auto
+    this.http.post('http://localhost:3000/contrat-auto-geteway/createCA', requestData).subscribe({
+      next: (response) => {
+        console.log('Réponse du backend:', response);
+        // Redirection ou autre traitement après succès
+      },
+      error: (err) => {
+        console.error('Erreur lors de la création du contrat:', err);
+        if (err.error) {
+          console.error('Détails de l\'erreur:', err.error);
+        }
+      }
+    });
   }
 
   private markFormGroupTouched(formGroup: FormGroup) {
