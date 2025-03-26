@@ -38,8 +38,11 @@ export class AuthentificationService {
   getUsers(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
-  getRole(userId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/role/${userId}`);
+  
+  getRole(userId: number): Observable<string> {
+    return this.http.get<string>(`${this.apiUrl}/role/${userId}`);
   }
+
+  
 
 }

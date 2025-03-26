@@ -23,7 +23,9 @@ export class RegisterComponent {
       codePostal: "",
       pays: ""
     },
-    date_naissance: new Date('1995-05-10')
+    date_naissance: new Date('1995-05-10'),
+    role:'user'
+
 
   };
 confirm_password: any;

@@ -3,9 +3,8 @@ import { AuthentificationService } from '../services/authentification.service';
 import { Router } from '@angular/router'; // Importation du Router
 import { AuthentificationDto } from '../models/authentification-dto';
 import { jwtDecode } from 'jwt-decode';
-
-
-
+import { catchError } from 'rxjs/operators'; // Importation de catchError
+import { of } from 'rxjs'; // Importation de of
 
 @Component({
   selector: 'app-login',
@@ -21,6 +20,7 @@ export class LoginComponent {
     private router: Router 
   ) {}
 
+  // Méthode exécutée lors de la soumission du formulaire de login
   onSubmit() {
     // Validation des champs
     if (!this.user.email || !this.user.password) {
@@ -38,32 +38,48 @@ export class LoginComponent {
         console.log('Token reçu:', token);
 
         // Enregistrement du token dans un cookie
-        document.cookie = `access_token=${token}; path=/; secure; SameSite=Strict`;
+        this.setTokenInCookie(token);
 
-        // Décodage du token JWT
+        // Décodage du token JWT pour obtenir l'ID utilisateur
         const decoded: any = jwtDecode(token);
-        const id = decoded.sub;
+        const userId = decoded.sub;
 
         // Vérification du rôle de l'utilisateur après décodage du token
-        this.authService.getRole(id).subscribe(
-          (roleResponse) => {
-            const role = roleResponse.name;
-            if (role === 'assure') {
-              this.router.navigate(['/dashboard-assure']); // Redirection vers le dashboard de l'assuré
-            } else {
-              // Redirection vers un autre tableau de bord
-            }
-          },
-          (error) => {
+        this.authService.getRole(userId).pipe(
+          catchError((error) => {
             console.error('Erreur de récupération du rôle:', error);
-            // Gérer l'erreur ici
-          }
+            // Retourne un rôle par défaut si une erreur se produit
+            return of({ role: 'user' });
+          })
+        ).subscribe(
+          (roleResponse) => this.handleRoleResponse(roleResponse)
         );
       },
       (error) => {
         console.error('Erreur de login:', error);
-        // Gérer l'erreur, afficher un message d'erreur, etc.
+        // Vous pouvez ajouter un message d'erreur à afficher à l'utilisateur
       }
     );
+  }
+
+  // Méthode pour enregistrer le token dans un cookie
+  private setTokenInCookie(token: string) {
+    document.cookie = `access_token=${token}; path=/; secure; SameSite=Strict`;
+  }
+
+  // Méthode pour gérer la réponse contenant le rôle de l'utilisateur
+  private handleRoleResponse(roleResponse: any) {
+    if (roleResponse && roleResponse.role) {
+      const role = roleResponse.role;
+
+      // Navigation en fonction du rôle
+      if (role === 'assure' || role === 'user') {
+        this.router.navigate(['/dashboard-assure']);
+      } else {
+        console.error('Rôle de l\'utilisateur inconnu:', role);
+      }
+    } else {
+      console.error('Réponse inattendue du serveur:', roleResponse);
+    }
   }
 }
