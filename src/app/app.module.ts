@@ -10,12 +10,13 @@ import { ContratModule } from './contrat/contrat.module';
 
 // Suppression de provideAnimationsAsync et remplacement par BrowserAnimationsModule
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DehasbortComponent } from './agentService/dehasbort/dehasbort.component';
+
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    DehasbortComponent,
+
     // HeaderComponent et SidebarclientComponent restent ici
   ],
   imports: [

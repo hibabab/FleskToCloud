@@ -17,7 +17,7 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthentificationService,
-    private router: Router 
+    private router: Router
   ) {}
 
   // Méthode exécutée lors de la soumission du formulaire de login
@@ -75,6 +75,12 @@ export class LoginComponent {
       // Navigation en fonction du rôle
       if (role === 'assure' || role === 'user') {
         this.router.navigate(['/dashboard-assure']);
+      } else if (role === 'agent service') {
+        this.router.navigate(['/agent/dashboard-agent']);
+      } else if (role === 'expert') {
+        this.router.navigate(['/dashboard-expert']);
+      } else if (role === 'admin') {
+        this.router.navigate(['/admin/interface']);
       } else {
         console.error('Rôle de l\'utilisateur inconnu:', role);
       }
