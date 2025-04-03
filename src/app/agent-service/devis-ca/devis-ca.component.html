@@ -1,0 +1,286 @@
+<div class="flex flex-col min-h-screen font-roboto">
+  <!-- Navbar fixe en haut -->
+  <nav class="bg-gray-50 text-gray-900 w-full z-50 p-2 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center px-4">
+      <!-- Logo et message de bienvenue -->
+      <div class="flex items-center space-x-4 ml-4 sm:ml-6 md:ml-8 lg:ml-10 xl:ml-5">
+        <a routerLink="/" class="flex items-center text-2xl font-semibold text-teal-800">
+          <i class="fas fa-umbrella w-8 h-8 mr-2"></i>
+          Flesk Cover
+        </a>
+        <h2 class="text-lg font-medium text-gray-700">Roulez sereinement, vivez pleinement</h2>
+      </div>
+
+      <!-- Profil et options -->
+      <div class="flex items-center space-x-4">
+        <!-- Icône Mail -->
+        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.94 6.33a2 2 0 0 1 1.5-.66h11.12a2 2 0 0 1 1.5.66l-6.06 3.95-6.06-3.95zM2 7.67V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.67l-5.88 3.83a1 1 0 0 1-1.06 0L2 7.67z" />
+          </svg>
+        </button>
+
+        <!-- Icône Notification -->
+        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
+          </svg>
+        </button>
+
+        <!-- Photo de profil et informations -->
+        <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
+          <div class="flex flex-col">
+            <span class="text-teal-800 font-medium">agent service</span>
+            <div class="flex space-x-3 text-sm text-gray-600 mt-1">
+              <a [routerLink]="['/dashboard-assure/account']" class="hover:text-teal-600">Mon compte</a>
+              <a href="#" class="hover:text-red-600">Déconnexion</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenu principal avec sidebar et contenu -->
+  <div class="flex flex-1">
+    <!-- Sidebar -->
+    <aside id="default-sidebar" class="fixed bg-teal-600 z-40 w-60 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+      <div class="h-full py-4 overflow-y-auto px-10">
+        <ul class="space-y-2 font-medium">
+          <!-- Accueil -->
+          <li>
+            <a [routerLink]="['/agent/interface']" class="flex items-center p-2 rounded-lg text-white hover:bg-teal-700 group">
+              <i class="fas fa-home w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Accueil</span>
+            </a>
+          </li>
+
+          <!-- Liste assuré automobile -->
+          <li>
+            <a [routerLink]="['/agent/liste-auto']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-car w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré automobile</span>
+            </a>
+          </li>
+
+          <!-- Liste assuré vie -->
+          <li>
+            <a [routerLink]="['/agent/liste-vie']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-heart w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré vie</span>
+            </a>
+          </li>
+
+          <!-- Liste expert -->
+          <li>
+            <a [routerLink]="['/agent/liste-expert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-user-tie w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste expert</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Ligne de séparation -->
+        <hr class="my-4 border-teal-500">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <p class="text-white text-sm text-center">Merci de votre visite !</p>
+          <p class="text-white text-xs text-center"> © 2025 Flesk Cover </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contenu principal centré -->
+    <main class="flex-1 ml-60 bg-gray-100">
+      <!-- Étape 1 -->
+      <div *ngIf="etape === 1" class="p-8">
+        <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+          <h1 class="text-3xl font-bold text-gray-800 mb-4">Votre véhicule</h1>
+          <h2 class="text-xl text-gray-600 mb-8">Type de véhicule</h2>
+          <form [formGroup]="formulaireEtape1" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <label class="p-4 border-2 rounded-lg cursor-pointer flex flex-col items-center justify-center space-y-2 transition-all duration-300 hover:border-blue-500 hover:shadow-lg"
+                     [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'tourisme'"
+                     [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Tourisme'">
+                <input type="radio" name="type" value="Tourisme" formControlName="type" class="hidden">
+                <i class="fas fa-car text-3xl text-teal-800"></i>
+                <span class="text-lg font-semibold text-gray-700">Tourisme</span>
+              </label>
+              <label class="p-4 border-2 rounded-lg cursor-pointer flex flex-col items-center justify-center space-y-2 transition-all duration-300 hover:border-blue-500 hover:shadow-lg"
+                     [class.border-blue-500]="formulaireEtape1.get('type')?.value === 'Utilitaire'"
+                     [class.bg-blue-50]="formulaireEtape1.get('type')?.value === 'Utilitaire'">
+                <input type="radio" name="type" value="Utilitaire" formControlName="type" class="hidden">
+                <i class="fas fa-truck text-3xl text-teal-800"></i>
+                <span class="text-lg font-semibold text-gray-700">Utilitaire</span>
+              </label>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+              <div class="space-y-2">
+                <label class="block text-lg font-semibold text-gray-700">Valeur à neuf (en Dinars) <span class="text-red-500">*</span></label>
+                <input type="number" formControlName="valeurNeuf" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div *ngIf="formulaireEtape1.get('valeurNeuf')?.invalid && formulaireEtape1.get('valeurNeuf')?.touched" class="text-red-500 text-sm">
+                  Ce champ est obligatoire.
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-lg font-semibold text-gray-700">Marque <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="marque" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div *ngIf="formulaireEtape1.get('marque')?.invalid && formulaireEtape1.get('marque')?.touched" class="text-red-500 text-sm">
+                  Ce champ est obligatoire.
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-lg font-semibold text-gray-700">Modèle <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="model" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div *ngIf="formulaireEtape1.get('model')?.invalid && formulaireEtape1.get('model')?.touched" class="text-red-500 text-sm">
+                  Ce champ est obligatoire.
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-lg font-semibold text-gray-700">Puissance <span class="text-red-500">*</span></label>
+                <input type="number" formControlName="puissance" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div *ngIf="formulaireEtape1.get('puissance')?.invalid && formulaireEtape1.get('puissance')?.touched" class="text-red-500 text-sm">
+                  Ce champ est obligatoire.
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-lg font-semibold text-gray-700">Année de 1ère mise en circulation <span class="text-red-500">*</span></label>
+                <input type="number" formControlName="DPMC" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div *ngIf="formulaireEtape1.get('DPMC')?.invalid && formulaireEtape1.get('DPMC')?.touched" class="text-red-500 text-sm">
+                  Ce champ est obligatoire.
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="block text-lg font-semibold text-gray-700">Immatriculation <span class="text-red-500">*</span></label>
+                <input type="text" formControlName="Imat" class="border p-3 rounded-lg w-full col-span-1 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div *ngIf="formulaireEtape1.get('Imat')?.invalid && formulaireEtape1.get('Imat')?.touched" class="text-red-500 text-sm">
+                  Le format de l'immatriculation doit être : 4 chiffres + "TU" + 3  ou 2 chiffres (ex: 1234TU567)
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="flex justify-end mt-8">
+            <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              Continuer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Étape 2 -->
+      <div *ngIf="etape === 2" class="p-8">
+        <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+          <h1 class="text-3xl font-bold text-gray-800 mb-4">Renseignements</h1>
+          <form [formGroup]="formulaireEtape2" class="space-y-6">
+            <!-- Champ Bonus / Malus -->
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Bonus / Malus <span class="text-red-500">*</span></label>
+              <select formControlName="bonusMalus" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option *ngFor="let classe of classesBonusMalus" [value]="classe">{{ classe }}</option>
+              </select>
+              <div *ngIf="formulaireEtape2.get('bonusMalus')?.invalid && formulaireEtape2.get('bonusMalus')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+            <!-- Champ Pack choisi -->
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Pack choisi <span class="text-red-500">*</span></label>
+              <select formControlName="packChoisi" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue">
+                <option *ngFor="let pack of packs" [value]="pack">{{ pack }}</option>
+              </select>
+              <div *ngIf="formulaireEtape2.get('packChoisi')?.invalid && formulaireEtape2.get('packChoisi')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+          </form>
+
+        
+          <!-- Boutons de navigation -->
+          <div class="flex justify-end mt-8">
+            <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
+              Retour
+            </button>
+            <button (click)="suivant()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              Continuer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Étape 3 -->
+      <div *ngIf="etape === 3" class="p-8">
+        <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+          <h1 class="text-3xl font-bold text-gray-800 mb-4">Vos coordonnées</h1>
+          <h2 class="text-xl text-gray-600 mb-8">Veuillez saisir vos informations personnelles.</h2>
+          <form [formGroup]="formulaireEtape3" class="space-y-6">
+            <!-- Champ Nom -->
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Nom <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="nom" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape3.get('nom')?.invalid && formulaireEtape3.get('nom')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+
+            <!-- Champ Prénom -->
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Prénom <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="prenom" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape3.get('prenom')?.invalid && formulaireEtape3.get('prenom')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+
+            <!-- Champ Adresse -->
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Adresse <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="adresse" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape3.get('adresse')?.invalid && formulaireEtape3.get('adresse')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+
+            <!-- Champ Code Postal -->
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Code Postal <span class="text-red-500">*</span></label>
+              <input type="number" formControlName="codePostal" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape3.get('codePostal')?.invalid && formulaireEtape3.get('codePostal')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+
+            <!-- Champ Téléphone -->
+            <div class="space-y-2">
+              <label class="block text-lg font-semibold text-gray-700">Téléphone <span class="text-red-500">*</span></label>
+              <input type="text" formControlName="tel" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="formulaireEtape3.get('tel')?.invalid && formulaireEtape3.get('tel')?.touched" class="text-red-500 text-sm">
+                Ce champ est obligatoire.
+              </div>
+            </div>
+
+            <!-- Champ CIN -->
+            <div class="flex flex-col">
+              <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> CIN</label>
+              <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+                <mat-icon class="text-blue-500 mr-2">badge</mat-icon>
+                <input type="text" formControlName="CIN" class="w-full bg-transparent focus:outline-none" required>
+                <div *ngIf="formulaireEtape3.get('CIN')?.invalid && formulaireEtape3.get('CIN')?.touched" class="text-red-500 text-sm">
+                  Ce champ est obligatoire.
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons de navigation -->
+            <div class="flex justify-end mt-8">
+              <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">
+                Retour
+              </button>
+              <button (click)="soumettre()" class="bg-teal-800 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                Soumettre
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
-import { AuthentificationService } from '../services/authentification.service';
+import { AuthentificationService } from '../../espace-client/services/authentification.service';
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
-  standalone:false
+  selector: 'app-creation-compte',
+  standalone: false,
+  templateUrl: './creation-compte.component.html',
+  styleUrl: './creation-compte.component.css'
 })
-export class RegisterComponent {
-
+export class CreationCompteComponent {
   // Déclaration des données de l'utilisateur
   user = {
     nom: "",
@@ -45,4 +44,6 @@ confirmPassword: any;
       }
     );
   }
+
+
 }

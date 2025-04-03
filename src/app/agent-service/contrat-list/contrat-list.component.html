@@ -1,0 +1,168 @@
+<div class="flex flex-col min-h-screen font-roboto">
+  <!-- Navbar fixe en haut -->
+  <nav class="bg-gray-50 text-gray-900 w-full z-50 p-2 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center px-4">
+      <!-- Logo et message de bienvenue -->
+      <div class="flex items-center space-x-4 ml-4 sm:ml-6 md:ml-8 lg:ml-10 xl:ml-5">
+        <a routerLink="/" class="flex items-center text-2xl font-semibold text-teal-800">
+          <i class="fas fa-umbrella w-8 h-8 mr-2"></i>
+          Flesk Cover
+        </a>
+        <h2 class="text-lg font-medium text-gray-700">Roulez sereinement, vivez pleinement</h2>
+      </div>
+
+      <!-- Profil et options -->
+      <div class="flex items-center space-x-4">
+        <!-- Icône Mail -->
+        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.94 6.33a2 2 0 0 1 1.5-.66h11.12a2 2 0 0 1 1.5.66l-6.06 3.95-6.06-3.95zM2 7.67V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.67l-5.88 3.83a1 1 0 0 1-1.06 0L2 7.67z" />
+          </svg>
+        </button>
+
+        <!-- Icône Notification -->
+        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
+          </svg>
+        </button>
+
+        <!-- Photo de profil et informations -->
+        <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
+          <div class="flex flex-col">
+            <span class="text-teal-800 font-medium">agent service</span>
+            <div class="flex space-x-3 text-sm text-gray-600 mt-1">
+              <a [routerLink]="['/dashboard-assure/account']" class="hover:text-teal-600">Mon compte</a>
+              <a href="#" class="hover:text-red-600">Déconnexion</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenu principal avec sidebar et contenu -->
+  <div class="flex flex-1">
+    <!-- Sidebar -->
+    <aside id="default-sidebar" class="fixed bg-teal-600 z-40 w-60 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+      <div class="h-full py-4 overflow-y-auto px-10">
+        <ul class="space-y-2 font-medium">
+          <!-- Accueil -->
+          <li>
+            <a [routerLink]="['/agent/interface']" class="flex items-center p-2 rounded-lg text-white hover:bg-teal-700 group">
+              <i class="fas fa-home w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Accueil</span>
+            </a>
+          </li>
+
+          <!-- Liste assuré automobile -->
+          <li>
+            <a [routerLink]="['/agent/liste-auto']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-car w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré automobile</span>
+            </a>
+          </li>
+
+          <!-- Liste assuré vie -->
+          <li>
+            <a [routerLink]="['/agent/liste-vie']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-heart w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré vie</span>
+            </a>
+          </li>
+
+          <!-- Liste expert -->
+          <li>
+            <a [routerLink]="['/agent/liste-expert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-user-tie w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste expert</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Ligne de séparation -->
+        <hr class="my-4 border-teal-500">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <p class="text-white text-sm text-center">Merci de votre visite !</p>
+          <p class="text-white text-xs text-center"> © 2025 Flesk Cover </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contenu principal centré -->
+    <main class="flex-1 ml-60 bg-gray-50 p-6">
+      <div class="max-w-6xl mx-auto">
+        <!-- Recherche par CIN -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+          <h2 class="text-xl font-bold text-teal-800 mb-4">Recherche des contrats</h2>
+
+          <div class="flex gap-4">
+            <input
+              type="text"
+              [(ngModel)]="cin"
+              placeholder="Entrez le CIN de l'assuré"
+              class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
+              (keyup.enter)="searchContrats()"
+            >
+            <button
+              (click)="searchContrats()"
+              [disabled]="!cin || isLoading"
+              class="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg disabled:opacity-50 transition-colors"
+            >
+              <span *ngIf="!isLoading">Rechercher</span>
+              <span *ngIf="isLoading">Recherche...</span>
+            </button>
+          </div>
+
+          <!-- Message d'erreur -->
+          <div *ngIf="errorMessage" class="mt-4 p-3 bg-red-100 text-red-700 rounded">
+            {{ errorMessage }}
+          </div>
+        </div>
+
+        <!-- Liste des contrats -->
+        <div *ngIf="contrats.length > 0" class="bg-white p-6 rounded-lg shadow">
+          <h2 class="text-xl font-bold text-teal-800 mb-4">Contrats trouvés ({{ contrats.length }})</h2>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-teal-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">N° Contrat</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">Date Souscription</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">Date Expiration</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">Véhicule</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr
+                  *ngFor="let c of contrats"
+                  class="hover:bg-gray-50 cursor-pointer transition-colors"
+                  (click)="onContratClick(c)"
+                >
+                  <td class="px-6 py-4 whitespace-nowrap font-medium text-teal-600">
+                    {{ c.contrat.num }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {{ c.contrat.dateSouscription | date:'dd/MM/yyyy' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {{ c.contrat.dateExpiration | date:'dd/MM/yyyy' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {{ c.vehicule.marque }} {{ c.vehicule.model }} ({{ c.vehicule.Imat }})
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoading" class="flex justify-center p-8">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

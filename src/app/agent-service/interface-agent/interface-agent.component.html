@@ -1,0 +1,250 @@
+<div class="flex flex-col min-h-screen font-roboto">
+  <!-- Navbar fixe en haut -->
+  <nav class="bg-gray-50 text-gray-900 w-full z-50 p-2 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center px-4">
+      <!-- Logo et message de bienvenue -->
+      <div class="flex items-center space-x-4 ml-4 sm:ml-6 md:ml-8 lg:ml-10 xl:ml-5">
+        <a routerLink="/" class="flex items-center text-2xl font-semibold text-teal-800">
+          <i class="fas fa-umbrella w-8 h-8 mr-2"></i>
+          Flesk Cover
+        </a>
+        <h2 class="text-lg font-medium text-gray-700">Roulez sereinement, vivez pleinement</h2>
+      </div>
+
+      <!-- Profil et options -->
+      <div class="flex items-center space-x-4">
+        <!-- Icône Mail -->
+        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.94 6.33a2 2 0 0 1 1.5-.66h11.12a2 2 0 0 1 1.5.66l-6.06 3.95-6.06-3.95zM2 7.67V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.67l-5.88 3.83a1 1 0 0 1-1.06 0L2 7.67z" />
+          </svg>
+        </button>
+
+        <!-- Icône Notification -->
+        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
+          </svg>
+        </button>
+
+        <!-- Photo de profil et informations -->
+        <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
+          <div class="flex flex-col">
+            <span class="text-teal-800 font-medium">agent service</span>
+            <div class="flex space-x-3 text-sm text-gray-600 mt-1">
+              <a [routerLink]="['/dashboard-assure/account']" class="hover:text-teal-600">Mon compte</a>
+              <a href="#" class="hover:text-red-600">Déconnexion</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenu principal avec sidebar et contenu -->
+  <div class="flex flex-1">
+    <!-- Sidebar -->
+    <aside id="default-sidebar" class="fixed bg-teal-600 z-40 w-60 h-[calc(100vh-4rem)] transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+      <div class="h-full py-4 overflow-y-auto px-10">
+        <ul class="space-y-2 font-medium">
+          <!-- Accueil -->
+          <li>
+            <a [routerLink]="['/agent/interface']" class="flex items-center p-2 rounded-lg text-white hover:bg-teal-700 group">
+              <i class="fas fa-home w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Accueil</span>
+            </a>
+          </li>
+
+          <!-- Liste assuré automobile -->
+          <li>
+            <a [routerLink]="['/agent/liste-auto']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-car w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré automobile</span>
+            </a>
+          </li>
+
+          <!-- Liste assuré vie -->
+          <li>
+            <a [routerLink]="['/agent/liste-vie']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-heart w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré vie</span>
+            </a>
+          </li>
+
+          <!-- Liste expert -->
+          <li>
+            <a [routerLink]="['/agent/liste-expert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
+              <i class="fas fa-user-tie w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
+              <span class="flex-1 ms-3 whitespace-nowrap">Liste expert</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Ligne de séparation -->
+        <hr class="my-4 border-teal-500">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <p class="text-white text-sm text-center">Merci de votre visite !</p>
+          <p class="text-white text-xs text-center"> © 2025 Flesk Cover </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="flex-1 sm:ml-60 p-4 flex flex-col items-center">
+      <div class="bg-gray-50 rounded-lg p-6 w-full max-w-6xl">
+        <h2 class="text-2xl font-bold text-teal-800 mb-6">Tableau de Bord</h2>
+
+        <!-- Assurance Auto et Vie Tabs -->
+        <div class="mb-8">
+          <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8">
+              <button
+                class="border-b-2 border-teal-500 text-teal-600 px-4 py-2 text-sm font-medium"
+                (click)="activeTab = 'auto'"
+                [class.border-teal-500]="activeTab === 'auto'"
+                [class.text-teal-600]="activeTab === 'auto'"
+                [class.border-transparent]="activeTab !== 'auto'"
+                [class.text-gray-500]="activeTab !== 'auto'"
+                [class.hover:text-gray-700]="activeTab !== 'auto'"
+                [class.hover:border-gray-300]="activeTab !== 'auto'">
+                Assurance Auto
+              </button>
+              <button
+                class="border-b-2 border-teal-500 text-teal-600 px-4 py-2 text-sm font-medium"
+                (click)="activeTab = 'vie'"
+                [class.border-teal-500]="activeTab === 'vie'"
+                [class.text-teal-600]="activeTab === 'vie'"
+                [class.border-transparent]="activeTab !== 'vie'"
+                [class.text-gray-500]="activeTab !== 'vie'"
+                [class.hover:text-gray-700]="activeTab !== 'vie'"
+                [class.hover:border-gray-300]="activeTab !== 'vie'">
+                Assurance Vie
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        <!-- agent-service.component.html -->
+        <div *ngIf="activeTab === 'auto'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Création Contrat -->
+          <a [routerLink]="['/agent/CA']"
+             class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500 block">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Création Contrat</h3>
+            </div>
+            <p class="text-gray-600">Créer un nouveau contrat d'assurance auto</p>
+          </a>
+
+          <!-- Renouvellement Contrat -->
+          <a [routerLink]="['/agent/renouvellementCA']"
+             class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500 block">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Renouvellement Contrat</h3>
+            </div>
+            <p class="text-gray-600">Renouveler un contrat existant</p>
+          </a>
+
+          <!-- Contrat Semestriel -->
+          <a [routerLink]="['/agent/semstrielCA']"
+             class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500 block">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Contrat Semestriel</h3>
+            </div>
+            <p class="text-gray-600">Gérer les contrats semestriels</p>
+          </a>
+
+          <!-- Liste des Contrats -->
+          <a [routerLink]="['/agent/tousCA']"
+             class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500 block">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Liste des Contrats</h3>
+            </div>
+            <p class="text-gray-600">Voir tous les contrats d'un assuré</p>
+          </a>
+
+          <!-- Devis -->
+          <a [routerLink]="['/agent/devis']"
+             class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500 block">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Devis</h3>
+            </div>
+            <p class="text-gray-600">Créer un devis</p>
+          </a>
+        </div>
+
+        <!-- Assurance Vie Section -->
+        <div *ngIf="activeTab === 'vie'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Création Contrat Vie -->
+          <div
+            class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500"
+            routerLink="/vie/creation-contrat">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Création Contrat</h3>
+            </div>
+            <p class="text-gray-600">Créer un nouveau contrat d'assurance vie</p>
+          </div>
+
+          <!-- Reçu de Paiement -->
+          <div
+            class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500"
+            routerLink="/vie/recu-paiement">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Reçu de Paiement</h3>
+            </div>
+            <p class="text-gray-600">Générer et gérer les reçus de paiement</p>
+          </div>
+
+          <!-- Touch Vert -->
+          <div
+            class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-teal-500"
+            routerLink="/vie/touch-vert">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-full bg-teal-100 text-teal-800 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Touch Vert</h3>
+            </div>
+            <p class="text-gray-600">Accéder aux options Touch Vert</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
