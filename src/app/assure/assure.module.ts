@@ -11,6 +11,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { DeviComponent } from './devi/devi.component';
 import { MatIconModule } from '@angular/material/icon';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
+import { ConstatComponent } from './constat/constat.component';
+import { VehiculeComponent } from './vehicule/vehicule.component';
+import { ConstatListComponent } from './constat-list/constat-list.component';
+
 
 
 @NgModule({
@@ -21,7 +25,11 @@ import { CreationContratComponent } from './creation-contrat/creation-contrat.co
     AceuilComponent,
     DashboardComponent,
     DeviComponent,
-    CreationContratComponent
+    CreationContratComponent,
+    ConstatComponent,
+    VehiculeComponent,
+    ConstatListComponent
+  
   ],
   imports: [
     CommonModule,
@@ -30,6 +38,6 @@ import { CreationContratComponent } from './creation-contrat/creation-contrat.co
     ReactiveFormsModule,
     MatIconModule,
 
-  ]
+]
 })
 export class AssureModule { }

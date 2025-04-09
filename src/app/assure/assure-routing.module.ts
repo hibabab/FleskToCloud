@@ -5,6 +5,8 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { AceuilComponent } from './aceuil/aceuil.component';
 import { DeviComponent } from './devi/devi.component';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
+import { ConstatComponent } from './constat/constat.component';
+import { ConstatListComponent } from './constat-list/constat-list.component';
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
@@ -16,7 +18,9 @@ const routes: Routes = [
     { path: 'etape1', component:DeviComponent  },
     { path: 'etape2', component:DeviComponent },
     { path: 'etape3', component:DeviComponent },
-    { path: '', redirectTo: 'etape1', pathMatch: 'full' }]
+    { path: '', redirectTo: 'etape1', pathMatch: 'full' },
+    { path: 'declarer constat', component: ConstatComponent },
+    { path: 'constat', component:ConstatListComponent },]
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

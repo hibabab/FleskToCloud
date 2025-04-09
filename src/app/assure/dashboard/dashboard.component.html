@@ -1,7 +1,7 @@
 <div class="flex h-screen  font-roboto">
 
 
-  <aside id="default-sidebar" class="fixed top-20 bg-teal-600 z-40 w-60 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+  <aside id="default-sidebar" class="fixed top-12 bg-teal-600 z-40 w-60 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
     <div class="h-full mt-4 py-4 overflow-y-auto px-10">
       <ul class="space-y-2 font-medium">
         <!-- Accueil -->
@@ -33,7 +33,7 @@
 
         <!-- Mes Constats -->
         <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+          <a [routerLink]="['/dashboard-assure', 'constat']"class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
             <i class="fas fa-file-signature w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
             <span class="flex-1 ms-3 whitespace-nowrap">Mes Constats</span>
           </a>
