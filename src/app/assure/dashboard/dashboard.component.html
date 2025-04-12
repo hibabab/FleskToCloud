@@ -6,25 +6,17 @@
       <ul class="space-y-2 font-medium">
         <!-- Accueil -->
         <li>
-          <a href="#" class="flex items-center p-2 rounded-lg text-white bg-teal-700 hover:bg-teal-600 group">
+          <a [routerLink]="['/dashboard-assure', 'interface']" class="flex items-center p-2 rounded-lg text-white bg-teal-700 hover:bg-teal-600 group">
             <i class="fas fa-home w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
             <span class="flex-1 ms-3 whitespace-nowrap">Accueil</span>
           </a>
         </li>
 
-        <!-- Mes Devis -->
-        <li>
-          <a [routerLink]="['/dashboard-assure', 'devi']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
-            <i class="fas fa-file-alt w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
-            <span class="flex-1 ms-3 whitespace-nowrap">
-              Devis
-            </span>
-          </a>
-        </li>
+
 
         <!-- Mes Contrats -->
         <li>
-          <a [routerLink]="['/dashboard-assure', 'CreationCA']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+          <a [routerLink]="['/dashboard-assure', 'MesCA']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
             <i class="fas fa-scroll w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
             <span class="flex-1 ms-3 whitespace-nowrap">
             Mes Contrats</span>

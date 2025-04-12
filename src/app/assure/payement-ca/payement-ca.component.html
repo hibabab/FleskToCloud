@@ -1,0 +1,74 @@
+<!-- payment-result.component.html -->
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+  <!-- Loader -->
+  <div *ngIf="isLoading" class="flex flex-col items-center space-y-4">
+    <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    <p class="text-gray-600 font-medium">Vérification du paiement en cours...</p>
+  </div>
+
+  <!-- Succès du paiement -->
+  <div *ngIf="!isLoading && isSuccess" class="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full text-center">
+    <div class="flex flex-col items-center">
+      <!-- Icône succès -->
+      <div class="w-20 h-20 flex items-center justify-center rounded-full bg-green-100 mb-6">
+        <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">Paiement effectué avec succès!</h1>
+
+      <p class="text-gray-600 mb-6 text-center">
+        Merci pour votre confiance. Vous recevrez la feuille rose de l'assurance à votre adresse
+        dans un délai maximum de 24 heures.
+      </p>
+
+      <p class="text-gray-500 mb-6 text-sm">
+        Un document PDF contenant les détails de votre contrat a été téléchargé automatiquement.
+        Veuillez le conserver précieusement.
+      </p>
+
+      <button
+        (click)="goToDashboard()"
+        class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+        Retour au tableau de bord
+      </button>
+    </div>
+  </div>
+
+  <!-- Échec du paiement -->
+  <div *ngIf="!isLoading && !isSuccess" class="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full text-center">
+    <div class="flex flex-col items-center">
+      <!-- Icône échec -->
+      <div class="w-20 h-20 flex items-center justify-center rounded-full bg-red-100 mb-6">
+        <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </div>
+
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">Échec du paiement</h1>
+
+      <p class="text-gray-600 mb-6">
+        {{ errorMessage || "Une erreur s'est produite lors du traitement de votre paiement." }}
+      </p>
+
+      <p class="text-gray-500 mb-6">
+        Vous pouvez essayer à nouveau ou contacter notre service client pour obtenir de l'aide.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+        <button
+          (click)="retryPayment()"
+          class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+          Réessayer
+        </button>
+
+        <button
+          (click)="goToDashboard()"
+          class="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 transition-colors">
+          Retour au tableau de bord
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

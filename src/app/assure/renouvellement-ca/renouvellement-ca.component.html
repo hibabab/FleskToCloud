@@ -1,0 +1,63 @@
+<div class="flex flex-col min-h-screen font-roboto">
+  
+  <main class="flex-1 ml-60 bg-gray-50">
+    <div class="max-w-6xl mx-auto p-8">
+      <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-md w-full p-8">
+        <div class="flex flex-col items-center mb-8 text-2xl font-semibold text-teal-800">
+          <i class="fas fa-umbrella w-8 h-8 mr-1 text-teal-800"></i>
+          <p>Flesk Cover</p>
+          <h2 class="font-semibold text-xl text-gray-700 mt-2">Renouvellement contrat auto</h2>
+        </div>
+
+        <form [formGroup]="renewalForm" (ngSubmit)="onSubmit()" class="w-full space-y-4">
+          <!-- Champ CIN (lecture seule) -->
+          <div>
+            <label class="block mb-1 text-sm font-medium text-gray-700">CIN</label>
+            <input type="text" [value]="userCin" readonly
+                  class="bg-gray-100 border border-gray-300 text-gray-900 rounded-lg block w-full p-2 cursor-not-allowed">
+          </div>
+
+          <!-- Champ Matricule -->
+          <div>
+            <label class="block mb-1 text-sm font-medium text-gray-700">Matricule</label>
+            <input type="text" formControlName="Imat"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2"
+                  placeholder="Matricule du véhicule">
+            <div *ngIf="renewalForm.get('Imat')?.invalid && renewalForm.get('Imat')?.touched" class="text-red-500 text-sm mt-1">
+              Le matricule est requis
+            </div>
+          </div>
+
+          <button type="submit" [disabled]="renewalForm.invalid || isLoading"
+                  class="w-full py-2 px-4 bg-teal-800 text-white rounded-lg mt-6 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            <span *ngIf="!isLoading">Valider</span>
+            <span *ngIf="isLoading">Traitement...</span>
+          </button>
+
+          <div *ngIf="errorMessage" class="text-red-500 text-sm text-center mt-2">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="text-teal-600 text-sm text-center mt-2">
+            {{ successMessage }}
+          </div>
+        </form>
+
+        <!-- Section Paiement -->
+        <div *ngIf="paymentData" class="w-full mt-6 p-4 bg-teal-50 rounded-lg">
+          <h3 class="font-medium text-teal-800 mb-2">Paiement du contrat</h3>
+          <p class="text-sm text-gray-600 mb-3">Votre contrat a été renouvelé. Veuillez procéder au paiement.</p>
+
+          <button (click)="continuePayment()" [disabled]="paymentLoading"
+                  class="w-full py-2 px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50">
+            <span *ngIf="!paymentLoading">Payer maintenant</span>
+            <span *ngIf="paymentLoading">Redirection en cours...</span>
+          </button>
+
+          <div *ngIf="paymentError" class="text-red-500 text-sm mt-2">
+            {{ paymentError }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -5,11 +5,26 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { AceuilComponent } from './aceuil/aceuil.component';
 import { DeviComponent } from './devi/devi.component';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
+import { PaymentInitiateComponent } from './payment/payment-initiate/payment-initiate.component';
+import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
+import { PaymentFailureComponent } from './payment/payment-failure/payment-failure.component';
+import { PaymentStatusComponent } from './payment/payment-status/payment-status.component';
+import { MesCAComponent } from './mes-ca/mes-ca.component';
+import { InterfaceComponent } from './interface/interface.component';
+import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
+
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
   { path: 'change-password', component: ChangePasswordComponent },
   { path: 'aceuil', component: AceuilComponent },
+  { path: 'contrat/:id/payment', component: PaymentInitiateComponent },
+  { path: 'payment/success', component: PaymentSuccessComponent },
+  { path: 'payment/failure', component: PaymentFailureComponent },
+  { path: 'contrat/:id/payment-status', component: PaymentStatusComponent },
+  { path: 'MesCA', component:MesCAComponent },
+  { path: 'interface', component:InterfaceComponent },
+  { path: 'NCA', component:RenouvellementCAComponent },
   { path: '', redirectTo: '/dashboard-assure/aceuil', pathMatch: 'full' },
    {path:'CreationCA',component:CreationContratComponent},
     { path: 'devi', component: DeviComponent },

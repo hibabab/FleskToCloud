@@ -1,0 +1,41 @@
+<div class="max-w-md mx-auto my-8 p-6 bg-white rounded-lg shadow-md">
+  <div class="text-center">
+    <div class="mx-auto flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+      <mat-icon class="text-red-500 text-4xl">error</mat-icon>
+    </div>
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Paiement échoué</h2>
+
+    <p class="text-red-500 mb-6 px-4">
+      {{error}}
+    </p>
+
+    <div class="flex flex-col space-y-3 mb-6">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="retry()"
+        class="flex items-center justify-center space-x-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+      >
+        <mat-icon>refresh</mat-icon>
+        <span>Réessayer le paiement</span>
+      </button>
+
+      <button
+        mat-raised-button
+        [routerLink]="['/dashboard']"
+        class="flex items-center justify-center space-x-2 py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition-colors"
+      >
+        <mat-icon>dashboard</mat-icon>
+        <span>Retour au tableau de bord</span>
+      </button>
+    </div>
+
+    <div class="text-sm text-gray-600 border-t pt-4">
+      <p class="mb-2">Si le problème persiste, veuillez contacter notre service client:</p>
+      <p class="font-medium">
+        <span class="font-semibold">Téléphone:</span> +216 24051646
+      </p>
+    </div>
+  </div>
+</div>

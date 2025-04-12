@@ -1,0 +1,32 @@
+/* payment-result.component.scss */
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Animation de l'icône de succès */
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+svg path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: checkmark 1s ease-in-out forwards;
+}
+
+/* Styles pour les snackbars */
+::ng-deep .success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}

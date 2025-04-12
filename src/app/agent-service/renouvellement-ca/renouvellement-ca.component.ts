@@ -106,7 +106,7 @@ async generateContratPDF(contratData: any): Promise<void> {
       body: [
         ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration', 'Nature', 'Échéances'],
         [
-          contratData.contrat.num || 'N/A',
+          contratData.contrat.id || 'N/A',
           133,
           contratData.assure?.numSouscription || 'N/A',
           contratData.contrat.dateSouscription || 'N/A',

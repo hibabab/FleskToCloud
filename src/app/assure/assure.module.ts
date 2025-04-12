@@ -11,6 +11,17 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { DeviComponent } from './devi/devi.component';
 import { MatIconModule } from '@angular/material/icon';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
+import { PayementCAComponent } from './payement-ca/payement-ca.component';
+import { HttpClientModule } from '@angular/common/http';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { PaymentInitiateComponent } from './payment/payment-initiate/payment-initiate.component';
+import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
+import { PaymentFailureComponent } from './payment/payment-failure/payment-failure.component';
+import { PaymentStatusComponent } from './payment/payment-status/payment-status.component';
+import { MesCAComponent } from './mes-ca/mes-ca.component';
+import { InterfaceComponent } from './interface/interface.component';
+import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
+import { CASemstrielComponent } from './casemstriel/casemstriel.component';
 
 
 @NgModule({
@@ -21,7 +32,16 @@ import { CreationContratComponent } from './creation-contrat/creation-contrat.co
     AceuilComponent,
     DashboardComponent,
     DeviComponent,
-    CreationContratComponent
+    CreationContratComponent,
+    PayementCAComponent,
+    PaymentInitiateComponent,
+    PaymentSuccessComponent,
+    PaymentFailureComponent,
+    PaymentStatusComponent,
+    MesCAComponent,
+    InterfaceComponent,
+    RenouvellementCAComponent,
+    CASemstrielComponent
   ],
   imports: [
     CommonModule,
@@ -29,6 +49,8 @@ import { CreationContratComponent } from './creation-contrat/creation-contrat.co
     AssureRoutingModule,
     ReactiveFormsModule,
     MatIconModule,
+    HttpClientModule,
+    MatSnackBarModule,
 
   ]
 })

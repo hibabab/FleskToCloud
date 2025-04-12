@@ -74,9 +74,9 @@ export class LoginComponent {
 
       // Navigation en fonction du rôle
       if (role === 'assure' || role === 'user') {
-        this.router.navigate(['/dashboard-assure']);
+        this.router.navigate(['/dashboard-assure/interface']);
       } else if (role === 'agent service') {
-        this.router.navigate(['/agent/dashboard-agent']);
+        this.router.navigate(['/agent/interface']);
       } else if (role === 'expert') {
         this.router.navigate(['/dashboard-expert']);
       } else if (role === 'admin') {
