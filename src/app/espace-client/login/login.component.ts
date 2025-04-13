@@ -1,91 +1,106 @@
 import { Component } from '@angular/core';
 import { AuthentificationService } from '../services/authentification.service';
-import { Router } from '@angular/router'; // Importation du Router
+import { Router } from '@angular/router';
 import { AuthentificationDto } from '../models/authentification-dto';
 import { jwtDecode } from 'jwt-decode';
-import { catchError } from 'rxjs/operators'; // Importation de catchError
-import { of } from 'rxjs'; // Importation de of
+import { catchError, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: false,
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'] // Correction de 'styleUrl' à 'styleUrls'
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   user: AuthentificationDto = {} as AuthentificationDto;
+  errorMessage: string | null = null;
+  isLoading: boolean = false;
 
   constructor(
     private authService: AuthentificationService,
     private router: Router
   ) {}
 
-  // Méthode exécutée lors de la soumission du formulaire de login
   onSubmit() {
-    // Validation des champs
     if (!this.user.email || !this.user.password) {
-      console.error('Tous les champs sont obligatoires.');
+      this.errorMessage = 'Tous les champs sont obligatoires.';
       return;
     }
 
-    // Appel de la méthode login dans le AuthentificationService
-    this.authService.login(this.user.email, this.user.password).subscribe(
-      (response) => {
-        console.log('Login réussi:', response);
+    this.isLoading = true;
+    this.errorMessage = null;
 
-        // Récupération du token
-        const token = response.access_token;
-        console.log('Token reçu:', token);
-
-        // Enregistrement du token dans un cookie
-        this.setTokenInCookie(token);
-
-        // Décodage du token JWT pour obtenir l'ID utilisateur
-        const decoded: any = jwtDecode(token);
-        const userId = decoded.sub;
-
-        // Vérification du rôle de l'utilisateur après décodage du token
-        this.authService.getRole(userId).pipe(
-          catchError((error) => {
-            console.error('Erreur de récupération du rôle:', error);
-            // Retourne un rôle par défaut si une erreur se produit
-            return of({ role: 'user' });
-          })
-        ).subscribe(
-          (roleResponse) => this.handleRoleResponse(roleResponse)
-        );
+    this.authService.verifyAdmin(this.user.email, this.user.password).pipe(
+      switchMap(isAdmin => {
+        if (isAdmin) {
+          // Si admin, on redirige directement sans appel login supplémentaire
+          this.router.navigate(['/admin/interface']);
+          return of({ role: 'admin' }); // On retourne un observable avec le rôle admin
+        } else {
+          return this.authService.login(this.user.email, this.user.password).pipe(
+            switchMap(response => {
+              this.handleLoginSuccess(response);
+              const decoded: any = jwtDecode(response.access_token);
+              return this.authService.getRole(decoded.sub).pipe(
+                catchError(() => of({ role: 'user' }))
+              );
+            })
+          );
+        }
+      })
+    ).subscribe({
+      next: (roleResponse) => {
+        this.handleRoleResponse(roleResponse);
+        this.isLoading = false;
       },
-      (error) => {
-        console.error('Erreur de login:', error);
-        // Vous pouvez ajouter un message d'erreur à afficher à l'utilisateur
+      error: (error) => {
+        this.handleLoginError(error);
+        this.isLoading = false;
       }
-    );
+    });
   }
 
-  // Méthode pour enregistrer le token dans un cookie
-  private setTokenInCookie(token: string) {
-    document.cookie = `access_token=${token}; path=/; secure; SameSite=Strict`;
+  private handleLoginSuccess(response: any) {
+    const token = response.access_token;
+    this.setTokenInCookie(token);
   }
 
-  // Méthode pour gérer la réponse contenant le rôle de l'utilisateur
   private handleRoleResponse(roleResponse: any) {
-    if (roleResponse && roleResponse.role) {
-      const role = roleResponse.role;
-
-      // Navigation en fonction du rôle
-      if (role === 'assure' || role === 'user') {
-        this.router.navigate(['/dashboard-assure/interface']);
-      } else if (role === 'agent service') {
-        this.router.navigate(['/agent/interface']);
-      } else if (role === 'expert') {
-        this.router.navigate(['/dashboard-expert']);
-      } else if (role === 'admin') {
-        this.router.navigate(['/admin/interface']);
-      } else {
-        console.error('Rôle de l\'utilisateur inconnu:', role);
-      }
-    } else {
-      console.error('Réponse inattendue du serveur:', roleResponse);
+    if (!roleResponse?.role) {
+      this.errorMessage = 'Impossible de déterminer votre rôle.';
+      return;
     }
+
+    switch (roleResponse.role.toLowerCase()) {
+      case 'admin':
+        this.router.navigate(['/admin/interface']);
+        break;
+      case 'assure':
+      case 'user':
+        this.router.navigate(['/dashboard-assure/interface']);
+        break;
+      case 'agent service':
+        this.router.navigate(['/agent/interface']);
+        break;
+      case 'expert':
+        this.router.navigate(['/dashboard-expert']);
+        break;
+      default:
+        this.errorMessage = 'Votre rôle ne permet pas d\'accéder à cette application.';
+        console.error('Rôle inconnu:', roleResponse.role);
+    }
+  }
+
+  private handleLoginError(error: any) {
+    console.error('Erreur de connexion:', error);
+    this.errorMessage = error.error?.message ||
+      (error.status === 401 ? 'Identifiants incorrects' : 'Erreur lors de la connexion. Veuillez réessayer.');
+  }
+
+  private setTokenInCookie(token: string) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000)); // 24h
+    document.cookie = `access_token=${token}; expires=${expires.toUTCString()}; path=/; secure; SameSite=Strict`;
   }
 }

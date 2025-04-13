@@ -411,7 +411,7 @@ export class ContratAutoComponent implements OnInit {
       garanties.push({
         type: TypeGaranties.DOMMAGEETCOLLIDION,
         capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf * 0.1)
+        cotisationNette: this.roundToThreeDecimals(valeurNeuf * 0.05)
       });
     }
     else if (packChoisi === 'Pack3') {
@@ -481,7 +481,7 @@ export class ContratAutoComponent implements OnInit {
         type: TypeGaranties.Tierce,
         capital: valeurNeuf,
         franchise: 0.200,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf * 0.2)
+        cotisationNette: this.roundToThreeDecimals(valeurNeuf * 0.02)
       });
 
       garanties.push({

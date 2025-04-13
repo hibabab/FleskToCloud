@@ -40,7 +40,10 @@ export class DeviComponent {
       marque: ['', Validators.required],
       model: ['', Validators.required],
       puissance: ['', Validators.required],
-      DPMC: ['', Validators.required],
+      DPMC: ['', [
+        Validators.required,
+        Validators.pattern(/^(19[7-9][1-9]|19[8-9]\d|20\d{2})$/)
+      ]],
       Imat: ['', [Validators.required, Validators.pattern(/^\d{4}TU\d{2,3}$/)]]
     });
     this.formulaireEtape2 = this.fb.group({
@@ -195,12 +198,12 @@ export class DeviComponent {
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 220.115
+        cotisationNette: Math.round((valeurNeuf / 220.115) * 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.Vol,
         capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 336.446
+        cotisationNette: Math.round((valeurNeuf / 336.446) * 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.PersonneTransportees,
@@ -238,12 +241,11 @@ export class DeviComponent {
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 220.115
+        cotisationNette: Math.round((valeurNeuf / 220.115) * 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.Vol,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 336.446
+        cotisationNette: Math.round((valeurNeuf / 336.446) * 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.PersonneTransportees,
@@ -275,7 +277,7 @@ export class DeviComponent {
       garanties.push({
         type: TypeGaranties.DOMMAGEETCOLLIDION,
         capital: valeurNeuf,
-        cotisationNette: valeurNeuf * 0.1
+        cotisationNette: valeurNeuf * 0.05
       });
     } else if (packChoisi === 'Tous les risques') {
       garanties.push({
@@ -290,12 +292,12 @@ export class DeviComponent {
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 220.115
+        cotisationNette: Math.round((valeurNeuf / 220.115) * 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.Vol,
         capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 336.446
+        cotisationNette: Math.round((valeurNeuf / 336.446) * 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.PersonneTransportees,
@@ -328,7 +330,7 @@ export class DeviComponent {
         type: TypeGaranties.Tierce,
         capital: valeurNeuf,
         franchise: 0.2,
-        cotisationNette: valeurNeuf * 0.2
+        cotisationNette: valeurNeuf * 0.02
       });
       garanties.push({
         type: TypeGaranties.ResponsabiliteCivile,

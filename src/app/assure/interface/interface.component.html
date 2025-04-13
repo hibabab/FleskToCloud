@@ -1,116 +1,119 @@
-<div class="flex">
+<div class="flex min-h-screen bg-gray-50">
   <app-dashboard></app-dashboard>
 
   <div class="flex-1 mt-30 ml-50">
 
-
-
     <!-- Contenu principal centré -->
-    <main class="flex-1 ml-0 sm:ml-60 bg-gray-50 p-6">
-      <!-- Titre de bienvenue -->
+    <main class="flex-1 ml-0 sm:ml-60 p-8">
+      <!-- Titre amélioré -->
       <div class="mb-10 text-center">
-        <h1 class="text-3xl font-bold text-teal-800 mb-2">Espace Assuré</h1>
-        <p class="text-gray-600">Gérez vos contrats et vos demandes en toute simplicité</p>
+        <h1 class="text-4xl font-extrabold text-teal-800 tracking-tight mb-2">
+          Espace Assuré
+        </h1>
+        <p class="text-lg text-gray-500">
+          Accédez rapidement à vos services d'assurance
+        </p>
       </div>
 
       <!-- Message d'erreur -->
-      <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
+      <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-100 text-red-700 rounded-lg shadow">
         {{ errorMessage }}
       </div>
 
-      <!-- Grille de cartes -->
-      <div *ngIf="user" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Carte Souscription Auto -->
-        <div (click)="navigateTo('/souscription-auto')" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer border-l-4 border-teal-800">
-          <div class="p-6 flex items-start space-x-4">
-            <div class="bg-teal-100 p-3 rounded-full">
-              <i class="fas fa-car text-teal-800 text-xl"></i>
+      <!-- Grille de cartes avec espacement réduit -->
+      <div *ngIf="user" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div (click)="navigateTo('/souscription-auto')"
+             class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer border-l-4 border-teal-800 flex flex-col justify-between p-6 h-64 w-64 mx-auto">
+          <div class="flex justify-center mb-4">
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-car text-teal-800 text-2xl"></i>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Souscription Auto</h3>
-              <p class="text-gray-600 mt-1">Souscrivez à un nouveau contrat auto</p>
-            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-800">Souscription Auto</h3>
+            <p class="text-gray-600 mt-1">Souscrivez à un nouveau contrat auto</p>
           </div>
         </div>
 
-        <!-- Carte Déclarer Constat -->
-        <div (click)="navigateTo('/declarer-constat')" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer border-l-4 border-teal-800">
-          <div class="p-6 flex items-start space-x-4">
-            <div class="bg-teal-100 p-3 rounded-full">
-              <i class="fas fa-file-alt text-teal-800 text-xl"></i>
+        <div (click)="navigateTo('/declarer-constat')"
+             class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer border-l-4 border-teal-800 flex flex-col justify-between p-6 h-64 w-64 mx-auto">
+          <div class="flex justify-center mb-4">
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-file-alt text-teal-800 text-2xl"></i>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Déclarer un constat</h3>
-              <p class="text-gray-600 mt-1">Déclarez un sinistre ou accident</p>
-            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-800">Déclarer un constat</h3>
+            <p class="text-gray-600 mt-1">Déclarez un sinistre ou accident</p>
           </div>
         </div>
 
-        <!-- Carte Renouvellement Auto -->
-        <div (click)="navigateTo('/dashboard-assure/NCA')" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer border-l-4 border-teal-800">
-          <div class="p-6 flex items-start space-x-4">
-            <div class="bg-teal-100 p-3 rounded-full">
-              <i class="fas fa-sync-alt text-teal-800 text-xl"></i>
+        <div (click)="navigateTo('/dashboard-assure/NCA')"
+             class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer border-l-4 border-teal-800 flex flex-col justify-between p-6 h-64 w-64 mx-auto">
+          <div class="flex justify-center mb-4">
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-sync-alt text-teal-800 text-2xl"></i>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Renouveler contrat Auto</h3>
-              <p class="text-gray-600 mt-1">Renouvelez votre contrat automobile</p>
-            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-800">Renouveler contrat Auto</h3>
+            <p class="text-gray-600 mt-1">Renouvelez votre contrat automobile</p>
           </div>
         </div>
 
-        <!-- Carte Paiement Semestriel -->
-        <div (click)="navigateTo('/paiement-auto')" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer border-l-4 border-teal-800">
-          <div class="p-6 flex items-start space-x-4">
-            <div class="bg-teal-100 p-3 rounded-full">
-              <i class="fas fa-credit-card text-teal-800 text-xl"></i>
+        <div (click)="navigateTo('/dashboard-assure/SmestrielCA')"
+             class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer border-l-4 border-teal-800 flex flex-col justify-between p-6 h-64 w-64 mx-auto">
+          <div class="flex justify-center mb-4">
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-credit-card text-teal-800 text-2xl"></i>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Paiement semestriel</h3>
-              <p class="text-gray-600 mt-1">Effectuez votre paiement</p>
-            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-800">Paiement semestriel</h3>
+            <p class="text-gray-600 mt-1">Effectuez votre paiement</p>
           </div>
         </div>
 
-        <!-- Carte Souscription Vie -->
-        <div (click)="navigateTo('/souscription-vie')" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer border-l-4 border-teal-800">
-          <div class="p-6 flex items-start space-x-4">
-            <div class="bg-teal-100 p-3 rounded-full">
-              <i class="fas fa-heart text-teal-800 text-xl"></i>
+        <div (click)="navigateTo('/souscription-vie')"
+             class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer border-l-4 border-teal-800 flex flex-col justify-between p-6 h-64 w-64 mx-auto">
+          <div class="flex justify-center mb-4">
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-heart text-teal-800 text-2xl"></i>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Souscription Vie</h3>
-              <p class="text-gray-600 mt-1">Souscrivez à un contrat vie</p>
-            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-800">Souscription Vie</h3>
+            <p class="text-gray-600 mt-1">Souscrivez à un contrat vie</p>
           </div>
         </div>
 
-
-        <div (click)="navigateTo('/devi')" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer border-l-4 border-teal-800">
-          <div class="p-6 flex items-start space-x-4">
-            <div class="bg-teal-100 p-3 rounded-full">
-              <i class="fas fa-file-contract text-teal-800 text-xl"></i>
+        <div (click)="navigateTo('/devi')"
+             class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 cursor-pointer border-l-4 border-teal-800 flex flex-col justify-between p-6 h-64 w-64 mx-auto">
+          <div class="flex justify-center mb-4">
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-file-contract text-teal-800 text-2xl"></i>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Demander devis </h3>
-              <p class="text-gray-600 mt-1">Un devis pour un contrat automobile</p>
-            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-800">Demander devis</h3>
+            <p class="text-gray-600 mt-1">Un devis pour un contrat automobile</p>
           </div>
         </div>
       </div>
 
       <!-- Squelette de chargement -->
-      <div *ngIf="isLoading && !errorMessage" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let _ of [1,2,3,4,5,6]" class="bg-white rounded-lg shadow-md overflow-hidden border-l-4 border-teal-800">
-          <div class="p-6 flex items-start space-x-4">
-            <div class="bg-gray-200 p-3 rounded-full animate-pulse h-12 w-12"></div>
-            <div class="flex-1 space-y-2">
-              <div class="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-              <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-            </div>
+      <div *ngIf="isLoading && !errorMessage" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div *ngFor="let _ of [1,2,3,4,5,6]" class="bg-white rounded-2xl shadow-md border-l-4 border-teal-800 flex flex-col justify-between p-6 h-64 w-64 mx-auto">
+          <div class="flex justify-center mb-4">
+            <div class="bg-gray-200 p-4 rounded-full animate-pulse h-14 w-14"></div>
+          </div>
+          <div class="space-y-2 text-center">
+            <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto animate-pulse"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto animate-pulse"></div>
           </div>
         </div>
       </div>
+
     </main>
   </div>
 </div>

@@ -146,7 +146,7 @@
                 <label class="block text-lg font-semibold text-gray-700">Année de 1ère mise en circulation <span class="text-red-500">*</span></label>
                 <input type="number" formControlName="DPMC" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <div *ngIf="formulaireEtape1.get('DPMC')?.invalid && formulaireEtape1.get('DPMC')?.touched" class="text-red-500 text-sm">
-                  Ce champ est obligatoire.
+                Année invalide
                 </div>
               </div>
               <div class="space-y-2">
@@ -193,7 +193,7 @@
             </div>
           </form>
 
-        
+
           <!-- Boutons de navigation -->
           <div class="flex justify-end mt-8">
             <button (click)="precedent()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mr-4">

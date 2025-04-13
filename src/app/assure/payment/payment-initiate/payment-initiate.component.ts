@@ -45,7 +45,7 @@ export class PaymentInitiateComponent implements OnInit {
     } else {
       this.error = "Numéro de contrat non trouvé";
       this.loading = false;
-      this.router.navigate(['/contrats']);
+      
     }
   }
 

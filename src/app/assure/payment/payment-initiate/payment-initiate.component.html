@@ -1,6 +1,6 @@
 <div class="payment-container bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
   <h1 class="text-3xl font-bold text-teal-800 mb-2 text-center">Paiement sécurisé de votre assurance auto</h1>
-  
+
   <div class="border-b border-gray-200 mb-6">
     <h3 class="text-2xl font-bold text-gray-800 mb-4">Contrat N°{{contratNum}}</h3>
   </div>
@@ -20,10 +20,10 @@
 
         <!-- Affichage conditionnel pour l'erreur de montant -->
         <p *ngIf="error.includes('montant')" class="text-sm text-gray-700 mt-2">
-          Le montant d'échéance associé à ce contrat est invalide ou manquant.
+          Le montant d'échéance associé à ce contrat est très grand. Vous devez le payer localement
           Veuillez contacter notre service client au
           <a href="tel:+21624051646" class="text-teal-800 font-medium">+216 24051646</a>
-          ou par email à
+
 
         </p>
       </div>

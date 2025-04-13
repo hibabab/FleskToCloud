@@ -53,7 +53,7 @@
           <label class="block text-lg font-semibold text-gray-700">Année de 1ère mise en circulation <span class="text-red-500">*</span></label>
           <input type="number" formControlName="DPMC" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
           <div *ngIf="formulaireEtape1.get('DPMC')?.invalid && formulaireEtape1.get('DPMC')?.touched" class="text-red-500 text-sm">
-            Ce champ est obligatoire.
+            Année invalide.
           </div>
         </div>
         <div class="space-y-2">
@@ -108,6 +108,8 @@
           <span class="font-medium">Bonus/Malus :</span>
           <ul class="list-disc list-inside ml-4">
             <li>Si c'est votre première fois d'assurer un véhicule de type <strong>tourisme</strong>, votre Bonus/Malus est de <strong>8</strong>.</li>
+            <li>
+              Si c'est votre première fois d'assurer un véhicule de type <strong>Utilitaire</strong>, votre Bonus/Malus est de <strong>5</strong>.</li>
             <li>Si ce n'est pas votre première fois, votre Bonus/Malus est celui indiqué dans votre <strong>ancien contrat automobile</strong>.</li>
           </ul>
         </li>

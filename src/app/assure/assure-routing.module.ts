@@ -12,6 +12,7 @@ import { PaymentStatusComponent } from './payment/payment-status/payment-status.
 import { MesCAComponent } from './mes-ca/mes-ca.component';
 import { InterfaceComponent } from './interface/interface.component';
 import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
+import { CASemstrielComponent } from './casemstriel/casemstriel.component';
 
 
 const routes: Routes = [
@@ -25,6 +26,7 @@ const routes: Routes = [
   { path: 'MesCA', component:MesCAComponent },
   { path: 'interface', component:InterfaceComponent },
   { path: 'NCA', component:RenouvellementCAComponent },
+  { path: 'SmestrielCA', component:CASemstrielComponent },
   { path: '', redirectTo: '/dashboard-assure/aceuil', pathMatch: 'full' },
    {path:'CreationCA',component:CreationContratComponent},
     { path: 'devi', component: DeviComponent },
