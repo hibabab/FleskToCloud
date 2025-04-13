@@ -37,7 +37,10 @@
                       <td class="px-4 py-3 text-sm text-gray-700">{{ constat.expert || 'Non défini' }}</td> <!-- Expert -->
                       <td class="px-4 py-3 text-sm text-gray-700">{{ constat.statut || 'En attente' }}</td> <!-- Status -->
                       <td class="px-4 py-3 text-sm text-gray-700">
-                        <a href="{{ constat.pdfUrl || '#' }}" class="text-blue-600">Télécharger</a> <!-- PDF -->
+                        <a *ngIf="constat.pathurl" [href]="'http://localhost:3000' + constat.pathurl" class="text-blue-600" target="_blank">
+                          Télécharger PDF
+                        </a>
+                        <span *ngIf="!constat.pathurl" class="text-gray-500">PDF non disponible</span>
                       </td>
                     </tr>
             

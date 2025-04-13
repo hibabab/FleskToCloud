@@ -8,7 +8,7 @@ import { catchError, tap } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class ConstatService {
-  private apiUrl = 'http://localhost:3000'; // L’URL de base de l’API
+  private apiUrl = 'http://localhost:3000'; // L'URL de base de l'API
 
   constructor(private http: HttpClient) {}
 
@@ -16,11 +16,11 @@ export class ConstatService {
     const body = {
       constatDto,
       conducteur1Email,
-      conducteur2Email
+      conducteur2Email,
     };
 
     return this.http.post(
-      `${this.apiUrl}/constat/create-constat/${userId}`, 
+      `${this.apiUrl}/constat/create-constat/${userId}`,
       body
     ).pipe(
       tap(() => console.log('✅ Constat créé avec succès')),
@@ -46,9 +46,9 @@ export class ConstatService {
     console.error('❌ Erreur HTTP:', {
       status: error.status,
       url: error.url,
-      message: error.message
+      message: error.message,
     });
-    
+
     let errorMessage = 'Erreur inconnue';
     if (error.status === 0) {
       errorMessage = 'Serveur inaccessible (CORS ou problème réseau)';
@@ -59,7 +59,19 @@ export class ConstatService {
     } else {
       errorMessage = `Erreur ${error.status} : ${error.message}`;
     }
-    
+
     return throwError(() => new Error(errorMessage));
+  }
+
+  // Mise à jour de la méthode d'upload pour corriger l'URL
+  uploadConstatPDF(constatId: number, file: Blob): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, 'constat-amiable.pdf');
+
+    // Correction de l'URL pour correspondre à l'endpoint de l'API
+    return this.http.post(`${this.apiUrl}/constat/upload-constat-file/${constatId}`, formData).pipe(
+      tap(() => console.log('📤 PDF envoyé avec succès')),
+      catchError(this.handleError)
+    );
   }
 }

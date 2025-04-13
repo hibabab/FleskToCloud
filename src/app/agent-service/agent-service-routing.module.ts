@@ -13,11 +13,13 @@ import { InterfaceAgentComponent } from './interface-agent/interface-agent.compo
 import { DevisCAComponent } from './devis-ca/devis-ca.component';
 import { ListeExpertComponent } from './liste-expert/liste-expert.component';
 import { ListeAutoComponent } from './liste-auto/liste-auto.component';
+import { ConstatListComponent } from './constat-list/constat-list.component';
 
 
 
 const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent },
   { path: 'creationCA', component: CreationContratComponent },
+  { path: '', redirectTo: 'interface', pathMatch: 'full' },
   { path: 'CA', component: ContratAutoComponent },
   { path: 'compte', component: CreationCompteComponent},
   { path: 'renouvellementCA', component: RenouvellementCAComponent},
@@ -27,6 +29,8 @@ const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent 
   { path: 'devis', component: DevisCAComponent},
   { path: 'liste-expert', component: ListeExpertComponent },
   { path: 'liste-auto', component: ListeAutoComponent },
+  { path: 'liste-constat', component: ConstatListComponent}
+
 
  ];
 

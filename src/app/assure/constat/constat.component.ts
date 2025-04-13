@@ -4,6 +4,9 @@ import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '
 import { VehiculeComponent } from '../vehicule/vehicule.component';
 import { ConstatService } from '../services/constat.service';
 import { jwtDecode } from 'jwt-decode';
+import html2pdf from 'html2pdf.js';
+
+
 
 
 @Component({
@@ -379,567 +382,585 @@ export class ConstatComponent implements OnInit {
       ? this.selectedCirconstancesA.length 
       : this.selectedCirconstancesB.length;
   }
-
+  async exportFullReport(): Promise<Blob> {
+    try {
+      // Récupération des données
+      const generalInfo = this.generalInfoForm?.value || {};
+      const temoinsList = this.temoins?.value || [];
+      const vehiculeAData = this.vehiculeAData || {};
+      const vehiculeBData = this.vehiculeBData || {};
   
-    async exportFullReport(): Promise<string> {
-      try {
-        // Récupération des données
-        const generalInfo = this.generalInfoForm?.value || {};
-        const temoinsList = this.temoins?.value || [];
-        const vehiculeAData = this.vehiculeAData || {};
-        const vehiculeBData = this.vehiculeBData || {};
-    
-        // Génération du HTML pour les témoins
-        const generateTemoinHTML = (temoin: any, index: number) => {
-          console.log("Données des témoins:", this.temoins.value);
-          // Vérification approfondie des données
-          const nom = temoin?.nom || 'Non renseigné';
-          const prenom = temoin?.prenom || '';
-          const telephone = temoin?.telephone ? `Tel: ${temoin.telephone}` : 'Tel: Non renseigné';
-          
-          // Construction de l'adresse
-          const adresseParts = [
-            temoin?.rueTemoin,
-            temoin?.codePostalTemoin,
-            temoin?.villeTemoin
-          ].filter(part => part && part.trim() !== '');
-          
-          const adresse = adresseParts.length > 0 
-            ? adresseParts.join(', ')
-            : 'Adresse non renseignée';
+      // Génération du HTML pour les témoins
+      const generateTemoinHTML = (temoin: any, index: number) => {
+        console.log("Données des témoins:", this.temoins.value);
+        // Vérification approfondie des données
+        const nom = temoin?.nom || 'Non renseigné';
+        const prenom = temoin?.prenom || '';
+        const telephone = temoin?.telephone ? `Tel: ${temoin.telephone}` : 'Tel: Non renseigné';
         
-          return `
-            <div class="temoin-block" style="margin-bottom: 10px;">
-              <strong>Témoin #${index + 1}</strong><br>
-              <span class="filled-field">${nom} ${prenom}</span><br>
-              <span class="filled-field">${adresse}</span><br>
-              <span class="filled-field">${telephone}</span>
-            </div>
-          `;
-        }
-    
-        // Génération du contenu HTML complet
-        const htmlContent = this.generateHTMLContent({
-          generalInfo,
-          temoinsList,
-          vehiculeAData,
-          vehiculeBData,
-          generateTemoinHTML
-        });
-    
-        // Création et ouverture du PDF
-        const pdfUrl = await this.generatePDF(htmlContent);
-
-    // Optionnel : ouvrir le PDF dans un nouvel onglet
+        // Construction de l'adresse
+        const adresseParts = [
+          temoin?.rueTemoin,
+          temoin?.codePostalTemoin,
+          temoin?.villeTemoin
+        ].filter(part => part && part.trim() !== '');
+        
+        const adresse = adresseParts.length > 0 
+          ? adresseParts.join(', ')
+          : 'Adresse non renseignée';
+      
+        return `
+          <div class="temoin-block" style="margin-bottom: 10px;">
+            <strong>Témoin #${index + 1}</strong><br>
+            <span class="filled-field">${nom} ${prenom}</span><br>
+            <span class="filled-field">${adresse}</span><br>
+            <span class="filled-field">${telephone}</span>
+          </div>
+        `;
+      }
   
-
-    // Retourner l'URL pour l'utiliser dans le payload
-    return pdfUrl;
-      } catch (error) {
-        console.error('Erreur lors de la génération du rapport:', error);
-        throw error;
+      // Génération du contenu HTML complet
+      const htmlContent = this.generateHTMLContent({
+        generalInfo,
+        temoinsList,
+        vehiculeAData,
+        vehiculeBData,
+        generateTemoinHTML
+      });
+  
+      const pdfBlob = await this.generatePDF(htmlContent);
+      return pdfBlob;
+  
+    } catch (error) {
+      console.error('Erreur lors de la génération du rapport:', error);
+      throw error;
+    }
+  }
+  
+  private generateHTMLContent(data: {
+    generalInfo: any,
+    temoinsList: any[],
+    vehiculeAData: any,
+    vehiculeBData: any,
+    generateTemoinHTML: Function
+  }): string {
+    const { generalInfo, temoinsList, vehiculeAData, vehiculeBData, generateTemoinHTML } = data;
+  
+    return `<!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Constat Amiable d'Accident</title>
+        <style>
+          ${this.getCSSStyles()}
+        </style>
+      </head>
+      <body>
+        
+          ${this.generateHeader()}
+          ${this.generateGeneralInfoTable(generalInfo, temoinsList, generateTemoinHTML)}
+          ${this.generateVehicleSections(vehiculeAData, vehiculeBData)}
+          ${this.generateSignatureSection()}
+       
+      </body>
+      </html>`;
+  }
+  
+  private getCSSStyles(): string {
+    return `
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        padding: 20px;
+        background-color: #f5f5f5;
+        color: #333;
       }
-    }
-    
-    private generateHTMLContent(data: {
-      generalInfo: any,
-      temoinsList: any[],
-      vehiculeAData: any,
-      vehiculeBData: any,
-      generateTemoinHTML: Function
-    }): string {
-      const { generalInfo, temoinsList, vehiculeAData, vehiculeBData, generateTemoinHTML } = data;
-    
-      return `<!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Constat Amiable d'Accident</title>
-          <style>
-            ${this.getCSSStyles()}
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            ${this.generateHeader()}
-            ${this.generateGeneralInfoTable(generalInfo, temoinsList, generateTemoinHTML)}
-            ${this.generateVehicleSections(vehiculeAData, vehiculeBData)}
-            ${this.generateSignatureSection()}
-          </div>
-        </body>
-        </html>`;
-    }
-    
-    private getCSSStyles(): string {
-      return `
+  
+      .container {
+        width: 60%;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+  
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+  
+      .header h1 {
+        font-size: 18px;
+        margin: 0;
+        color: #333;
+      }
+  
+      .constat-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        table-layout: fixed;
+      }
+  
+      .constat-header {
+        font-weight: bold;
+        background-color: #f2f2f2;
+        border: 1px solid #000;
+      }
+  
+      .constat-table td {
+        border: 1px solid #000;
+        padding: 8px;
+        vertical-align: top;
+      }
+  
+      .underline {
+        border-bottom: 1px solid #000;
+        display: inline-block;
+        min-width: 80px;
+        height: 16px;
+        margin-left: 5px;
+      }
+  
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+      }
+  
+      .checkbox {
+        border: 1px solid #000;
+        width: 12px;
+        height: 12px;
+        margin-right: 5px;
+        display: inline-block;
+      }
+  
+      .divided-cell {
+        display: flex;
+        height: 100%;
+      }
+  
+      .cell-part {
+        flex: 1;
+        padding: 0 5px;
+      }
+  
+      .dotted-divider {
+        border-right: 2px dotted #000;
+      }
+  
+      .main-container {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+      }
+  
+      .vehicle-section {
+        width: 34%;
+        padding: 10px;
+        border: 1px solid #000;
+        border-radius: 3px;
+      }
+  
+      .vehicle-section h2 {
+        text-align: center;
+        font-size: 14px;
+        margin-top: 0;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #000;
+      }
+  
+      .vehicle-section h3 {
+        font-size: 12px;
+        margin: 10px 0 5px 0;
+      }
+  
+      .circumstances {
+        width: 38%;
+        padding: 10px;
+        border: 1px solid #000;
+        border-radius: 3px;
+      }
+  
+      .circumstances h2 {
+        text-align: center;
+        font-size: 14px;
+        margin-top: 0;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #000;
+      }
+  
+      .circumstance-instructions {
+        font-size: 11px;
+        text-align: center;
+        margin-bottom: 10px;
+        font-style: italic;
+      }
+  
+      .circumstance-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+  
+      .circumstance-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+  
+      .vehicle-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+  
+      .signature-section {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+      }
+  
+      .signature-box {
+        width: 45%;
+        text-align: center;
+      }
+  
+      .signature-line {
+        border-bottom: 1px solid #000;
+        height: 30px;
+        margin-top: 5px;
+      }
+  
+      .sketch-img {
+        width: 100%;
+        height: auto;
+        max-height: 400px;
+        object-fit: contain;
+        border: 1px solid #ddd;
+      }
+  
+      .section {
+        margin-bottom: 30px;
+      }
+  
+      .section-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #000;
+      }
+  
+      .observation-content {
+        min-height: 100px;
+        border: 1px dashed #ccc;
+        padding: 10px;
+      }
+  
+      .section_degat {
+        width: 20%;
+        padding: 10px;
+        border: 1px solid #000;
+        border-radius: 3px;
+        margin-bottom: 20px;
+      }
+  
+      .filled-field {
+        color: red;
+        font-weight: bold;
+      }
+  
+      @media print {
         body {
-          font-family: Arial, sans-serif;
-          font-size: 14px;
-          padding: 20px;
-          background-color: #f5f5f5;
-          color: #333;
-        }
-    
-        .container {
-          width: 60%;
-          margin: auto;
-          background: #fff;
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-    
-        .header {
-          text-align: center;
-          margin-bottom: 20px;
-        }
-    
-        .header h1 {
-          font-size: 18px;
-          margin: 0;
-          color: #333;
-        }
-    
-        .constat-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-          table-layout: fixed;
-        }
-    
-        .constat-header {
-          font-weight: bold;
-          background-color: #f2f2f2;
-          border: 1px solid #000;
-        }
-    
-        .constat-table td {
-          border: 1px solid #000;
-          padding: 8px;
-          vertical-align: top;
-        }
-    
-        .underline {
-          border-bottom: 1px solid #000;
-          display: inline-block;
-          min-width: 80px;
-          height: 16px;
-          margin-left: 5px;
-        }
-    
-        .checkbox-container {
-          display: flex;
-          align-items: center;
-          margin-top: 5px;
-        }
-    
-        .checkbox {
-          border: 1px solid #000;
-          width: 12px;
-          height: 12px;
-          margin-right: 5px;
-          display: inline-block;
-        }
-    
-        .divided-cell {
-          display: flex;
-          height: 100%;
-        }
-    
-        .cell-part {
-          flex: 1;
-          padding: 0 5px;
-        }
-    
-        .dotted-divider {
-          border-right: 2px dotted #000;
-        }
-    
-        .main-container {
-          display: flex;
-          justify-content: space-between;
-          margin: 20px 0;
-        }
-    
-        .vehicle-section {
-          width: 30%;
           padding: 10px;
-          border: 1px solid #000;
-          border-radius: 3px;
         }
-    
-        .vehicle-section h2 {
-          text-align: center;
-          font-size: 14px;
-          margin-top: 0;
-          padding-bottom: 5px;
-          border-bottom: 1px solid #000;
-        }
-    
-        .vehicle-section h3 {
-          font-size: 12px;
-          margin: 10px 0 5px 0;
-        }
-    
+  
+        .vehicle-section,
         .circumstances {
-          width: 38%;
-          padding: 10px;
-          border: 1px solid #000;
-          border-radius: 3px;
+          page-break-inside: avoid;
         }
-    
-        .circumstances h2 {
-          text-align: center;
-          font-size: 14px;
-          margin-top: 0;
-          padding-bottom: 5px;
-          border-bottom: 1px solid #000;
-        }
-    
-        .circumstance-instructions {
-          font-size: 11px;
-          text-align: center;
-          margin-bottom: 10px;
-          font-style: italic;
-        }
-    
-        .circumstance-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 8px;
-        }
-    
-        .circumstance-item {
-          display: flex;
-          align-items: center;
-          margin-bottom: 5px;
-        }
-    
-        .vehicle-labels {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 5px;
-          font-weight: bold;
-        }
-    
-        .signature-section {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 40px;
-        }
-    
-        .signature-box {
-          width: 45%;
-          text-align: center;
-        }
-    
-        .signature-line {
-          border-bottom: 1px solid #000;
-          height: 30px;
-          margin-top: 5px;
-        }
-    
-        .sketch-img {
-          width: 100%;
-          height: auto;
-          max-height: 400px;
-          object-fit: contain;
-          border: 1px solid #ddd;
-        }
-    
-        .section {
-          margin-bottom: 30px;
-        }
-    
-        .section-title {
-          font-weight: bold;
-          margin-bottom: 10px;
-          border-bottom: 1px solid #000;
-        }
-    
-        .observation-content {
-          min-height: 100px;
-          border: 1px dashed #ccc;
-          padding: 10px;
-        }
-    
-        .section_degat {
-          width: 20%;
-          padding: 10px;
-          border: 1px solid #000;
-          border-radius: 3px;
-          margin-bottom: 20px;
-        }
-    
-        .filled-field {
-          color: red;
-          font-weight: bold;
-        }
-    
-        @media print {
-          body {
-            padding: 10px;
-          }
-    
-          .vehicle-section,
-          .circumstances {
-            page-break-inside: avoid;
-          }
-        }
-      `;
-    }
-    
-    private generateHeader(): string {
-      return `
-        <div class="header">
-          <h1>CONSTAT AMIABLE D'ACCIDENT</h1>
-        </div>`;
-    }
-    
-    private generateGeneralInfoTable(generalInfo: any, temoinsList: any[], generateTemoinHTML: Function): string {
-      return `
-        <table class="constat-table">
-          <tr class="constat-header">
-            <td width="40%">
-              <div class="divided-cell">
-                <div class="cell-part dotted-divider">
-                  <strong>1. Date de l'accident</strong><br>
-                  <span class="filled-field">${generalInfo.dateAccident || ''}</span>
-                </div>
-                <div class="cell-part">
-                  <strong>Heure</strong><br>
-                  <span class="filled-field">${generalInfo.heureAccident || ''}</span>
-                </div>
-              </div>
-            </td>
-            <td width="30%">
-              <strong>2. Lieu</strong><br>
-              <span class="filled-field">${generalInfo.rue || ''}, ${generalInfo.codePostal || ''} ${generalInfo.ville || ''}</span>
-            </td>
-            <td width="30%">
-              <strong>3. Blessés même légers</strong>
-              <div class="checkbox-container">
-                <span class="checkbox">${!generalInfo.blesses ? '✓' : ''}</span> non
-                <span class="checkbox">${generalInfo.blesses ? '✓' : ''}</span> oui
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <strong>4. Dégats matériels autres qu'aux véhicules A et B</strong>
-              <div class="checkbox-container">
-                <span class="checkbox">${!generalInfo.degatsMateriels ? '✓' : ''}</span> non
-                <span class="checkbox">${generalInfo.degatsMateriels ? '✓' : ''}</span> oui
-              </div>
-            </td>
-            <td colspan="2">
-              <strong>5. Témoins</strong><br>
-              ${temoinsList.length > 0 ? 
-                temoinsList.map((temoin, index) => generateTemoinHTML(temoin, index)).join('') : 
-                '<span class="filled-field">Aucun témoin déclaré</span>'
-              }
-            </td>
-          </tr>
-        </table>`;
-    }
-    
-    private generateVehicleSections(vehiculeAData: any, vehiculeBData: any): string {
-      return `
-        <div class="main-container">
-          ${this.generateVehicleSection('A', vehiculeAData)}
-          ${this.generateCircumstancesSection()}
-          ${this.generateVehicleSection('B', vehiculeBData)}
-        </div>`;
-    }
-    
-    private generateVehicleSection(vehicleLetter: string, vehicleData: any): string {
-      const bgColor = vehicleLetter === 'A' ? '#d4edda' : '#fff3cd'; // vert clair ou jaune clair
-      const borderColor = vehicleLetter === 'A' ? '#155724' : '#856404'; // vert foncé ou jaune foncé
-    
-      return `
-        <div class="vehicle-section" style="background-color: ${bgColor}; border: 2px solid ${borderColor}; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-          <h2>VÉHICULE ${vehicleLetter}</h2>
-          
-          <h3>6. Société d'Assurances</h3>
-          <p>Véhicule assuré par <span class="underline filled-field">${vehicleData.vehiculeAssure || ''}</span></p>
-          <p>Contrat N° <span class="underline filled-field" style="min-width: 60%;">${vehicleData.contratAssurance || ''}</span></p>
-          <p>Agence <span class="underline filled-field" style="min-width: 70%;">${vehicleData.agence || ''}</span></p>
-          <p>Attestation valable <span class="underline filled-field" style="min-width: 70%;">${vehicleData.dateDebut || ''} - ${vehicleData.dateFin || ''}</span></p>
-    
-          <h3>7. Identité du Conducteur</h3>
-          <p>Nom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.nomConducteur || vehicleData.nomAssure || ''}</span></p>
-          <p>Prénom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.prenomConducteur || vehicleData.prenomAssure || ''}</span></p>
-          <p>Adresse <span class="underline filled-field" style="min-width: 80%;">${vehicleData.rueConducteur || ''}, ${vehicleData.codePostalConducteur || ''} ${vehicleData.villeConducteur || ''}</span></p>
-          <p>Permis de conduire n° <span class="underline filled-field" style="min-width: 60%;">${vehicleData.numPermis || ''}</span></p>
-          <p>Délivré le <span class="underline filled-field" style="min-width: 60%;">${vehicleData.dateDelivrance || ''}</span></p>
-    
-          <h3>8. Assuré (voir attestation d'assurance)</h3>
-          <p>Nom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.nomAssure || ''}</span></p>
-          <p>Prénom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.prenomAssure || ''}</span></p>
-          <p>Adresse <span class="underline filled-field" style="min-width: 80%;">${vehicleData.rueAssure || ''}, ${vehicleData.codePostalAssure || ''} ${vehicleData.villeAssure || ''}</span></p>
-          <p>Téléphone <span class="underline filled-field" style="min-width: 60%;">${vehicleData.telAssure || ''}</span></p>
-    
-          <h3>9. Identité du véhicule</h3>
-          <p>Marque, Type <span class="underline filled-field" style="min-width: 70%;">${vehicleData.marqueVehicule || ''} ${vehicleData.modeleVehicule || ''}</span></p>
-          <p>N° d'immatriculation <span class="underline filled-field" style="min-width: 70%;">${vehicleData.numImmatriculation || ''}</span></p>
-          <p>Sens suivi <span class="underline filled-field" style="min-width: 80%;">${vehicleData.venantDe || ''} vers ${this.vehiculeAData.allantA || ''}</span></p>
-        </div>`;
-    }
-    
-    private generateCircumstancesSection(): string {
-      return `
-        <div class="circumstances" style="width: 33%; max-width: 600px; margin: 0 auto;">
-          <h2 style="text-align: center; margin-bottom: 10px; font-size: 16px;">12. Circonstances</h2>
-          <p style="text-align: center; font-style: italic; margin-bottom: 15px; font-size: 12px;">
-            Mettre une croix (x) dans les cases correspondantes pour chaque véhicule
-          </p>
-    
-          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <div style="width: 48%; text-align: left; font-weight: bold;">Véhicule A (${this.getSelectedCount('A')})</div>
-            <div style="width: 48%; text-align: right; font-weight: bold;">Véhicule B (${this.getSelectedCount('B')})</div>
-          </div>
-    
-          <div style="border: 1px solid #ddd; padding: 10px;">
-            ${this.circonstancesOptions.map(option => `
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;">
-                <div style="width: 85%; display: flex; align-items: center;">
-                  <span style="border: 1px solid #000; width: 14px; height: 14px; margin-right: 8px;
-                        display: inline-flex; justify-content: center; align-items: center; color: red;">
-                    ${this.isSelected(option.id, 'A') ? '✗' : ''}
-                  </span>
-                  <span>${option.id}. ${option.label}</span>
-                </div>
-                <div style="width: 10%; text-align: right;">
-                  <span style="border: 1px solid #000; width: 14px; height: 14px;
-                        display: inline-flex; justify-content: center; align-items: center; color: red;">
-                    ${this.isSelected(option.id, 'B') ? '✗' : ''}
-                  </span>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-    
-    
-    private generateSignatureSection(): string {
-      return `
-        <div class="signature-section">
-          <div class="signature-box">
-            <p>A. Signature du conducteur A</p>
-            <div class="signature-line"></div>
-            <p>Date et signature</p>
-          </div>
-          <div class="signature-box">
-            <p>B. Signature du conducteur B</p>
-            <div class="signature-line"></div>
-            <p>Date et signature</p>
-          </div>
-        </div>`;
-    }
-    
-    private async generatePDF(htmlContent: string): Promise<string> {
-      const options = {
-        margin: 10,
-        filename: 'constat-amiable.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-    
-
-    
-      const blob = new Blob([htmlContent], { type: 'text/html' });
-      const pdfUrl = URL.createObjectURL(blob);
-      
-      
-      return pdfUrl;
-     
-    
-    }
-    getCookie(name: string): string | null {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-      return null;
-    }
-    
-    async submitConstat(): Promise<void> {
-      const token = this.getCookie('access_token');
-            
-      if (token) {
-        const decoded: any = jwtDecode(token); // Décode le token
-        const userId = Number(decoded.sub);
-    
-        const generalData = this.generalInfoForm.value;
-        const temoins = this.temoins.value;
-    
-        // Attendre la génération du PDF et récupérer l'URL
-        const pdfUrl = await this.exportFullReport();
-        window.open(pdfUrl, '_blank');
-    
-        // Préparation du constatPayload
-        const constatPayload: any = {
-          dateAccident: generalData.dateAccident,
-          heure: generalData.heureAccident,
-          lieu: {
-            rue: generalData.rue,
-            ville: generalData.ville,
-            codePostal: generalData.codePostal,
-            pays: 'Tunisia'
-          },
-          blessees: generalData.blesses,
-          degatMateriels: generalData.degatsMateriels,
-          temoins: temoins.map((t: any) => ({
-            nom: t.nom,
-            prenom: t.prenom,
-            telephone: t.telephone,
-            adresse: {
-              rue: t.rueTemoin,
-              ville: t.villeTemoin,
-              codePostal: t.codePostalTemoin,
-              pays: 'Tunisia',
-            },
-          })),
-          pdfUrl
-        };
-    
-        // Ajout du conducteur du véhicule A si ce n'est pas l'assuré
-        if (!this.vehiculeAData.isAssureConducteur) {
-          constatPayload.conducteur = {
-            nom: this.vehiculeAData.nomConducteur,
-            prenom: this.vehiculeAData.prenomConducteur,
-            numPermis: this.vehiculeAData.numPermis,
-            adresse: {
-              rue: this.vehiculeAData.rueConducteur,
-              ville: this.vehiculeAData.villeConducteur,
-              codePostal: this.vehiculeAData.codePostalConducteur,
-              pays: 'Tunisia'
-            }
-          };
-        }
-    
-        // Détermination des adresses email des conducteurs
-        const conducteur1Email = this.vehiculeAData.isAssureConducteur 
-          ? this.vehiculeAData.emailAssure 
-          : this.vehiculeAData.emailConducteur;
-    
-        const conducteur2Email = this.vehiculeBData.isAssureConducteur 
-          ? this.vehiculeBData.emailAssure 
-          : this.vehiculeBData.emailConducteur;
-    
-        // Appel API pour créer le constat
-        this.constatService.createConstat(userId, constatPayload, conducteur1Email, conducteur2Email).subscribe({
-          next: res => {
-            console.log('✅ Constat créé avec succès', res);
-          },
-          error: err => {
-            console.error('❌ Erreur lors de la création du constat', err);
-          }
-        });
       }
+    `;
+  }
+  
+  private generateHeader(): string {
+    return `
+      <div class="header">
+        <h1>CONSTAT AMIABLE D'ACCIDENT</h1>
+      </div>`;
+  }
+  
+  private generateGeneralInfoTable(generalInfo: any, temoinsList: any[], generateTemoinHTML: Function): string {
+    return `
+      <table class="constat-table">
+        <tr class="constat-header">
+          <td width="40%">
+            <div class="divided-cell">
+              <div class="cell-part dotted-divider">
+                <strong>1. Date de l'accident</strong><br>
+                <span class="filled-field">${generalInfo.dateAccident || ''}</span>
+              </div>
+              <div class="cell-part">
+                <strong>Heure</strong><br>
+                <span class="filled-field">${generalInfo.heureAccident || ''}</span>
+              </div>
+            </div>
+          </td>
+          <td width="30%">
+            <strong>2. Lieu</strong><br>
+            <span class="filled-field">${generalInfo.rue || ''}, ${generalInfo.codePostal || ''} ${generalInfo.ville || ''}</span>
+          </td>
+          <td width="30%">
+            <strong>3. Blessés même légers</strong>
+            <div class="checkbox-container">
+              <span class="checkbox">${!generalInfo.blesses ? '✓' : ''}</span> non
+              <span class="checkbox">${generalInfo.blesses ? '✓' : ''}</span> oui
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>4. Dégats matériels autres qu'aux véhicules A et B</strong>
+            <div class="checkbox-container">
+              <span class="checkbox">${!generalInfo.degatsMateriels ? '✓' : ''}</span> non
+              <span class="checkbox">${generalInfo.degatsMateriels ? '✓' : ''}</span> oui
+            </div>
+          </td>
+          <td colspan="2">
+            <strong>5. Témoins</strong><br>
+            ${temoinsList.length > 0 ? 
+              temoinsList.map((temoin, index) => generateTemoinHTML(temoin, index)).join('') : 
+              '<span class="filled-field">Aucun témoin déclaré</span>'
+            }
+          </td>
+        </tr>
+      </table>`;
+  }
+  
+  private generateVehicleSections(vehiculeAData: any, vehiculeBData: any): string {
+    return `
+      <div class="main-container">
+        ${this.generateVehicleSection('A', vehiculeAData)}
+        ${this.generateCircumstancesSection()}
+        ${this.generateVehicleSection('B', vehiculeBData)}
+      </div>`;
+  }
+  
+  private generateVehicleSection(vehicleLetter: string, vehicleData: any): string {
+    const bgColor = vehicleLetter === 'A' ? '#d4edda' : '#fff3cd'; // vert clair ou jaune clair
+    const borderColor = vehicleLetter === 'A' ? '#155724' : '#856404'; // vert foncé ou jaune foncé
+  
+    return `
+      <div class="vehicle-section" style="background-color: ${bgColor}; border: 2px solid ${borderColor}; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h2>VÉHICULE ${vehicleLetter}</h2>
+        
+        <h3>6. Société d'Assurances</h3>
+        <p>Véhicule assuré par <span class="underline filled-field">${vehicleData.vehiculeAssure || ''}</span></p>
+        <p>Contrat N° <span class="underline filled-field" style="min-width: 60%;">${vehicleData.contratAssurance || ''}</span></p>
+        <p>Agence <span class="underline filled-field" style="min-width: 70%;">${vehicleData.agence || ''}</span></p>
+        <p>Attestation valable <span class="underline filled-field" style="min-width: 70%;">${vehicleData.dateDebut || ''} - ${vehicleData.dateFin || ''}</span></p>
+  
+        <h3>7. Identité du Conducteur</h3>
+        <p>Nom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.nomConducteur || vehicleData.nomAssure || ''}</span></p>
+        <p>Prénom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.prenomConducteur || vehicleData.prenomAssure || ''}</span></p>
+        <p>Adresse <span class="underline filled-field" style="min-width: 80%;">${vehicleData.rueConducteur || ''}, ${vehicleData.codePostalConducteur || ''} ${vehicleData.villeConducteur || ''}</span></p>
+        <p>Permis de conduire n° <span class="underline filled-field" style="min-width: 60%;">${vehicleData.numPermis || ''}</span></p>
+        <p>Délivré le <span class="underline filled-field" style="min-width: 60%;">${vehicleData.dateDelivrance || ''}</span></p>
+  
+        <h3>8. Assuré (voir attestation d'assurance)</h3>
+        <p>Nom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.nomAssure || ''}</span></p>
+        <p>Prénom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.prenomAssure || ''}</span></p>
+        <p>Adresse <span class="underline filled-field" style="min-width: 80%;">${vehicleData.rueAssure || ''}, ${vehicleData.codePostalAssure || ''} ${vehicleData.villeAssure || ''}</span></p>
+        <p>Téléphone <span class="underline filled-field" style="min-width: 60%;">${vehicleData.telAssure || ''}</span></p>
+  
+        <h3>9. Identité du véhicule</h3>
+        <p>Marque, Type <span class="underline filled-field" style="min-width: 70%;">${vehicleData.marqueVehicule || ''} ${vehicleData.modeleVehicule || ''}</span></p>
+        <p>N° d'immatriculation <span class="underline filled-field" style="min-width: 70%;">${vehicleData.numImmatriculation || ''}</span></p>
+        <p>Sens suivi <span class="underline filled-field" style="min-width: 80%;">${vehicleData.venantDe || ''} vers ${this.vehiculeAData.allantA || ''}</span></p>
+      </div>`;
+  }
+  
+  private generateCircumstancesSection(): string {
+    return `
+      <div class="circumstances" style="width: 34%; max-width: 600px; margin: 0 auto;">
+        <h2 style="text-align: center; margin-bottom: 10px; font-size: 16px;">12. Circonstances</h2>
+        <p style="text-align: center; font-style: italic; margin-bottom: 15px; font-size: 12px;">
+          Mettre une croix (x) dans les cases correspondantes pour chaque véhicule
+        </p>
+  
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <div style="width: 48%; text-align: left; font-weight: bold;">Véhicule A (${this.getSelectedCount('A')})</div>
+          <div style="width: 48%; text-align: right; font-weight: bold;">Véhicule B (${this.getSelectedCount('B')})</div>
+        </div>
+  
+        <div style="border: 1px solid #ddd; padding: 10px;">
+          ${this.circonstancesOptions.map(option => `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;">
+              <div style="width: 85%; display: flex; align-items: center;">
+                <span style="border: 1px solid #000; width: 14px; height: 14px; margin-right: 8px;
+                      display: inline-flex; justify-content: center; align-items: center; color: red;">
+                  ${this.isSelected(option.id, 'A') ? '✗' : ''}
+                </span>
+                <span>${option.id}. ${option.label}</span>
+              </div>
+              <div style="width: 10%; text-align: right;">
+                <span style="border: 1px solid #000; width: 14px; height: 14px;
+                      display: inline-flex; justify-content: center; align-items: center; color: red;">
+                  ${this.isSelected(option.id, 'B') ? '✗' : ''}
+                </span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  
+  private generateSignatureSection(): string {
+    return `
+      <div class="signature-section">
+        <div class="signature-box">
+          <p>A. Signature du conducteur A</p>
+          <div class="signature-line"></div>
+          <p>Date et signature</p>
+        </div>
+        <div class="signature-box">
+          <p>B. Signature du conducteur B</p>
+          <div class="signature-line"></div>
+          <p>Date et signature</p>
+        </div>
+      </div>`;
+  }
+  
+  private async generatePDF(htmlContent: string): Promise<Blob> {
+
+    const element = document.createElement('div');
+    element.innerHTML = htmlContent;
+  
+    const opt = {
+      margin: 5,
+      filename: 'constat-amiable.pdf',
+      html2canvas: { 
+        scale: 2,
+        scrollY: 0,
+        useCORS: true,
+        allowTaint: true
+      },
+      jsPDF: { 
+        unit: 'mm',
+        format: [280, 320], // [width, height] (A4 standard: [210, 297])
+        orientation: 'portrait'
+      }
+    };
+    const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+    return pdfBlob;
+   
+  
+  }
+  getCookie(name: string): string | null {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+  }
+  
+  async submitConstat(): Promise<void> {
+    const token = this.getCookie('access_token');
+  
+    if (token) {
+      const decoded: any = jwtDecode(token); // Décode le token
+      const userId = Number(decoded.sub);
+  
+      const generalData = this.generalInfoForm.value;
+      const temoins = this.temoins.value;
+  
+      const pdfBlob = await this.exportFullReport();
+  
+      // Ouverture du PDF dans un nouvel onglet
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+  
+      // Création du FormData pour le PDF
+      const formData = new FormData();
+      formData.append('file', pdfBlob, 'constat-amiable.pdf');
+  
+      // Préparation du constatPayload
+      const constatPayload: any = {
+        dateAccident: generalData.dateAccident,
+        heure: generalData.heureAccident,
+        lieu: {
+          rue: generalData.rue,
+          ville: generalData.ville,
+          codePostal: generalData.codePostal,
+          pays: 'Tunisia'
+        },
+        blessees: generalData.blesses,
+        degatMateriels: generalData.degatsMateriels,
+        temoins: temoins.map((t: any) => ({
+          nom: t.nom,
+          prenom: t.prenom,
+          telephone: t.telephone,
+          adresse: {
+            rue: t.rueTemoin,
+            ville: t.villeTemoin,
+            codePostal: t.codePostalTemoin,
+            pays: 'Tunisia',
+          },
+        })),
+        pdfUrl
+      };
+  
+      // Ajout du conducteur du véhicule A si ce n'est pas l'assuré
+      if (!this.vehiculeAData.isAssureConducteur) {
+        constatPayload.conducteur = {
+          nom: this.vehiculeAData.nomConducteur,
+          prenom: this.vehiculeAData.prenomConducteur,
+          numPermis: this.vehiculeAData.numPermis,
+          adresse: {
+            rue: this.vehiculeAData.rueConducteur,
+            ville: this.vehiculeAData.villeConducteur,
+            codePostal: this.vehiculeAData.codePostalConducteur,
+            pays: 'Tunisia'
+          }
+        };
+      }
+  
+      // Détermination des adresses email des conducteurs
+      const conducteur1Email = this.vehiculeAData.isAssureConducteur 
+        ? this.vehiculeAData.emailAssure 
+        : this.vehiculeAData.emailConducteur;
+  
+      const conducteur2Email = this.vehiculeBData.isAssureConducteur 
+        ? this.vehiculeBData.emailAssure 
+        : this.vehiculeBData.emailConducteur;
+  
+      // Création du constat et récupération de l'ID
+      this.constatService.createConstat(userId, constatPayload, conducteur1Email, conducteur2Email).subscribe({
+        next: (res) => {
+          console.log('✅ Constat créé avec succès', res);
+  
+          // On récupère l'ID du constat créé
+          const constatId = res.idConstat;  // Assure-toi que l'API retourne un id de constat
+  
+          // Upload du PDF après la création du constat avec l'ID retourné
+          this.constatService.uploadConstatPDF(constatId, pdfBlob).subscribe({
+            next: (uploadRes) => {
+              console.log('✅ PDF uploadé avec succès', uploadRes);
+            },
+            error: (uploadErr) => {
+              console.error('❌ Erreur lors de l’upload du PDF', uploadErr);
+            }
+          });
+        },
+        error: (err) => {
+          console.error('❌ Erreur lors de la création du constat', err);
+        }
+      });
     }
-    
-    
+  }
+  
+  
 }

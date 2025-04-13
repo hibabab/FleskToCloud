@@ -10,6 +10,8 @@ import { ContratModule } from './contrat/contrat.module';
 
 // Suppression de provideAnimationsAsync et remplacement par BrowserAnimationsModule
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NotificationComponent } from './agent/notification/notification.component';
+
 
 
 
@@ -18,9 +20,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent,
-
-
-    // HeaderComponent et SidebarclientComponent restent ici
+    NotificationComponent,
+  
   ],
   imports: [
     BrowserModule,
