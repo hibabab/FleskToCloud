@@ -22,6 +22,9 @@ import { MesCAComponent } from './mes-ca/mes-ca.component';
 import { InterfaceComponent } from './interface/interface.component';
 import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
 import { CASemstrielComponent } from './casemstriel/casemstriel.component';
+import { VehiculeComponent } from './vehicule/vehicule.component';
+import { ConstatComponent } from './constat/constat.component';
+import { NotificationAssureComponent } from './notification-assure/notification-assure.component';
 
 
 @NgModule({
@@ -41,7 +44,11 @@ import { CASemstrielComponent } from './casemstriel/casemstriel.component';
     MesCAComponent,
     InterfaceComponent,
     RenouvellementCAComponent,
-    CASemstrielComponent
+    CASemstrielComponent,
+    VehiculeComponent,
+    ConstatComponent,
+    NotificationAssureComponent,
+
   ],
   imports: [
     CommonModule,
@@ -52,6 +59,9 @@ import { CASemstrielComponent } from './casemstriel/casemstriel.component';
     HttpClientModule,
     MatSnackBarModule,
 
+  ],
+  exports: [
+    VehiculeComponent
   ]
 })
 export class AssureModule { }

@@ -1,0 +1,147 @@
+<div class="flex">
+   
+
+   <div class="flex-1 mt-20 ml-60">
+    <section class="min-h-screen p-4 space-y-10">
+
+      <!-- Tableau En attente -->
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-800">Constats en attente</h2>
+            <p class="text-sm text-gray-600 mt-1">Liste des constats à planifier</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-100">
+              <tr class="text-gray-700">
+                <th class="px-4 py-3">N° Police</th>
+                <th class="px-4 py-3">Assuré</th>
+                <th class="px-4 py-3">Lieu</th>
+                <th class="px-4 py-3">Date</th>
+                <th class="px-4 py-3">Statut</th>
+                <th class="px-4 py-3">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let c of enAttente" class="hover:bg-gray-50">
+                <td class="px-4 py-4">{{ c.police }}</td>
+                <td class="px-4 py-4">{{ c.assure }}</td>
+                <td class="px-4 py-4">{{ c.lieu }}</td>
+                <td class="px-4 py-4">{{ c.date }}</td>
+                <td class="px-4 py-4">
+                  <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">{{ c.statut }}</span>
+                </td>
+                <td class="px-4 py-4">
+                  <button class="px-3 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700 flex items-center"
+                          (click)="openModal(c)">
+                    <i class="fas fa-calendar-plus mr-1"></i> Planifier
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tableau En cours -->
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-800">Constats en cours</h2>
+            <p class="text-sm text-gray-600 mt-1">Liste des constats à estimer</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-100">
+              <tr class="text-gray-700">
+                <th class="px-4 py-3">N° Police</th>
+                <th class="px-4 py-3">Assuré</th>
+                <th class="px-4 py-3">Lieu</th>
+                <th class="px-4 py-3">Date</th>
+                <th class="px-4 py-3">Statut</th>
+                <th class="px-4 py-3">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let c of enCours" class="hover:bg-gray-50">
+                <td class="px-4 py-4">{{ c.police }}</td>
+                <td class="px-4 py-4">{{ c.assure }}</td>
+                <td class="px-4 py-4">{{ c.lieu }}</td>
+                <td class="px-4 py-4">{{ c.date }}</td>
+                <td class="px-4 py-4">
+                  <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">{{ c.statut }}</span>
+                </td>
+                <td class="px-4 py-4">
+                  <button class="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 flex items-center"
+                          (click)="estimerMontant(c)">
+                    <i class="fas fa-money-bill-wave mr-1"></i> Estimer
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tableau Terminée -->
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-gray-800">Constats terminés</h2>
+            <p class="text-sm text-gray-600 mt-1">Liste des constats clôturés</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-100">
+              <tr class="text-gray-700">
+                <th class="px-4 py-3">N° Police</th>
+                <th class="px-4 py-3">Assuré</th>
+                <th class="px-4 py-3">Lieu</th>
+                <th class="px-4 py-3">Date</th>
+                <th class="px-4 py-3">Statut</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let c of terminee" class="hover:bg-gray-50">
+                <td class="px-4 py-4">{{ c.police }}</td>
+                <td class="px-4 py-4">{{ c.assure }}</td>
+                <td class="px-4 py-4">{{ c.lieu }}</td>
+                <td class="px-4 py-4">{{ c.date }}</td>
+                <td class="px-4 py-4">
+                  <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">{{ c.statut }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</div>
+
+<!-- Modal de planification -->
+<div *ngIf="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg w-96 shadow-lg">
+    <h3 class="text-lg font-semibold mb-4">Planifier un rendez-vous</h3>
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Date et heure</label>
+      <input type="datetime-local" class="w-full p-2 border rounded">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Lieu</label>
+      <input type="text" class="w-full p-2 border rounded" placeholder="Adresse ou garage partenaire">
+    </div>
+    <div class="flex justify-end space-x-3">
+      <button (click)="closeModal()" class="px-4 py-2 border rounded">Annuler</button>
+      <button class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">Confirmer</button>
+    </div>
+  </div>
+</div>

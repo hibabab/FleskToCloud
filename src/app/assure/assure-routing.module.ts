@@ -5,15 +5,17 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
 import { AceuilComponent } from './aceuil/aceuil.component';
 import { DeviComponent } from './devi/devi.component';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
-import { PaymentInitiateComponent } from './payment/payment-initiate/payment-initiate.component';
-import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
-import { PaymentFailureComponent } from './payment/payment-failure/payment-failure.component';
-import { PaymentStatusComponent } from './payment/payment-status/payment-status.component';
-import { MesCAComponent } from './mes-ca/mes-ca.component';
-import { InterfaceComponent } from './interface/interface.component';
-import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
+import { ConstatListComponent } from './constat-list/constat-list.component';
+import { ConstatComponent } from './constat/constat.component';
 import { CASemstrielComponent } from './casemstriel/casemstriel.component';
-
+import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
+import { InterfaceComponent } from './interface/interface.component';
+import { MesCAComponent } from './mes-ca/mes-ca.component';
+import { PaymentStatusComponent } from './payment/payment-status/payment-status.component';
+import { PaymentFailureComponent } from './payment/payment-failure/payment-failure.component';
+import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
+import { PaymentInitiateComponent } from './payment/payment-initiate/payment-initiate.component';
+import { NotificationAssureComponent } from './notification-assure/notification-assure.component';
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
@@ -27,13 +29,16 @@ const routes: Routes = [
   { path: 'interface', component:InterfaceComponent },
   { path: 'NCA', component:RenouvellementCAComponent },
   { path: 'SmestrielCA', component:CASemstrielComponent },
+  { path: 'notification', component:NotificationAssureComponent },
   { path: '', redirectTo: '/dashboard-assure/aceuil', pathMatch: 'full' },
    {path:'CreationCA',component:CreationContratComponent},
     { path: 'devi', component: DeviComponent },
     { path: 'etape1', component:DeviComponent  },
     { path: 'etape2', component:DeviComponent },
     { path: 'etape3', component:DeviComponent },
-    { path: '', redirectTo: 'etape1', pathMatch: 'full' }]
+
+    { path: 'declarer constat', component: ConstatComponent },
+    { path: 'constat', component:ConstatListComponent },]
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

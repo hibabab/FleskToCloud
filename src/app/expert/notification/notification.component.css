@@ -1,0 +1,49 @@
+/* Conteneur des notifications */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 300px;
+  width: 100%;
+}
+
+/* Style général des notifications */
+.notification {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Typage des notifications */
+.notification.success {
+  background-color: #28a745; /* Vert pour succès */
+}
+
+.notification.error {
+  background-color: #dc3545; /* Rouge pour erreur */
+}
+
+.notification.info {
+  background-color: #17a2b8; /* Bleu pour info */
+}
+
+.notification.warning {
+  background-color: #ffc107; /* Jaune pour avertissement */
+}
+
+/* Style du bouton de fermeture */
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}

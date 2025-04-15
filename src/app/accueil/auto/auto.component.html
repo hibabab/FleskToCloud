@@ -189,23 +189,7 @@
           </div>
         </div>
 
-        <!-- Question 4 -->
-        <div class="border-b border-gray-200 pb-4">
-          <div
-            class="flex justify-between items-center cursor-pointer"
-            (click)="toggleAnswer(4)"
-          >
-            <h3 class="text-xl font-semibold text-gray-900">
-              Que signifie « Usage privé trajet / travail » ?
-            </h3>
-            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[4]}">
-              ▼
-            </span>
-          </div>
-          <div *ngIf="isOpen[4]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
-            Cela signifie que le véhicule est utilisé pour des trajets personnels et professionnels.
-          </div>
-        </div>
+
 
         <!-- Question 5 -->
         <div class="border-b border-gray-200 pb-4">
@@ -243,24 +227,8 @@
           </div>
         </div>
 
-        <!-- Question 7 -->
-        <div class="border-b border-gray-200 pb-4">
-          <div
-            class="flex justify-between items-center cursor-pointer"
-            (click)="toggleAnswer(7)"
-          >
-            <h3 class="text-xl font-semibold text-gray-900">
-              En cas de changement de domicile, est-ce que je dois changer ma carte grise ?
-            </h3>
-            <span class="text-green-600 transform transition-transform duration-300" [ngClass]="{'rotate-180': isOpen[7]}">
-              ▼
-            </span>
-          </div>
-          <div *ngIf="isOpen[7]" class="mt-2 text-gray-700 font-bold animate-fade-in-up">
-            Oui, vous devez mettre à jour votre carte grise en cas de changement de domicile.
-          </div>
-        </div>
-      </div>
+      
+
     </div>
   </div>
 </div>

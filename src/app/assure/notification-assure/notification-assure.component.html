@@ -1,0 +1,28 @@
+<div class="flex-1 mt-20 ml-60 p-6">
+  <div class="bg-white rounded-2xl shadow-lg p-6 border border-green-100">
+    <h2 class="text-2xl font-semibold text-green-800 mb-6 flex items-center">
+      <svg class="w-6 h-6 mr-2 text-green-700" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z"/>
+      </svg>
+      Notifications
+    </h2>
+
+    <div *ngIf="notifications.length; else aucuneNotification">
+      <ul class="space-y-4">
+        <li *ngFor="let notif of notifications"
+            [ngClass]="notif.isRead ? 'bg-gray-100 border-gray-300' : 'bg-green-50 border-green-300'"
+            class="border-l-4 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-[1.01]">
+          <p class="text-sm text-gray-800 font-medium">{{ notif.message }}</p>
+          <small class="text-gray-500 italic">{{ notif.createdAt | date:'short' }}</small>
+        </li>
+      </ul>
+    </div>
+
+    <ng-template #aucuneNotification>
+      <div class="text-center text-gray-400 mt-4">
+        <p>Aucune notification disponible.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>
+

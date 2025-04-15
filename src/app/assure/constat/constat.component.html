@@ -1,0 +1,355 @@
+<div class="flex">
+  <app-dashboard></app-dashboard>
+
+  <div class="flex-1 mt-10 ml-40">
+    <section class="min-h-screen flex items-center justify-center p-4">
+      <!-- Conteneur principal -->
+      <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-4xl p-5 w-full h-auto">
+        
+        <!-- Barre de progression -->
+        <div class="w-full mb-6">
+          <div class="flex justify-between mb-2 text-sm">
+            <span *ngFor="let step of steps; let i = index" 
+                  [class.font-bold]="currentStep === i"
+                  [class.text-teal-800]="currentStep === i">
+                Étape {{i+1}}: {{step.title}}
+            </span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-teal-800 h-2.5 rounded-full" 
+                 [style.width.%]="(currentStep + 1) / steps.length * 100"></div>
+          </div>
+        </div>
+
+        <!-- Titre principal -->
+        <div class="text-center">
+          <div class="flex items-center justify-center mb-6 text-2xl font-semibold text-teal-800">
+            <i class="fas fa-car-crash w-8 h-8 text-teal-800 mr-2"></i>
+            <p>Constat Amiable d'Accident Automobile</p>
+          </div>
+          
+          <!-- Message uniquement sur la première page -->
+          <p class="text-gray-500 text-sm text-center mt-2" *ngIf="currentStep === 0">
+            <span class="text-teal-800 font-semibold">NB :</span> 
+            Le constat doit être effectué sur le territoire tunisien, entre deux véhicules maximum et sans blessé.
+          </p>
+        </div>
+
+        <!-- Formulaire multi-pages -->
+        <div class="w-full md:w-7/8 px-4 md:px-16">
+          <!-- Page 1 - Informations générales (incluant les témoins) -->
+<div *ngIf="currentStep === 0"  class="space-y-5 mt-6">
+  <form [formGroup]="generalInfoForm">  
+    
+  
+  <!-- Section Date/Heure -->
+  <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+    <div class="flex-1">
+      <label for="dateAccident" class="block mb-2 text-sm font-medium text-gray-700">
+        Date de l'accident <span class="text-red-500">*</span>
+      </label>
+      <input type="date" formControlName="dateAccident" id="dateAccident" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600">
+    </div>
+    <div class="flex-1">
+      <label for="heureAccident" class="block mb-2 text-sm font-medium text-gray-700">
+        Heure <span class="text-red-500">*</span>
+      </label>
+      <input type="time" formControlName="heureAccident" id="heureAccident" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600">
+    </div>
+  </div>
+
+  <!-- Section Lieu -->
+  <p class="font-semibold text-gray-700 mt-4 mb-4">Lieu de l'accident</p>
+  
+  <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+    <div class="flex-1">
+      <label class="block mb-2 text-sm font-medium text-gray-700">Pays <span class="text-red-500">*</span></label>
+      <div class="flex items-center bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Tunisia.svg" 
+              alt="Drapeau Tunisie" class="w-6 h-6 mr-2">
+        <span class="text-gray-700 font-medium">Tunisie</span>
+      </div>
+    </div>
+    
+    <div class="flex-1">
+      <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
+      <input type="text" formControlName="ville" id="ville" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600">
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+    <div class="flex-1">
+      <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-red-500">*</span></label>
+      <input type="text" formControlName="rue" id="rue" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600">
+    </div>
+    <div class="flex-1">
+      <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-red-500">*</span></label>
+      <input type="text" formControlName="codePostal" id="codePostal" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600">
+    </div>
+  </div>
+
+  <!-- Section Checkboxes -->
+  <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-5">
+    <div class="flex-1 flex items-center">
+      <input type="checkbox" formControlName="degatsMateriels" id="degats" 
+            class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+      <label for="degats" class="ml-2 text-sm font-medium text-gray-700">
+        Dégâts matériels (autres qu'aux véhicules)
+      </label>
+    </div>
+    <div class="flex-1 flex items-center">
+      <input type="checkbox" formControlName="blesses" id="blesse" 
+            class="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+      <label for="blesse" class="ml-2 text-sm font-medium text-gray-700">
+        Blessé(s) (même légers)
+      </label>
+    </div>
+  </div>
+</form>
+
+  <!-- Section Témoins intégrée -->
+  <form [formGroup]="constatForm">
+  <div class="mt-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Témoins</h3>
+    
+    <div formArrayName="temoins" class="space-y-4">
+      <div *ngFor="let temoin of temoins.controls; let i = index" [formGroupName]="i" 
+           class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        
+        <div class="flex justify-between items-center mb-3">
+          <h4 class="font-medium text-gray-700">Témoin #{{i + 1}}</h4>
+          <button type="button" (click)="removeTemoin(i)" 
+                  class="text-red-500 hover:text-red-700 text-sm"
+                  [disabled]="temoins.length <= 1">
+            Supprimer
+          </button>
+        </div>
+
+        <!-- Nom et Prénom -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block mb-1 text-sm text-gray-600">Nom*</label>
+            <input type="text" formControlName="nom"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+          </div>
+          <div>
+            <label class="block mb-1 text-sm text-gray-600">Prénom</label>
+            <input type="text" formControlName="prenom"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+          </div>
+        </div>
+
+        <!-- Téléphone -->
+        <div class="mb-4">
+          <label class="block mb-1 text-sm text-gray-600">Téléphone*</label>
+          <input type="tel" formControlName="telephone"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+        </div>
+
+        <!-- Adresse -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Adresse</label>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block mb-1 text-xs text-gray-500">Rue*</label>
+              <input type="text" formControlName="rueTemoin"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+            </div>
+            <div>
+              <label class="block mb-1 text-xs text-gray-500">Code Postal*</label>
+              <input type="text" formControlName="codePostalTemoin"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+            </div>
+            <div>
+              <label class="block mb-1 text-xs text-gray-500">Ville*</label>
+              <input type="text" formControlName="villeTemoin"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" (click)="addTemoin()" 
+          class="mt-4 flex items-center text-sm text-teal-600 hover:text-teal-800">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Ajouter un témoin
+    </button>
+  </div>
+</form>
+</div>
+          <!-- Page 2 - Véhicule A -->
+          <div *ngIf="currentStep === 1" class="space-y-5 mt-6">
+            <app-vehicule #vehiculeA  [driverPrefix]="'A'" 
+            (formSubmitted)="onFormSubmitted($event, 'A')"></app-vehicule>
+           
+          </div>
+          
+          <div *ngIf="currentStep === 2" class="space-y-5 mt-6">
+            <app-vehicule #vehiculeB
+  [driverPrefix]="'B'" 
+  (formSubmitted)="onFormSubmitted($event, 'B')">
+</app-vehicule>
+            
+          </div>
+
+          <!-- Page 4 - Circonstances -->
+          <div *ngIf="currentStep === 3" class="space-y-5 mt-6">
+            <h2 class="text-xl font-semibold text-center text-teal-800 mb-2">12. Circonstances</h2>
+            <p class="text-sm text-gray-600 text-center mb-6">Mettre une croix (x) dans les cases correspondantes pour chaque véhicule</p>
+
+            <div class="flex justify-center gap-16 mb-4">
+              <div class="flex items-center">
+                <div class="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center mr-2">
+                  <i class="fas fa-car text-sm text-teal-800"></i>
+                </div>
+                <span class="font-medium text-teal-800">Véhicule A</span>
+              </div>
+              
+              <div class="flex items-center">
+                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                  <i class="fas fa-car text-sm text-blue-800"></i>
+                </div>
+                <span class="font-medium text-blue-800">Véhicule B</span>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div *ngFor="let option of circonstancesOptions" class="flex items-center px-4 py-2 border-b">
+                <div class="w-12 flex justify-center">
+                  <input type="checkbox" 
+                        [id]="'A-circonstance-' + option.id"
+                        [checked]="isSelected(option.id, 'A')"
+                        (change)="toggleCirconstance(option.id, 'A')"
+                        class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                </div>
+                
+                <div class="flex-1 px-4 text-center">
+                  <p class="text-sm text-gray-700">
+                    <span class="font-medium">{{option.id}}.</span> {{option.label}}
+                  </p>
+                </div>
+                
+                <div class="w-12 flex justify-center">
+                  <input type="checkbox" 
+                        [id]="'B-circonstance-' + option.id"
+                        [checked]="isSelected(option.id, 'B')"
+                        (change)="toggleCirconstance(option.id, 'B')"
+                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-8">
+              <div class="p-3 bg-teal-50 rounded-lg text-center">
+                <p class="text-sm font-medium text-gray-700">
+                  Cases cochées Véhicule A: 
+                  <span class="font-bold text-teal-800 ml-2">{{getSelectedCount('A')}}</span>
+                </p>
+              </div>
+              <div class="p-3 bg-blue-50 rounded-lg text-center">
+                <p class="text-sm font-medium text-gray-700">
+                  Cases cochées Véhicule B: 
+                  <span class="font-bold text-blue-800 ml-2">{{getSelectedCount('B')}}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Page 5 - Croquis et signatures -->
+          <div *ngIf="currentStep === 4" class="space-y-5 mt-6" #exportContainer>
+            <div class="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-md">
+              <h1 class="text-2xl font-bold mb-6 text-center">Croquis de constat automobile</h1>
+              
+              <div class="flex flex-col md:flex-row gap-6">
+                <!-- Bibliothèque d'icônes -->
+                <div class="w-full md:w-1/5 bg-gray-100 p-4 rounded-lg">
+                  <h2 class="font-semibold mb-3">Éléments</h2>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div *ngFor="let icon of icons" 
+                        (click)="selectIcon(icon)"
+                        class="p-2 bg-gray-200 rounded hover:bg-gray-300 transition cursor-pointer flex flex-col items-center">
+                      <span [innerHTML]="icon.svg" class="text-3xl mb-1"></span>
+                      <span class="text-xs">{{icon.name}}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-4">
+                    <h3 class="font-semibold mb-2">Options</h3>
+                    <button (click)="deleteSelected()" class="w-full py-2 bg-red-500 text-white rounded mb-2">
+                      Supprimer
+                    </button>
+                    <button (click)="clearAll()" class="w-full py-2 bg-red-700 text-white rounded">
+                      Tout effacer
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Zone de dessin -->
+                <div class="w-full md:w-4/5 relative">
+                  <div #sketchContainer class="bg-gray-50 border-2 border-gray-300 rounded-lg overflow-hidden"
+                      (click)="placeIcon($event)"
+                      style="height: 600px; position: relative;">
+                    <!-- Fond de schéma routier -->
+                    <svg class="absolute w-full h-full">
+                      <path d="M 100 300 L 700 300" stroke="#555" stroke-width="20" stroke-linecap="round"/>
+                      <path d="M 100 300 L 100 100" stroke="#555" stroke-width="15" stroke-linecap="round"/>
+                      <path d="M 100 100 L 400 100" stroke="#555" stroke-width="15" stroke-linecap="round"/>
+                      <path d="M 400 100 L 700 300" stroke="#555" stroke-width="15" stroke-linecap="round"/>
+                      <path d="M 100 300 L 700 300" stroke="#fff" stroke-width="2" stroke-dasharray="20,10"/>
+                    </svg>
+                    
+                    <!-- Éléments placés par l'utilisateur -->
+                    <div *ngFor="let item of placedItems; let i = index" 
+                        [style.left.px]="item.x" 
+                        [style.top.px]="item.y"
+                        [class.border-blue-500]="selectedItemIndex === i"
+                        class="absolute cursor-move border-2 border-transparent p-1 bg-white bg-opacity-70 rounded"
+                        (mousedown)="startDrag($event, i)"
+                        draggable="false">
+                      <span [innerHTML]="item.svg" class="block"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+           
+          </div>
+
+          <!-- Navigation entre pages -->
+          <div class="mt-8 flex justify-between">
+            <button *ngIf="currentStep > 0" 
+                    (click)="previousStep()"
+                    type="button"
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                Précédent
+            </button>
+            
+            <button *ngIf="currentStep < steps.length - 1" 
+                    (click)="nextStep()"
+                    type="button"
+                    class="px-4 py-2 bg-teal-800 text-white rounded hover:bg-teal-700 disabled:bg-gray-400">
+                Suivant
+            </button>
+
+            <button *ngIf="currentStep === steps.length - 1" 
+            (click) =" submitConstat()"
+                    type="button"
+                    class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+           
+                    Soumettre le constat</button>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
