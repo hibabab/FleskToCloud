@@ -7,6 +7,7 @@ import { DeviComponent } from './devi/devi.component';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
 import { ConstatComponent } from './constat/constat.component';
 import { ConstatListComponent } from './constat-list/constat-list.component';
+import { NotificationComponent } from './notification/notification.component';
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
@@ -20,7 +21,8 @@ const routes: Routes = [
     { path: 'etape3', component:DeviComponent },
     { path: '', redirectTo: 'etape1', pathMatch: 'full' },
     { path: 'declarer constat', component: ConstatComponent },
-    { path: 'constat', component:ConstatListComponent },]
+    { path: 'constat', component:ConstatListComponent },
+    {path:'notification',component:NotificationComponent}  ,]
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

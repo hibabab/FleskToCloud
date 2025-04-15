@@ -25,7 +25,7 @@
 
         <!-- Mes Constats -->
         <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
+          <a [routerLink]="['/dashboard-assure', 'constat']"class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
             <i class="fas fa-file-signature w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
             <span class="flex-1 ms-3 whitespace-nowrap">Mes Constats</span>
           </a>
@@ -81,11 +81,13 @@
         </button>
 
         <!-- Icône Notification -->
-        <button class="h-10 w-10 flex items-center justify-center rounded-full  border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
-          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
-          </svg>
-        </button>
+        <a [routerLink]="['/dashboard-assure/notification']" routerLinkActive="router-link-active">
+          <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
+            <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
+            </svg>
+          </button>
+        </a>
 
         <!-- Photo de profil et informations -->
         <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">

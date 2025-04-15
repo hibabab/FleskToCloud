@@ -90,10 +90,7 @@ export class ConstatEnCoursComponent implements OnInit {
     }
   }
 
-  validerEstimation() {
-    alert(`Montant estimé pour ${this.selectedConstat.assure}: ${this.montantEstime} DT`);
-    this.closeModal();
-  }
+
 
   private getCookie(name: string): string | null {
     const value = `; ${document.cookie}`;
@@ -101,4 +98,46 @@ export class ConstatEnCoursComponent implements OnInit {
     if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
     return null;
   }
-}
+ 
+  isLoading: boolean = false;
+  
+  validerEstimation(): void {
+    // Add more detailed validation
+    if (!this.selectedConstat || 
+        !this.selectedConstat.idConstat || 
+        !this.montantEstime || 
+        !this.descriptionDommage || 
+        !this.fileToUpload) {
+      alert('Veuillez remplir tous les champs obligatoires et sélectionner un constat.');
+      return;
+    }
+  
+    this.isLoading = true;
+  
+    const formData = new FormData();
+    formData.append('constatId', this.selectedConstat.idConstat.toString());
+    formData.append('montant', this.montantEstime.toString());
+    formData.append('degats', this.descriptionDommage);
+  
+    if (this.commentaire) {
+      formData.append('commentaire', this.commentaire);
+    }
+  
+    formData.append('rapport', this.fileToUpload, this.fileToUpload.name);
+  
+    this.expertconstatService.estimerConstatParExpert(formData).subscribe({
+      next: () => {
+        alert('Estimation envoyée avec succès.');
+        this.closeModal();
+        this.loadConstatsEnCours();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Une erreur est survenue lors de l\'envoi de l\'estimation.');
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+}  

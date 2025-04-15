@@ -14,6 +14,9 @@ import { DevisCAComponent } from './devis-ca/devis-ca.component';
 import { ListeExpertComponent } from './liste-expert/liste-expert.component';
 import { ListeAutoComponent } from './liste-auto/liste-auto.component';
 import { ConstatListComponent } from './constat-list/constat-list.component';
+import { NotificationComponent } from './notification/notification.component';
+
+
 
 
 
@@ -29,7 +32,8 @@ const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent 
   { path: 'devis', component: DevisCAComponent},
   { path: 'liste-expert', component: ListeExpertComponent },
   { path: 'liste-auto', component: ListeAutoComponent },
-  { path: 'liste-constat', component: ConstatListComponent}
+  { path: 'liste-constat', component: ConstatListComponent},
+   {path:'notification',component:NotificationComponent}  
 
 
  ];

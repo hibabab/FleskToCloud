@@ -3,67 +3,97 @@ import { ConstatService } from '../Services/constat.service';
 
 @Component({
   selector: 'app-constat-list',
-  standalone: false,
+  standalone:false,
   templateUrl: './constat-list.component.html',
   styleUrls: ['./constat-list.component.css']
 })
 export class ConstatListComponent implements OnInit {
+  
 
   constats: any[] = [];
   experts: any[] = [];
-  selectedExpert: any = null;
-  newExpert = { nom: '', prenom: '', email: '' };
-
+  selectedExpertId: number | null = null;
   showPopup = false;
   currentConstat: any;
+  commentaire: string = '';
+  affectedConstats = new Map<number, boolean>(); // Map pour suivre les constats affectés
 
   constructor(private constatService: ConstatService) { }
 
   ngOnInit(): void {
-    // Récupération des constats
-    this.constatService.getAllConstats().subscribe(
-      (data) => {
+    this.loadConstats();
+    this.loadExperts();
+  }
+  loadConstats(): void {
+    this.constatService.getAllConstats().subscribe({
+      next: (data) => {
         this.constats = data;
-        console.log("Constats :", this.constats);
+        
+        // Réinitialiser la map
+        this.affectedConstats.clear();
+        
+        // Marquer les constats qui ont un expert comme affectés
+        data.forEach((constat: any) => {
+          const hasExpert = Boolean(constat.expert);
+          this.affectedConstats.set(constat.idConstat, hasExpert);
+        });
+        
+        console.log("Map des constats affectés:", Array.from(this.affectedConstats.entries()));
       },
-      (error) => {
-        console.error('Erreur lors de la récupération des constats:', error);
+      error: (error) => {
+        console.error('Erreur lors du chargement des constats:', error);
       }
-    );
-
-    // Récupération des experts
-    this.constatService.getAllExperts().subscribe(
-      (data) => {
+    });
+  }
+  assignExpert(): void {
+    if (!this.selectedExpertId || !this.currentConstat) {
+      console.error("Sélection invalide");
+      return;
+    }
+  
+    const agentId = 1; // À remplacer par l'ID réel de l'agent
+  
+    this.constatService.affecterExpert(
+      this.selectedExpertId, 
+      this.currentConstat.idConstat, 
+      agentId,
+      this.commentaire
+    ).subscribe({
+      next: (res) => {
+        console.log("Succès:", res);
+        this.closePopup();
+        alert("Expert affecté avec succès !");
+        
+        // Recharger les constats pour s'assurer que les données sont à jour
+        this.loadConstats();
+      },
+      error: (err) => {
+        console.error("Erreur:", err);
+      }
+    });
+  }
+  loadExperts(): void {
+    this.constatService.getAllExperts().subscribe({
+      next: (data) => {
         this.experts = data;
-        console.log("Experts :", this.experts);
       },
-      (error) => {
-        console.error('Erreur lors de la récupération des experts:', error);
+      error: (error) => {
+        console.error('Erreur:', error);
       }
-    );
+    });
   }
 
-  openPopup(constat: any) {
+  openPopup(constat: any): void {
+    console.log("Ouverture popup pour constat:", constat);
     this.currentConstat = constat;
+    this.selectedExpertId = null;
+    this.commentaire = '';
     this.showPopup = true;
   }
 
-  closePopup() {
+  closePopup(): void {
     this.showPopup = false;
-    this.selectedExpert = null;
-    this.newExpert = { nom: '', prenom: '', email: '' };
   }
 
-  assignExpert() {
-    const expertAffecte = this.selectedExpert ?? this.newExpert;
-
-    // TODO : Appel API pour associer expertAffecte à this.currentConstat
-    console.log("Expert affecté :", expertAffecte, "au constat :", this.currentConstat);
-
-    this.closePopup();
-  }
- 
-interventionDate: string = '';
-commentaire: string = '';
-
+  
 }

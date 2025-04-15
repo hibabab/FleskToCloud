@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ExpertconstatService {
   private apiUrl = 'http://localhost:3000/expert'; // URL de ton API Gateway
+  private constatUrl = 'http://localhost:3000/constat';
 
   constructor(private http: HttpClient) {}
 
@@ -20,14 +21,18 @@ export class ExpertconstatService {
     return this.http.get<number>(`${this.apiUrl}/user/${userId}/expert-id`);
   }
   // Programmer une expertise
-programmerExpertise(data: {
-  constatId: number;
-  date: string;
-  heure: string;
-  lieu: string;
-  commentaire?: string;
-}): Observable<any> {
-  return this.http.post('http://localhost:3000/constat/programmer-expertise', data);
-}
+  programmerExpertise(data: {
+    constatId: number;
+    date: string;
+    heure: string;
+    lieu: string;
+    commentaire?: string;
+  }): Observable<any> {
+    return this.http.post('http://localhost:3000/constat/programmer-expertise', data);
+  }
+
+  estimerConstatParExpert(formData: FormData): Observable<any> {
+    return this.http.post(`${this.constatUrl}/estimer-constat-expert`, formData);
+  }
 
 }

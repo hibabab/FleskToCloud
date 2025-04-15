@@ -14,6 +14,7 @@ import { CreationContratComponent } from './creation-contrat/creation-contrat.co
 import { ConstatComponent } from './constat/constat.component';
 import { VehiculeComponent } from './vehicule/vehicule.component';
 import { ConstatListComponent } from './constat-list/constat-list.component';
+import { NotificationComponent } from './notification/notification.component';
 
 
 
@@ -28,7 +29,8 @@ import { ConstatListComponent } from './constat-list/constat-list.component';
     CreationContratComponent,
     ConstatComponent,
     VehiculeComponent,
-    ConstatListComponent
+    ConstatListComponent,
+    NotificationComponent
   
   ],
   imports: [

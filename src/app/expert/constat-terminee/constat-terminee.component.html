@@ -13,38 +13,52 @@
         </div>
   
         <!-- Tableau des constats terminés -->
-        <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+        <div class="bg-white p-6 rounded-2xl shadow-md overflow-x-auto border border-gray-200">
           <table class="w-full border-collapse">
-            <thead class="bg-gray-100">
-              <tr class="text-gray-700">
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">N° Police</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Assuré</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Lieu</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Statut</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+            <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
+              <tr>
+                <th class="px-4 py-3 text-left">ID</th>
+                <th class="px-4 py-3 text-left">Date Accident</th>
+                <th class="px-4 py-3 text-left">Heure</th>
+                <th class="px-4 py-3 text-left">Blessés</th>
+                <th class="px-4 py-3 text-left">Dégâts</th>
+                <th class="px-4 py-3 text-left">Statut</th>
+                
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-              <tr *ngFor="let c of constatsTermines" class="hover:bg-gray-50">
-                <td class="px-4 py-4 text-sm font-medium">{{ c.police }}</td>
-                <td class="px-4 py-4 text-sm">{{ c.assure }}</td>
-                <td class="px-4 py-4 text-sm">{{ c.lieu }}</td>
-                <td class="px-4 py-4 text-sm">{{ c.date }}</td>
-                <td class="px-4 py-4 text-sm">
-                  <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">{{ c.statut }}</span>
+              <tr *ngFor="let c of constatestime" class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3">{{ c.idConstat }}</td>
+                <td class="px-4 py-3">{{ c.dateAccident | date:'dd/MM/yyyy' }}</td>
+                <td class="px-4 py-3">{{ c.heure }}</td>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full"
+                    [ngClass]="c.blessees ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                    {{ c.blessees ? 'Oui' : 'Non' }}
+                  </span>
                 </td>
-                <td class="px-4 py-4">
-                  <!-- Lien vers le rapport PDF -->
-                  <a href="{{ c.rapportPdf }}" target="_blank" class="px-3 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700 flex items-center">
-                    <i class="fas fa-file-pdf mr-1"></i> Télécharger le rapport
-                  </a>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full"
+                    [ngClass]="c.degatMateriels ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                    {{ c.degatMateriels ? 'Oui' : 'Non' }}
+                  </span>
                 </td>
+                <td class="px-4 py-3">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full"
+                    [ngClass]="{
+                      'bg-yellow-100 text-yellow-700': c.statut === 'En attente',
+                      'bg-blue-100 text-blue-700': c.statut === 'En cours de traitement',
+                      'bg-green-100 text-green-700': c.statut === 'Terminé'
+                    }">
+                    {{ c.statut }}
+                  </span>
+                </td>
+                
               </tr>
             </tbody>
           </table>
         </div>
       </section>
     </div>
-  </div>
+</div>
   
