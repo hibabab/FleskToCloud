@@ -95,10 +95,6 @@ export class CASemstrielComponent  implements OnInit {
       }
     });
   }
-
-
-
-
   loadUserContrats(): void {
     if (!this.userCin) {
       this.errorMessage = 'CIN utilisateur non disponible';

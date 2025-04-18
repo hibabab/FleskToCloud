@@ -79,7 +79,8 @@ export class ContratListComponent {
     });
   }
 
- async generateContratPDF(contratData: any): Promise<void> {
+
+async generateContratPDF(contratData: any): Promise<void> {
    try {
      const doc = new jsPDF('p', 'mm', 'a4') as any;
      doc.setFont('helvetica');
@@ -303,7 +304,6 @@ export class ContratListComponent {
 
    }
  }
-
   private loadImageAsBase64(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();

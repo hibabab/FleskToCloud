@@ -16,6 +16,7 @@ import { PaymentFailureComponent } from './payment/payment-failure/payment-failu
 import { PaymentSuccessComponent } from './payment/payment-success/payment-success.component';
 import { PaymentInitiateComponent } from './payment/payment-initiate/payment-initiate.component';
 import { NotificationComponent } from './notification/notification.component';
+import { MesReCuComponent } from './mes-re-cu/mes-re-cu.component';
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
@@ -27,7 +28,7 @@ const routes: Routes = [
   { path: 'contrat/:id/payment-status', component: PaymentStatusComponent },
   { path: 'MesCA', component:MesCAComponent },
   { path: 'souscription-auto', component:CreationContratComponent },
-
+  { path: 'mesRecu', component:MesReCuComponent },
   { path: 'interface', component:InterfaceComponent },
   { path: 'NCA', component:RenouvellementCAComponent },
   { path: 'SmestrielCA', component:CASemstrielComponent },
