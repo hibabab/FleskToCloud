@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { NotificationService,Notification } from '../../expert/service/notification/notification.service';
 import { jwtDecode } from 'jwt-decode';
+import { Notification,NotificationService } from '../../agent-service/Services/notification.service';
 
 @Component({
-  selector: 'app-notification-assure',
+  selector: 'app-notification',
   standalone: false,
-  templateUrl: './notification-assure.component.html',
-  styleUrl: './notification-assure.component.css'
+  templateUrl: './notification.component.html',
+  styleUrl: './notification.component.css'
 })
-export class NotificationAssureComponent  implements OnInit {
+export class NotificationComponent implements OnInit {
   notifications: Notification[] = [];
   userId!: number;
 
@@ -48,4 +48,3 @@ export class NotificationAssureComponent  implements OnInit {
     return null;
   }
 }
-

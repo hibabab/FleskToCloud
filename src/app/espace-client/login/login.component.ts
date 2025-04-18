@@ -36,7 +36,7 @@ export class LoginComponent {
         if (isAdmin) {
           // Si admin, on redirige directement sans appel login supplémentaire
           this.router.navigate(['/admin/interface']);
-          return of({ role: 'admin' }); // On retourne un observable avec le rôle admin
+          return of({ role: 'admin' });
         } else {
           return this.authService.login(this.user.email, this.user.password).pipe(
             switchMap(response => {

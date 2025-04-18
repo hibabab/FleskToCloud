@@ -1,23 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { jwtDecode } from 'jwt-decode';
+import { NotificationService } from '../../agent-service/Services/notification.service';
+import { AbstractControl } from '@angular/forms';
 
-// Enum pour les types de garanties
-export enum TypeGaranties {
-  ResponsabiliteCivile = 'ResponsabiliteCivile',
-  RTI = 'RTI',
-  DefenseEtRecours = 'DefenseEtRecours',
-  Incendie = 'Incendie',
-  Vol = 'Vol',
-  PersonneTransportees = 'PersonneTransportees',
-  BrisDeGlaces = 'BrisDeGlaces',
-  Tierce = 'Tierce',
-  AssistanceAutomobile = 'AssistanceAutomobile',
-  IndividuelAccidentConducteur = 'IndividuelAccidentConducteur',
-  EVENEMENTCLIMATIQUE = 'Evènements climatiques',
-  GREVESEMEUTESETMOUVEMENTPOPULAIRE = 'Grèves Emeutes et Mouvements populaires',
-  DOMMAGEETCOLLIDION = 'Dommage et Collision'
-}
 
 @Component({
   selector: 'app-creation-contrat',
@@ -25,25 +12,22 @@ export enum TypeGaranties {
   templateUrl: './creation-contrat.component.html',
   styleUrls: ['./creation-contrat.component.css'],
 })
-export class CreationContratComponent {
+export class CreationContratComponent implements OnInit {
   insuranceForm: FormGroup;
+  userData: any;
+  isLoading = false;
+  errorMessage = '';
+  successMessage = '';
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private notificationService: NotificationService
+  ) {
     this.insuranceForm = this.fb.group({
       assure: this.fb.group({
-        nom: ['', Validators.required],
-        prenom: ['', Validators.required],
-        Cin: ['', Validators.required],
-        dateNaissance: ['', Validators.required],
-        telephone: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        bonusMalus: ['', Validators.required],
-        adresse: this.fb.group({
-          pays: ['', Validators.required],
-          ville: ['', Validators.required],
-          rue: ['', Validators.required],
-          codePostal: ['', Validators.required]
-        })
+        bonusMalus: ['', [Validators.required, Validators.min(1)]],
       }),
       vehicule: this.fb.group({
         type: ['', Validators.required],
@@ -64,371 +48,124 @@ export class CreationContratComponent {
         packChoisi: ['', Validators.required],
         typePaiement: ['', Validators.required],
         NatureContrat: ['', Validators.required]
+
       })
     });
   }
-  onSubmit() {
-    // Vérifier si le formulaire est valide
-    if (this.insuranceForm.valid) {
-      const assureData = this.insuranceForm.get('assure')?.value;
-      const vehiculeData = this.insuranceForm.get('vehicule')?.value;
-      const contratData = this.insuranceForm.get('contrat')?.value;
 
-      // Convertir bonusMalus en nombre entier
-      assureData.bonusMalus = Number(assureData.bonusMalus);
-
-      // Debug: Affichage des données de chaque groupe de formulaire
-      console.log('Assuré:', assureData);
-      console.log('Véhicule:', vehiculeData);
-      console.log('Contrat:', contratData);
-
-      if (assureData && vehiculeData && contratData) {
-        // Calcul des garanties
-        const garanties = this.calculateGaranties(contratData.packChoisi, vehiculeData,Number(assureData.bonusMalus));
-
-        // Création du contrat
-        const contratAuto = this.createContratAuto(assureData, vehiculeData, contratData, garanties);
-
-        const apiUrl = 'http://localhost:3000/contrat-auto-geteway/createCA'; // Assurez-vous que l'URL API est correcte
-        this.http.post(apiUrl, contratAuto).subscribe(
-          response => {
-            console.log('Contrat créé avec succès:', response);
-          },
-          error => {
-            console.error('Erreur lors de la création du contrat:', error);
-          }
-        );
-      } else {
-        console.error('Données manquantes dans l\'un des groupes de formulaire.');
-      }
-    } else {
-      console.error('Le formulaire est invalide.');
-      // Debug: Affichage des erreurs du formulaire
-      console.log(this.insuranceForm.errors);
-    }
+  ngOnInit(): void {
+    this.loadUserDataFromToken();
   }
-  calculateResponsabiliteCivile(typeVehicule: string, bonusMalus: number, puissance: number): number {
-    let cotisation = 0;
-    if (typeVehicule === 'Tourisme') {
-      switch (bonusMalus) {
-        case 11:
-          if (puissance === 4) cotisation = 385;
-          else if (puissance === 5) cotisation = 490;
-          else if (puissance === 7) cotisation = 595;
-          break;
-        case 10:
-          if (puissance === 4) cotisation = 330;
-          else if (puissance === 5) cotisation = 420;
-          else if (puissance === 7) cotisation = 510;
-          break;
-        case 9:
-          if (puissance === 4) cotisation = 275;
-          else if (puissance === 5) cotisation = 350;
-          else if (puissance === 7) cotisation = 425;
-          break;
-        case 8:
-          if (puissance === 4) cotisation = 220;
-          else if (puissance === 5) cotisation = 280;
-          else if (puissance === 7) cotisation = 340;
-          break;
-        case 7:
-          if (puissance === 4) cotisation = 176;
-          else if (puissance === 5) cotisation = 224;
-          else if (puissance === 7) cotisation = 272;
-          break;
-        case 6:
-          if (puissance === 4) cotisation = 154;
-          else if (puissance === 5) cotisation = 196;
-          else if (puissance === 7) cotisation = 238;
-          break;
-        case 5:
-          if (puissance === 4) cotisation = 132;
-          else if (puissance === 5) cotisation = 168;
-          else if (puissance === 7) cotisation = 204;
-          break;
-        case 4:
-          if (puissance === 4) cotisation = 110;
-          else if (puissance === 5) cotisation = 140;
-          else if (puissance === 7) cotisation = 170;
-          break;
-        case 3:
-          if (puissance === 4) cotisation = 99;
-          else if (puissance === 5) cotisation = 126;
-          else if (puissance === 7) cotisation = 153;
-          break;
-        case 2:
-          if (puissance === 4) cotisation = 88;
-          else if (puissance === 5) cotisation = 112;
-          else if (puissance === 7) cotisation = 136;
-          break;
-        case 1:
-          if (puissance === 4) cotisation = 77;
-          else if (puissance === 5) cotisation = 98;
-          else if (puissance === 7) cotisation = 119;
-          break;
-        default:
-          cotisation = 0;
+  getFormControls(): { name: string; control: AbstractControl }[] {
+    const controls: { name: string; control: AbstractControl }[] = [];
+
+    Object.keys(this.insuranceForm.controls).forEach(key => {
+      const control = this.insuranceForm.get(key);
+      if (control) {
+        controls.push({
+          name: key,
+          control: control
+        });
       }
-    } else if (typeVehicule === 'Utilitaire') {
-      switch (bonusMalus) {
-        case 7:
-          if (puissance >= 5 && puissance <= 6) cotisation = 428;
-          else if (puissance >= 7 && puissance <= 9) cotisation = 524;
-          else if (puissance >= 11 && puissance <= 12) cotisation = 676;
-          break;
-        case 6:
-          if (puissance >= 5 && puissance <= 6) cotisation = 363.8;
-          else if (puissance >= 7 && puissance <= 9) cotisation = 445.4;
-          else if (puissance >= 11 && puissance <= 12) cotisation = 574.6;
-          break;
-        case 5:
-          if (puissance >= 5 && puissance <= 6) cotisation = 321;
-          else if (puissance >= 7 && puissance <= 9) cotisation = 393;
-          else if (puissance >= 11 && puissance <= 12) cotisation = 507;
-          break;
-        case 4:
-          if (puissance >= 5 && puissance <= 6) cotisation = 256.8;
-          else if (puissance >= 7 && puissance <= 9) cotisation = 314.4;
-          else if (puissance >= 11 && puissance <= 12) cotisation = 405.6;
-          break;
-        case 3:
-          if (puissance >= 5 && puissance <= 6) cotisation = 214;
-          else if (puissance >= 7 && puissance <= 9) cotisation = 262;
-          else if (puissance >= 11 && puissance <= 12) cotisation = 338;
-          break;
-        case 2:
-          if (puissance >= 5 && puissance <= 6) cotisation = 192.6;
-          else if (puissance >= 7 && puissance <= 9) cotisation = 235.8;
-          else if (puissance >= 11 && puissance <= 12) cotisation = 304.2;
-          break;
-        case 1:
-          if (puissance >= 5 && puissance <= 6) cotisation = 171.2;
-          else if (puissance >= 7 && puissance <= 9) cotisation = 209.6;
-          else if (puissance >= 11 && puissance <= 12) cotisation = 270.4;
-          break;
-        default:
-          cotisation = 0;
-      }
-    }
-    return cotisation;
+    });
+
+    return controls;
+  }
+  private getCookie(name: string): string | null {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
   }
 
-  calculateGaranties(packChoisi: string, vehiculeData: any, bonusMalus: number): any[] {
-    const garanties = [];
-    const valeurNeuf = vehiculeData.valeurNeuf;
-    const puissance = vehiculeData.puissance;
-    const responsabiliteCivile = this.calculateResponsabiliteCivile(vehiculeData.type, bonusMalus,vehiculeData.puissance);
+  loadUserDataFromToken(): void {
+    const token = this.getCookie('access_token');
 
-    if (packChoisi === 'Pack1') {
-      garanties.push({
-        type: TypeGaranties.ResponsabiliteCivile,
-        cotisationNette: responsabiliteCivile
-      });
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
-      garanties.push({
-        type: TypeGaranties.Incendie,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 220.115
-      });
-      garanties.push({
-        type: TypeGaranties.Vol,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 336.446
-      });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
-      garanties.push({
-        type: TypeGaranties.BrisDeGlaces,
-        capital: valeurNeuf <= 30000 ? 500 : 600,
-        cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
-      });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
-    } else if (packChoisi === 'Pack2') {
-      garanties.push({
-        type: TypeGaranties.ResponsabiliteCivile,
-        cotisationNette: responsabiliteCivile
-      });
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
-      garanties.push({
-        type: TypeGaranties.Incendie,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 220.115
-      });
-      garanties.push({
-        type: TypeGaranties.Vol,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 336.446
-      });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
-      garanties.push({
-        type: TypeGaranties.BrisDeGlaces,
-        capital: valeurNeuf <= 30000 ? 500 : 600,
-        cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
-      });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.DOMMAGEETCOLLIDION,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf * 0.1
-      });
-    } else if (packChoisi === 'Pack3') {
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
-      garanties.push({
-        type: TypeGaranties.Incendie,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 220.115
-      });
-      garanties.push({
-        type: TypeGaranties.Vol,
-        capital: valeurNeuf,
-        cotisationNette: valeurNeuf / 336.446
-      });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
-      garanties.push({
-        type: TypeGaranties.BrisDeGlaces,
-        capital: valeurNeuf <= 30000 ? 500 : 600,
-        cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
-      });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.Tierce,
-        capital: valeurNeuf,
-        franchise: 0.2,
-        cotisationNette: valeurNeuf * 0.2
-      });
-      garanties.push({
-        type: TypeGaranties.ResponsabiliteCivile,
-        cotisationNette: responsabiliteCivile
-      });
+    if (!token) {
+      this.errorMessage = 'Session invalide. Veuillez vous reconnecter.';
+      return;
     }
 
-    return garanties;
+    try {
+      const decoded: any = jwtDecode(token);
+      const userId = Number(decoded.sub);
+
+      if (!userId) {
+        this.errorMessage = 'Impossible de récupérer l\'ID utilisateur';
+        return;
+      }
+
+      this.fetchUserData(userId);
+    } catch (error) {
+      this.errorMessage = 'Erreur de décodage du token';
+      console.error('Erreur de décodage:', error);
+    }
   }
 
-  createContratAuto(assureData: any, vehiculeData: any, contratData: any, garanties: any[]): any {
-    const today = new Date();
-    const dateSouscription = today.toISOString().split('T')[0]; // Format YYYY-MM-DD
-    const dateExpiration = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().split('T')[0];
-    const echeances = dateExpiration;
-
-    if (!garanties || garanties.length === 0) {
-      console.error('Aucune garantie fournie.');
-      return null;
-    }
-
-    const cotisationNette = garanties.reduce((sum, garantie) => sum + garantie.cotisationNette, 0);
-    const cotisationTotale = cotisationNette + 50.000 + 3.800 + 0.800 + 10.000 + 3.000 + 1.000;
-    // Calcul du montantEcheance en fonction du type de paiement
-    const montantEcheance = contratData.typePaiement === 'Semestriel' ? cotisationTotale / 2 : cotisationTotale;
-
-    const contratAuto = {
-      assure: {
-        nom: assureData.nom,
-        prenom: assureData.prenom,
-        email: assureData.email,
-        Cin: assureData.Cin,
-        telephone: assureData.telephone,
-        date_naissance: assureData.dateNaissance,
-        password:"",
-        adresse: {
-          rue: assureData.adresse.rue,
-          ville: assureData.adresse.ville,
-          codePostal: assureData.adresse.codePostal,
-          pays: assureData.adresse.pays,
-        },
-        bonusMalus: assureData.bonusMalus,
+  fetchUserData(userId: number): void {
+    this.isLoading = true;
+    this.http.get<any>(`http://localhost:3000/auth/users/${userId}`).subscribe({
+      next: (user) => {
+        this.userData = user;
+        this.isLoading = false;
       },
-      vehicule: vehiculeData,
-      contrat: {
-        ...contratData,
-        NatureContrat: contratData.NatureContrat,
-        typePaiement:contratData.typePaiement ,
-        dateSouscription,
-        dateExpiration,
-        echeances,
-        cotisationNette,
-        cotisationTotale,
-        montantEcheance,
-        garanties
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = 'Erreur lors de la récupération des données utilisateur';
+        console.error('Erreur:', err);
+      }
+    });
+  }
+
+  onSubmit(): void {
+    if (this.insuranceForm.invalid) {
+      this.errorMessage = 'Veuillez remplir tous les champs obligatoires';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const formData = {
+      ...this.insuranceForm.value,
+      assure: {
+        ...this.insuranceForm.value.assure,
+        // Ajoutez les infos utilisateur récupérées depuis le token
+        userId: this.userData.id,
+        nom: this.userData.nom,
+        prenom: this.userData.prenom,
+        Cin: this.userData.Cin,
+        dateNaissance: this.userData.dateNaissance,
+        telephone: this.userData.telephone,
+        email: this.userData.email,
+        adresse: this.userData.adresse
       }
     };
 
-    console.log('Données envoyées au backend:', contratAuto);
-    return contratAuto;
+    // Créer une demande de souscription qui notifiera les agents
+    this.notificationService.createSubscriptionRequest(this.userData, formData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.successMessage = 'Votre demande de contrat a été envoyée avec succès. Un agent va la traiter prochainement.';
+
+        // Créer une notification pour l'utilisateur lui-même
+        this.notificationService.createNotification(
+          this.userData.id,
+          'Votre demande de contrat d\'assurance a été soumise et est en attente de traitement.'
+        ).subscribe();
+
+        // Réinitialiser le formulaire
+        this.insuranceForm.reset();
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = 'Erreur lors de l\'envoi de la demande. Veuillez réessayer.';
+        console.error('Erreur:', error);
+      }
+    });
   }
+
+
+
 }

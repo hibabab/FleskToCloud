@@ -1,15 +1,94 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
+import { jwtDecode } from 'jwt-decode';
+import { ExpertconstatService } from '../service/expertconstat.service';
 
 @Component({
   selector: 'app-constat-terminee',
-  standalone: false,
   templateUrl: './constat-terminee.component.html',
-  styleUrl: './constat-terminee.component.css'
+  standalone:false,
+  styleUrls: ['./constat-terminee.component.css']
 })
-export class ConstatTermineeComponent {
-  constatsTermines = [
-    { id: 1, police: '123456', assure: 'Hiba Wakel', lieu: 'Tunis', date: '2024-04-01', statut: 'Terminée', rapportPdf: 'assets/reports/Rapport_123456.pdf' },
-    { id: 2, police: '654321', assure: 'Ali Ben Ali', lieu: 'Sfax', date: '2024-04-03', statut: 'Terminée', rapportPdf: 'assets/reports/Rapport_654321.pdf' },
-    { id: 3, police: '789123', assure: 'Noura Youssef', lieu: 'Nabeul', date: '2024-04-05', statut: 'Terminée', rapportPdf: 'assets/reports/Rapport_789123.pdf' },
-  ]
+export class ConstatTermineeComponent implements OnInit {
+  userId: number | null = null;
+  expertId: number | null = null;
+  constatestime: any[] = [];
+  isLoading = false;
+  errorMessage: string | null = null;
+
+  constructor(private expertconstatService: ExpertconstatService) {}
+
+  ngOnInit(): void {
+    this.decodeUserIdFromToken();
+  }
+
+  private getCookie(name: string): string | null {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+  }
+
+  private decodeUserIdFromToken(): void {
+    try {
+      const token = this.getCookie('access_token');
+      if (!token) {
+        this.errorMessage = 'Token non trouvé';
+        return;
+      }
+
+      const decoded: any = jwtDecode(token);
+      this.userId = Number(decoded.sub);
+      if (!this.userId) {
+        this.errorMessage = 'ID utilisateur invalide dans le token';
+        return;
+      }
+      this.getExpertIdAndLoadConstats();
+    } catch (error) {
+      console.error('Erreur lors du décodage du token:', error);
+      this.errorMessage = 'Erreur d\'authentification';
+    }
+  }
+
+  private getExpertIdAndLoadConstats(): void {
+    if (!this.userId) return;
+
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    this.expertconstatService.getExpertIdByUserId(this.userId).subscribe({
+      next: (expertId) => {
+        this.expertId = expertId;
+        this.loadConstatsEstime();
+      },
+      error: (err) => {
+        console.error('Erreur lors de la récupération de l\'ID expert:', err);
+        this.errorMessage = 'Erreur lors de la récupération de l\'ID expert';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadConstatsEstime(): void {
+    if (!this.expertId) {
+      this.errorMessage = 'ID expert non trouvé';
+      this.isLoading = false;
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    this.expertconstatService.getConstatsByExpertId(this.expertId).subscribe({
+      next: (data) => {
+        this.constatestime = data.filter((constat: any) => constat.statut === 'ESTIMÉ');
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des constats:', error);
+        this.errorMessage = 'Erreur lors du chargement des constats';
+        this.isLoading = false;
+      }
+    });
+  }
 }

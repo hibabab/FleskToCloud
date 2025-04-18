@@ -8,7 +8,7 @@ import { NotificationComponent } from './notification/notification.component';
 
 
 const routes: Routes = [
-  { path: '', component: DehasbortExpertComponent },
+  { path: 'dashboard-expert', component: DehasbortExpertComponent },
   { path: 'constats/en-attente', component: ConstatEnAttenteComponent },  // 👈 Constats en attente
   { path: 'constats/en-cours', component: ConstatEnCoursComponent },  // 👈 Constats en cours
   { path: 'constats/terminee', component: ConstatTermineeComponent },

@@ -1,273 +1,286 @@
-
 <div class="flex flex-col md:flex-row">
   <!-- Dashboard -->
   <app-dashboard class="w-full md:w-64 bg-white shadow-md"></app-dashboard>
 
   <!-- Contenu principal -->
   <div class="flex-1 p-4 md:p-8 bg-gray-100 min-h-screen">
-  <h1 class="text-3xl font-bold text-center text-teal-800 mb-6">Souscrire à un contrat Assurance Auto</h1>
-  <form [formGroup]="insuranceForm" (ngSubmit)="onSubmit()">
-    <!-- Partie Assuré -->
-    <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Vos Coordonnées</h2>
-    <div formGroupName="assure" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Nom -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nom</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">person</mat-icon>
-          <input type="text" formControlName="nom" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Prénom -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Prénom</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">person</mat-icon>
-          <input type="text" formControlName="prenom" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- CIN -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> CIN</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">badge</mat-icon>
-          <input type="text" formControlName="Cin" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Date de Naissance -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Date Naissance</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <input type="date" formControlName="dateNaissance" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
+    <h1 class="text-3xl font-bold text-center text-teal-800 mb-6">Souscrire à un contrat Assurance Auto</h1>
 
-      <!-- Adresse -->
-      <div formGroupName="adresse">
-        <!-- Pays -->
-        <div class="flex flex-col">
-          <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Pays</label>
-          <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
-            <mat-icon class="text-blue-500 mr-2">location_on</mat-icon>
-            <input type="text" formControlName="pays" class="w-full bg-transparent focus:outline-none" placeholder="Pays" required />
-          </div>
-        </div>
-        <!-- Ville -->
-        <div class="flex flex-col">
-          <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Ville</label>
-          <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
-            <mat-icon class="text-blue-500 mr-2">location_city</mat-icon>
-            <input type="text" formControlName="ville" class="w-full bg-transparent focus:outline-none" placeholder="Ville" required />
-          </div>
-        </div>
-        <!-- Rue -->
-        <div class="flex flex-col">
-          <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Rue</label>
-          <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
-            <mat-icon class="text-blue-500 mr-2">home</mat-icon>
-            <input type="text" formControlName="rue" class="w-full bg-transparent focus:outline-none" placeholder="Rue" required />
-          </div>
-        </div>
-        <!-- Code postal -->
-        <div class="flex flex-col">
-          <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Code postal</label>
-          <div class="flex items-center border border-black p-3 rounded-lg shadow-sm bg-gray-50">
-            <mat-icon class="text-blue-500 mr-2">markunread_mailbox</mat-icon>
-            <input type="text" formControlName="codePostal" class="w-full bg-transparent focus:outline-none" placeholder="Code postal" required />
-          </div>
-        </div>
-      </div>
-
-      <!-- Téléphone -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Téléphone</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">phone</mat-icon>
-          <input type="text" formControlName="telephone" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Email -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Email</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">email</mat-icon>
-          <input type="email" formControlName="email" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-      <!-- Bonus Malus -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Classe Bonus Malus</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">grade</mat-icon>
-          <select formControlName="bonusMalus" class="w-full bg-transparent focus:outline-none">
-            <option *ngFor="let classe of [1,2,3,4,5,6,7,8,9,10,11]" [value]="classe">{{ classe }}</option>
-          </select>
-        </div>
-      </div>
+    <!-- Message de chargement -->
+    <div *ngIf="isLoading" class="text-center py-8">
+      <p class="text-lg text-blue-600">Chargement de vos informations...</p>
     </div>
 
-    <!-- Partie Véhicule -->
-    <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Votre Véhicule</h2>
-    <div formGroupName="vehicule" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Type de véhicule -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Type</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">category</mat-icon>
-          <select formControlName="type" class="w-full bg-transparent focus:outline-none" required>
-            <option value="Tourisme">Tourisme</option>
-            <option value="Utilitaire">Utilitaire</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Marque -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Marque</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">directions_car</mat-icon>
-          <input type="text" formControlName="marque" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Modèle -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Modèle</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">build</mat-icon>
-          <input type="text" formControlName="model" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Immatriculation -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1">
-          <span class="text-red-500">*</span> Immatriculation
-        </label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">confirmation_number</mat-icon>
-          <input type="text" formControlName="Imat" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-        <span class="text-red-500 text-sm" *ngIf="insuranceForm.get('vehicule.Imat')?.invalid && insuranceForm.get('vehicule.Imat')?.touched">
-          Le format doit être 4 chiffres + "TU" + 3 chiffres (ex: 1234TU567).
-        </span>
-      </div>
-
-      <!-- Énergie -->
-      <div class="flex flex-col">
-        <label> Énergie</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">local_gas_station</mat-icon>
-          <input type="text" formControlName="energie" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Nombre de places -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nombre de places</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">event_seat</mat-icon>
-          <input type="number" formControlName="nbPlace" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Date de mise en circulation -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Date de mise en circulation</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">calendar_today</mat-icon>
-          <input type="date" formControlName="DPMC" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Cylindrée -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Cylindrée</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">speed</mat-icon>
-          <input type="text" formControlName="cylindree" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Charge utile -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"> Charge utile</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">weight</mat-icon>
-          <input type="number" formControlName="chargeUtil" class="w-full bg-transparent focus:outline-none">
-        </div>
-      </div>
-
-      <!-- Valeur à neuf -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Valeur à neuf</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">money</mat-icon>
-          <input type="number" formControlName="valeurNeuf" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Numéro de châssis -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Numéro de châssis</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">confirmation_number</mat-icon>
-          <input type="text" formControlName="numChassis" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Poids à vide -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Poids à vide</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">fitness_center</mat-icon>
-          <input type="number" formControlName="poidsVide" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
-
-      <!-- Puissance -->
-      <div class="flex flex-col">
-        <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Puissance</label>
-        <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-          <mat-icon class="text-blue-500 mr-2">fitness_center</mat-icon>
-          <input type="number" formControlName="puissance" class="w-full bg-transparent focus:outline-none" required>
-        </div>
-      </div>
+    <!-- Message d'erreur -->
+    <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      {{ errorMessage }}
     </div>
 
-    <!-- Partie Contrat -->
-    <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Renseignement</h2>
-    <div formGroupName="contrat" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Champ Pack choisi -->
-      <div class="space-y-2">
-        <label class="block text-lg font-semibold text-gray-700">Pack choisi <span class="text-red-500">*</span></label>
-        <select formControlName="packChoisi" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="Pack1">Pack Essentille</option>
-          <option value="Pack2">Pack Dommage et Collision</option>
-          <option value="Pack3">Pack tous risques</option>
-        </select>
+    <!-- Formulaire principal -->
+    <form *ngIf="userData && !isLoading" [formGroup]="insuranceForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Section Assuré -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Vos Coordonnées</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="bg-gray-50 p-3 rounded">
+            <p class="font-semibold text-gray-600">Nom complet</p>
+            <p class="text-lg">{{ userData.nom }} {{ userData.prenom }}</p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded">
+            <p class="font-semibold text-gray-600">CIN</p>
+            <p class="text-lg">{{ userData.Cin }}</p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded">
+            <p class="font-semibold text-gray-600">Email</p>
+            <p class="text-lg">{{ userData.email }}</p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded">
+            <p class="font-semibold text-gray-600">Téléphone</p>
+            <p class="text-lg">{{ userData.telephone }}</p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded">
+            <p class="font-semibold text-gray-600">Adresse</p>
+            <p class="text-lg">
+              {{ userData.adresse?.rue }}, {{ userData.adresse?.codePostal }}<br>
+              {{ userData.adresse?.ville }}, {{ userData.adresse?.pays }}
+            </p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded">
+            <p class="font-semibold text-gray-600">Date de naissance</p>
+            <p class="text-lg">{{ userData.date_naissance | date:'dd/MM/yyyy' }}</p>
+          </div>
+        </div>
+
+        <!-- Bonus Malus - Correction: dans le sous-groupe assure -->
+        <div formGroupName="assure" class="flex flex-col">
+          <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Classe Bonus Malus</label>
+          <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
+            <mat-icon class="text-teal-800 mr-2">grade</mat-icon>
+            <select formControlName="bonusMalus" class="w-full bg-transparent focus:outline-none">
+              <option value="" disabled selected>Sélectionnez une classe</option>
+              <option *ngFor="let classe of [1,2,3,4,5,6,7,8,9,10,11]" [value]="classe">{{ classe }}</option>
+            </select>
+          </div>
+          <span class="text-red-500 text-sm"
+                *ngIf="insuranceForm.get('assure.bonusMalus')?.invalid && insuranceForm.get('assure.bonusMalus')?.touched">
+            Ce champ est obligatoire
+          </span>
+        </div>
       </div>
 
-      <!-- Nature paiement -->
-      <div class="space-y-2">
-        <label class="block text-lg font-semibold text-gray-700">Nature de paiement <span class="text-red-500">*</span></label>
-        <select formControlName="typePaiement" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="Annuel">Annuel</option>
-          <option value="Semestriel">Semestriel</option>
-        </select>
-      </div>
-      <!-- Nature de contrat -->
-      <div class="space-y-2">
-        <label class="block text-lg font-semibold text-gray-700">Nature de contrat <span class="text-red-500">*</span></label>
-        <select formControlName="NatureContrat" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="Renouvelable">Renouvelable</option>
-          <option value="Fermé">Fermé</option>
-        </select>
-      </div>
-    </div>
+      <!-- Section Véhicule -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Votre Véhicule</h2>
 
-    <div class="flex justify-center mt-6">
-      <button type="submit" class="bg-teal-800 text-white px-6 py-2 rounded-lg shadow-md hover:bg-teal-600 transition duration-300">SOUSCRIRE</button>
-    </div>
-  </form>
+        <div formGroupName="vehicule" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Type de véhicule -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Type</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">category</mat-icon>
+              <select formControlName="type" class="w-full bg-transparent focus:outline-none">
+                <option value="" disabled selected>Sélectionnez un type</option>
+                <option value="Tourisme">Tourisme</option>
+                <option value="Utilitaire">Utilitaire</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Marque -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Marque</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">directions_car</mat-icon>
+              <input type="text" formControlName="marque" placeholder="Ex: Renault"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Modèle -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Modèle</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">build</mat-icon>
+              <input type="text" formControlName="model" placeholder="Ex: Clio"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Immatriculation -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium">
+              <span class="text-red-500">*</span> Immatriculation
+            </label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">confirmation_number</mat-icon>
+              <input type="text" formControlName="Imat" placeholder="Ex: 1234TU567"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+            <span class="text-red-500 text-sm"
+                  *ngIf="insuranceForm.get('vehicule.Imat')?.invalid && insuranceForm.get('vehicule.Imat')?.touched">
+              Format attendu: 4 chiffres + "TU" + 3 chiffres (ex: 1234TU567)
+            </span>
+          </div>
+
+          <!-- Énergie -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Énergie</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">local_gas_station</mat-icon>
+              <input type="text" formControlName="energie" placeholder="Ex: Diesel"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Nombre de places -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Nombre de places</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">event_seat</mat-icon>
+              <input type="number" formControlName="nbPlace" min="1" max="9"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Date de mise en circulation -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Date mise en circulation</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">calendar_today</mat-icon>
+              <input type="date" formControlName="DPMC"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Cylindrée -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Cylindrée (cm³)</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">speed</mat-icon>
+              <input type="number" formControlName="cylindree" min="0"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Charge utile -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium">Charge utile (kg)</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">weight</mat-icon>
+              <input type="number" formControlName="chargeUtil" min="0"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Valeur à neuf -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Valeur à neuf </label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">euro_symbol</mat-icon>
+              <input type="number" formControlName="valeurNeuf" min="0" step="100"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Numéro de châssis -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Numéro de châssis</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">confirmation_number</mat-icon>
+              <input type="text" formControlName="numChassis"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Poids à vide -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Poids à vide (kg)</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">fitness_center</mat-icon>
+              <input type="number" formControlName="poidsVide" min="0"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Puissance -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Puissance (CV)</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">speed</mat-icon>
+              <input type="number" formControlName="puissance" min="1"
+                     class="w-full bg-transparent focus:outline-none">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Contrat -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Options du contrat</h2>
+
+        <div formGroupName="contrat" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Pack choisi -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Pack choisi</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">shield</mat-icon>
+              <select formControlName="packChoisi" class="w-full bg-transparent focus:outline-none">
+                <option value="" disabled selected>Sélectionnez un pack</option>
+                <option value="Pack1">Pack Essentiel</option>
+                <option value="Pack2">Pack Dommage et Collision</option>
+                <option value="Pack3">Pack Tous Risques</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Nature de paiement -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Nature de paiement</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">payment</mat-icon>
+              <select formControlName="typePaiement" class="w-full bg-transparent focus:outline-none">
+                <option value="" disabled selected>Sélectionnez un mode</option>
+                <option value="Annuel">Annuel</option>
+                <option value="Semestriel">Semestriel</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Nature de contrat - Correction: placé dans le bon sous-groupe -->
+          <div class="flex flex-col">
+            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Nature de contrat</label>
+            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
+              <mat-icon class="text-blue-500 mr-3">description</mat-icon>
+              <select formControlName="NatureContrat" class="w-full bg-transparent focus:outline-none">
+                <option value="" disabled selected>Sélectionnez une nature</option>
+                <option value="Renouvelable">Renouvelable</option>
+                <option value="Fermé">Fermé</option>
+              </select>
+            </div>
+            <span class="text-red-500 text-sm"
+                  *ngIf="insuranceForm.get('contrat.NatureContrat')?.invalid && insuranceForm.get('contrat.NatureContrat')?.touched">
+              Ce champ est obligatoire
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton de soumission -->
+      <div class="flex justify-center mt-8">
+        <button type="submit"
+                [disabled]="insuranceForm.invalid || isLoading"
+                class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300
+                       disabled:bg-gray-400 disabled:cursor-not-allowed">
+          <span *ngIf="!isLoading">SOUSCRIRE</span>
+          <span *ngIf="isLoading">Traitement en cours...</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

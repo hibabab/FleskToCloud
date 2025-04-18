@@ -51,16 +51,11 @@ export class PaymentService {
     return this.http.post<PaymentResponse>(`${this.apiUrl}/payments/generate`, payload);
   }
 
-   
+
 // Ajoutez cette méthode dans PaymentService
-cancelPayment(contratNum: number): Observable<PaymentResponse> {
-  return this.http.delete<PaymentResponse>(`${this.apiUrl}/payments/cancel/${contratNum}`)
-    .pipe(
-      catchError(error => {
-        console.error('Erreur lors de l\'annulation du paiement:', error);
-        return throwError(() => error);
-      })
-    );
+cancelPayment(contratNum: number): Observable<any> {
+  // Changez DELETE en POST pour correspondre à l'implémentation du backend
+  return this.http.post<any>(`${this.apiUrl}/payments/cancel/${contratNum}`, {});
 }
   /**
    * Vérifie le statut d'un paiement spécifique

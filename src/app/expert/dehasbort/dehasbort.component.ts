@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
   templateUrl: './dehasbort.component.html',
   styleUrl: './dehasbort.component.css'
 })
-export class DehasbortExpertComponent{
+export class DehasbortExpertComponent {
 
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserDto } from '../models/user-dto';
 import { UserService } from '../services/user-service.service';
 import { jwtDecode } from 'jwt-decode';
+import { NotificationService } from '../../agent-service/Services/notification.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,7 +27,13 @@ export class DashboardComponent implements OnInit {
     date_naissance: new Date()
   };
 
-  constructor(private userService: UserService) {}
+  unreadNotificationsCount: number = 0; // Nouvelle propriété
+
+  constructor(
+    private userService: UserService,
+    private notificationService: NotificationService
+  ) {}
+
 
   // Fonction pour récupérer un cookie spécifique
   getCookie(name: string): string | null {
@@ -44,12 +51,28 @@ export class DashboardComponent implements OnInit {
         const decoded: any = jwtDecode(token);
         const userId = Number(decoded.sub); // Récupère l'ID utilisateur
         this.loadUserData(userId);
+        this.loadUnreadNotifications(userId); // Ajoutez cette ligne
       } catch (error) {
         console.error('Erreur lors du décodage du token', error);
       }
     } else {
       console.error('Token JWT non trouvé');
     }
+  }
+
+
+
+  loadUnreadNotifications(userId: number): void {
+    this.notificationService.getUnreadNotifications(userId).subscribe({
+      next: (notifications) => {
+        
+        this.unreadNotificationsCount = notifications.length;
+        console.log('Nombre de notifications non lues:', this.unreadNotificationsCount);
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des notifications non lues', error);
+      }
+    });
   }
 
   loadUserData(userId: number): void {

@@ -5,13 +5,10 @@
     <section class="min-h-screen p-4">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h2 class="text-2xl font-semibold text-gray-800">Mes constats</h2>
-          <p class="text-sm text-gray-600 mt-1">Consultez et suivez vos sinistres</p>
+          <h2 class="text-2xl font-semibold text-gray-800">liste des  sinistres</h2>
+        
         </div>
-        <button type="submit" routerLink="/dashboard-assure/declarer constat"
-          class="px-6 py-2.5 text-white bg-teal-700 hover:bg-green-800 rounded-lg text-sm focus:outline-none focus:ring-4 transition-all">
-          <i class="fas fa-car-crash mr-2"></i> Déclarer constat
-        </button>
+      
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow-lg">
@@ -22,7 +19,7 @@
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">N° police</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Date survenance</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Adresse</th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Expert</th>
+               
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">PDF</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
@@ -36,26 +33,33 @@
                 <td class="px-4 py-3 text-sm text-gray-700">
                   {{ constat.lieu?.rue }}, {{ constat.lieu?.ville }},{{ constat.lieu?.codePostal }}
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ constat.expert || 'Non défini' }}</td>
+             
                 <td class="px-4 py-3 text-sm text-gray-700">{{ constat.statut || 'En attente' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">
-                  <a *ngIf="constat.pathurl" [href]="'http://localhost:3000' + constat.pathurl" class="text-blue-600" target="_blank">
-                    Télécharger PDF
+             
+                <td class="px-4 py-4">
+                  <!-- Lien vers le rapport PDF -->
+                  <a *ngIf="constat.pathurl" [href]="'http://localhost:3000' + constat.pathurl" target="_blank" class="px-3 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700 flex items-center">
+                    <i class="fas fa-file-pdf mr-1"></i>  Télécharger PDF
                   </a>
                   <span *ngIf="!constat.pathurl" class="text-gray-500">PDF non disponible</span>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                  <button class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
-                          (click)="openPopup(constat)">
-                    Affecter expert
-                  </button>
-                </td>
-              </tr>
-
-              <tr *ngIf="constats.length === 0">
-                <td colspan="7" class="px-4 py-4 text-center text-sm text-gray-500">
-                  Vous n'avez aucun sinistre pour le moment !
-                </td>
+                  <td class="px-4 py-3 text-sm">
+                   
+                    
+                    <!-- Bouton si non affecté -->
+                    <button *ngIf="!affectedConstats.get(constat.idConstat)"
+                            class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
+                            (click)="openPopup(constat)">
+                      Affecter expert
+                    </button>
+                    
+                    <!-- Affichage si affecté -->
+                    <div *ngIf="affectedConstats.get(constat.idConstat)" class="flex items-center">
+                      <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                      </svg>
+                      <span class="text-sm text-gray-600">Expert affecté</span>
+                    </div>
+                  </td>
               </tr>
             </tbody>
           </table>
@@ -78,19 +82,15 @@
         <!-- ✅ Sélection expert existant -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Choisir un expert</label>
-          <select [(ngModel)]="selectedExpert" name="expert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-teal-800 focus:border-teal-800 text-gray-900" required>
+          <select [(ngModel)]="selectedExpertId" name="expert" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-teal-800 focus:border-teal-800 text-gray-900" required>
             <option value="" disabled selected>-- Sélectionner --</option>
-            <option *ngFor="let expert of experts" [value]="expert">
-              {{ expert.user.nom }} {{ expert.user.prenom }}
+            <option *ngFor="let expert of experts" [value]="expert.id">
+              {{ expert.user.nom }} {{ expert.user.prenom }} ({{ expert.specialite }})
             </option>
           </select>
         </div>
 
-        <!-- ✅ Date d'intervention -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Date d'intervention</label>
-          <input type="date" [(ngModel)]="interventionDate" name="interventionDate" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-teal-800 focus:border-teal-800 text-gray-900" required>
-        </div>
+        
 
         <!-- ✅ Commentaire -->
         <div>

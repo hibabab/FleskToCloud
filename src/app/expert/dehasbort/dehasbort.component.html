@@ -9,9 +9,9 @@
             <span class="flex-1 ms-3 whitespace-nowrap">Tableau de bord</span>
           </a>
         </li>
-  
-        
-  
+
+
+
         <!-- Constats en attente -->
         <li>
           <a [routerLink]="['/expert/constats/en-attente']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
@@ -19,7 +19,7 @@
             <span class="flex-1 ms-3 whitespace-nowrap">Constats en attente</span>
           </a>
         </li>
-  
+
         <!-- Constats en cours -->
         <li>
           <a [routerLink]="['/expert/constats/en-cours']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
@@ -35,9 +35,9 @@
             <span class="flex-1 ms-3 whitespace-nowrap">Historique</span>
           </a>
         </li>
-  
-      
-  
+
+
+
         <!-- Documents -->
         <li>
           <a [routerLink]="['/expert/documents']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 group">
@@ -45,9 +45,9 @@
             <span class="flex-1 ms-3 whitespace-nowrap">Documents</span>
           </a>
         </li>
-  
+
       </ul>
-  
+
       <!-- Ligne de séparation -->
       <hr class="my-4 border-teal-500">
       <div class="flex flex-col items-center justify-center space-y-2">
@@ -66,26 +66,27 @@
         </a>
         <h2 class="text-lg font-medium text-gray-700">Expertise automobile</h2>
       </div>
-  
+
       <!-- Profil et options -->
       <div class="flex items-center space-x-4">
         <!-- Icône Notification avec lien -->
-        <a [routerLink]="['/expert/notification']" routerLinkActive="router-link-active">
+        <a [routerLink]="['/expert/notification']" routerLinkActive="router-link-active" class="relative">
           <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
             <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
             </svg>
           </button>
-        </a>
-      
-      
         
-  
+        </a>
+
+
+
+
         <!-- Photo de profil et informations -->
         <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
           <div class="flex flex-col">
             <span class="text-teal-800 font-medium">Expert</span>
-  
+
             <div class="flex space-x-3 text-sm text-gray-600 mt-1">
               <a [routerLink]="['/dashboard-expert/account']" class="hover:text-teal-600">Mon compte</a>
               <a href="#" class="hover:text-red-600">Déconnexion</a>
@@ -95,5 +96,5 @@
       </div>
     </div>
   </nav>
-  
+
 </div>

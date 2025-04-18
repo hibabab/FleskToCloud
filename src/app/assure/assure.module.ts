@@ -24,7 +24,9 @@ import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca
 import { CASemstrielComponent } from './casemstriel/casemstriel.component';
 import { VehiculeComponent } from './vehicule/vehicule.component';
 import { ConstatComponent } from './constat/constat.component';
-import { NotificationAssureComponent } from './notification-assure/notification-assure.component';
+import { NotificationComponent } from './notification/notification.component';
+import { MesReCuComponent } from './mes-re-cu/mes-re-cu.component';
+
 
 
 @NgModule({
@@ -47,7 +49,8 @@ import { NotificationAssureComponent } from './notification-assure/notification-
     CASemstrielComponent,
     VehiculeComponent,
     ConstatComponent,
-    NotificationAssureComponent,
+    NotificationComponent,
+    MesReCuComponent
 
   ],
   imports: [

@@ -846,7 +846,7 @@ export class ConstatComponent implements OnInit {
       },
       jsPDF: {
         unit: 'mm',
-        format: [280, 320], // [width, height] (A4 standard: [210, 297])
+        format: [240, 320], // [width, height] (A4 standard: [210, 297])
         orientation: 'portrait'
       }
     };

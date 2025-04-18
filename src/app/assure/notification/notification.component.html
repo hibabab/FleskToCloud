@@ -1,0 +1,150 @@
+<div class="flex min-h-screen bg-gray-50">
+  <app-dashboard></app-dashboard>
+  <div class="flex-1 mt-20 ml-60 p-6">
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+          <svg class="w-6 h-6 mr-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z"/>
+          </svg>
+          Notifications
+        </h2>
+        <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">{{notifications.length}} </span>
+      </div>
+
+      <div *ngIf="notifications.length; else aucuneNotification">
+        <ul class="space-y-3">
+          <li *ngFor="let notif of notifications"
+              [ngClass]="{
+                'bg-gray-50': notif.isRead,
+                'bg-green-50': !notif.isRead,
+                'bg-blue-50': notif.type === 'subscription_accepted',
+                'cursor-pointer': notif.type === 'subscription_accepted'
+              }"
+              class="border-l-4 p-4 rounded-lg transition-all duration-200 ease-in-out"
+              [class.border-gray-300]="notif.isRead"
+              [class.border-green-500]="!notif.isRead && notif.type !== 'subscription_accepted'"
+              [class.border-blue-500]="notif.type === 'subscription_accepted'"
+              (click)="notif.type === 'subscription_accepted' ? showNotificationDetails(notif) : null">
+            <div class="flex justify-between items-start">
+              <div class="flex items-start">
+                <div [ngClass]="{
+                  'text-gray-400': notif.isRead,
+                  'text-green-500': !notif.isRead && notif.type !== 'subscription_accepted',
+                  'text-blue-500': notif.type === 'subscription_accepted'
+                }"
+                     class="mr-3 mt-0.5">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path *ngIf="notif.type === 'subscription_accepted'" d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+                    <path *ngIf="notif.type !== 'subscription_accepted'" fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">{{ notif.message }}</p>
+                  <small class="text-gray-500 block mt-1">{{ notif.createdAt | date:'mediumDate' }} à {{ notif.createdAt | date:'shortTime' }}</small>
+                </div>
+              </div>
+              <span *ngIf="notif.type === 'subscription_accepted'" class="ml-2 px-2.5 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                </svg>
+                Paiement
+              </span>
+            </div>
+            <div *ngIf="notif.type === 'subscription_accepted'" class="mt-3 flex justify-end">
+              <button class="text-xs px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md shadow-sm flex items-center"
+                      (click)="$event.stopPropagation(); proceedToPaymentFromList(notif)">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+                Payer maintenant
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <ng-template #aucuneNotification>
+        <div class="text-center py-10">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune notification</h3>
+          <p class="mt-1 text-sm text-gray-500">Vous n'avez aucune notification pour le moment.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour afficher les détails de la notification (uniquement pour les acceptations) -->
+<div *ngIf="showDetailsModal && selectedNotification?.type === 'subscription_accepted'" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 backdrop-blur-sm">
+  <div class="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-md">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-gray-900">Détails de la notification</h3>
+      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-500 rounded-full p-1 hover:bg-gray-100">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6">
+      <div class="flex items-start">
+        <div class="text-blue-500 mr-3 mt-0.5">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-gray-800 font-medium">{{ selectedNotification?.message }}</p>
+          <p class="text-gray-500 text-sm mt-1">{{ selectedNotification?.createdAt | date:'EEEE d MMMM y à HH:mm' }}</p>
+        </div>
+      </div>
+
+      <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+        <div class="flex items-center mb-3">
+          <svg class="w-5 h-5 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+          </svg>
+          <h4 class="text-blue-800 font-medium">Paiement requis</h4>
+        </div>
+
+        <p class="text-gray-700 text-sm mb-4">
+          Votre demande de souscription a été acceptée. Pour finaliser votre contrat, veuillez procéder au paiement.
+        </p>
+
+        <div *ngIf="selectedNotification?.contractId || selectedNotification?.metadata?.contratId" class="bg-white p-3 rounded border border-gray-200 mb-4">
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <p class="text-gray-500">N° de contrat</p>
+              <p class="font-medium">{{ selectedNotification?.contractId || selectedNotification?.metadata?.contratId }}</p>
+            </div>
+            <div *ngIf="selectedNotification?.metadata?.contratDetails?.dateDebut">
+              <p class="text-gray-500">Date début</p>
+              <p class="font-medium">{{ selectedNotification?.metadata?.contratDetails?.dateDebut | date:'shortDate' }}</p>
+            </div>
+            <div *ngIf="selectedNotification?.metadata?.contratDetails?.montant">
+              <p class="text-gray-500">Montant</p>
+              <p class="font-medium">{{ selectedNotification?.metadata?.contratDetails?.montant }} DT</p>
+            </div>
+          </div>
+        </div>
+
+        <button (click)="proceedToPayment()"
+                class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-md shadow-sm flex items-center justify-center transition-colors duration-200">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+          </svg>
+          Procéder au paiement
+        </button>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 bg-gray-50 flex justify-end border-t border-gray-200">
+      <button (click)="closeModal()" class="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md text-sm font-medium transition-colors duration-200">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
