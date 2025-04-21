@@ -9,6 +9,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 
 import { MailService } from './service/mail.service';
+import { AssuranceAutoModule } from './assurance-auto/assurance-auto.module';
+import { PaiementModule } from './paiement/paiement.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -55,6 +58,12 @@ import { MailService } from './service/mail.service';
 
     // Import feature modules
     AuthModule,
+
+    AssuranceAutoModule,
+
+    PaiementModule,
+
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService, MailService],

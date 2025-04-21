@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Adresse } from './adresse.entity';
+import { NotificationEntity } from 'src/notification/entities/notification.entity';
 
 @Entity()
 export class User {
@@ -43,4 +45,9 @@ export class User {
 
   @Column({ default: false })
   isBlocked: boolean;
+  @OneToMany(() => NotificationEntity, (notification) => notification.user, {
+    cascade: true,
+    nullable: true,
+  })
+  notifications: NotificationEntity[];
 }
