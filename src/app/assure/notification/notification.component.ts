@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NotificationService ,Notification} from '../../agent-service/Services/notification.service';
+import { NotificationService, Notification } from '../../agent-service/Services/notification.service';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 
@@ -27,45 +27,40 @@ export class NotificationComponent {
     }
   }
 
-  // Dans le composant côté demandeur
-handleNotificationClick(notification: Notification): void {
-  // Marquer comme lue si ce n'est pas déjà fait
-  if (!notification.isRead) {
-    this.notificationService.markAsRead(notification.id).subscribe(() => {
-      notification.isRead = true;
-    });
-  }
-
-  // Vérifier si c'est une notification de souscription acceptée
-  if (notification.type === 'subscription_accepted') {
-    // Rechercher l'ID du contrat dans l'ordre de priorité
-    const contractId = notification.contractId ||
-                      (notification.metadata && notification.metadata.contratId);
-
-    if (contractId) {
-      // Naviguer vers la page de paiement avec l'ID du contrat
-      this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
-    } else if (notification.link) {
-      // Si pas d'ID mais un lien est disponible
-      this.router.navigateByUrl(notification.link);
-    } else {
-      console.error('Impossible de trouver l\'ID du contrat ou le lien pour le paiement');
+  handleNotificationClick(notification: Notification): void {
+    // Marquer comme lue si ce n'est pas déjà fait
+    if (!notification.isRead) {
+      this.markAsRead(notification);
     }
-    return;
+
+    // Vérifier si c'est une notification de souscription acceptée
+    if (notification.type === 'subscription_accepted') {
+      // Rechercher l'ID du contrat dans l'ordre de priorité
+      const contractId = notification.contractId ||
+                       (notification.metadata && notification.metadata.contratId);
+
+      if (contractId) {
+        // Naviguer vers la page de paiement avec l'ID du contrat
+        this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
+      } else if (notification.link) {
+        // Si pas d'ID mais un lien est disponible
+        this.router.navigateByUrl(notification.link);
+      } else {
+        console.error('Impossible de trouver l\'ID du contrat ou le lien pour le paiement');
+      }
+      return;
+    }
+
+    // Pour les autres types de notifications
+    if (notification.link) {
+      this.router.navigateByUrl(notification.link);
+    }
   }
 
-  // Pour les autres types de notifications
-  if (notification.link) {
-    this.router.navigateByUrl(notification.link);
-  }
-}
-  // Nouvelle méthode pour rediriger directement depuis la liste sans ouvrir le modal
   proceedToPaymentFromList(notification: Notification): void {
     // Marquer comme lue si ce n'est pas déjà fait
     if (!notification.isRead) {
-      this.notificationService.markAsRead(notification.id).subscribe(() => {
-        notification.isRead = true;
-      });
+      this.markAsRead(notification);
     }
 
     // Déterminer l'ID du contrat à partir des propriétés disponibles
@@ -80,7 +75,6 @@ handleNotificationClick(notification: Notification): void {
     }
   }
 
-  // Rediriger vers le paiement avec un identifiant de contrat valide
   proceedToPayment(): void {
     if (this.selectedNotification) {
       // Déterminer l'ID du contrat à partir des propriétés disponibles
@@ -99,10 +93,22 @@ handleNotificationClick(notification: Notification): void {
     }
   }
 
-  // Fermer le modal
   closeModal(): void {
     this.showDetailsModal = false;
     this.selectedNotification = null;
+  }
+
+  markAsRead(notification: Notification): void {
+    if (!notification.isRead) {
+      this.notificationService.markAsRead(notification.id).subscribe(
+        () => {
+          notification.isRead = true;
+          // Stocker l'état dans le localStorage
+          this.storeReadNotification(notification.id);
+        },
+        (error) => console.error('Erreur lors du marquage comme lu:', error)
+      );
+    }
   }
 
   showNotificationDetails(notification: Notification): void {
@@ -110,15 +116,12 @@ handleNotificationClick(notification: Notification): void {
 
     // Si la notification n'est pas déjà lue, la marquer comme lue
     if (!notification.isRead) {
-      this.notificationService.markAsRead(notification.id).subscribe(() => {
-        notification.isRead = true;
-      });
+      this.markAsRead(notification);
     }
 
     this.showDetailsModal = true;
   }
 
-  // Fonction pour récupérer le token et extraire l'ID de l'utilisateur
   private decodeUserIdFromToken(): void {
     const token = this.getCookie('access_token');
     if (token) {
@@ -129,23 +132,45 @@ handleNotificationClick(notification: Notification): void {
     }
   }
 
-  // Récupérer les notifications
   private loadNotifications(): void {
     this.notificationService.getNotifications(this.userId).subscribe(
       (data) => {
         // Trier par date (plus récentes en premier)
         this.notifications = this.notificationService.sortNotificationsByDate(data);
+
+        // Vérifier le localStorage pour les notifications marquées comme lues
+        this.checkReadNotifications();
       },
       (error) => console.error('Erreur chargement notifications :', error)
     );
   }
 
-  // Vérifier si une notification est une notification de souscription acceptée
+  private storeReadNotification(notificationId: number): void {
+    const readNotifications = this.getReadNotifications();
+    if (!readNotifications.includes(notificationId)) {
+      readNotifications.push(notificationId);
+      localStorage.setItem('readNotifications', JSON.stringify(readNotifications));
+    }
+  }
+
+  private getReadNotifications(): number[] {
+    const readNotifications = localStorage.getItem('readNotifications');
+    return readNotifications ? JSON.parse(readNotifications) : [];
+  }
+
+  private checkReadNotifications(): void {
+    const readNotifications = this.getReadNotifications();
+    this.notifications.forEach(notification => {
+      if (readNotifications.includes(notification.id)) {
+        notification.isRead = true;
+      }
+    });
+  }
+
   isSubscriptionAccepted(notification: Notification): boolean {
     return notification.type === 'subscription_accepted';
   }
 
-  // Lire les cookies
   private getCookie(name: string): string | null {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);

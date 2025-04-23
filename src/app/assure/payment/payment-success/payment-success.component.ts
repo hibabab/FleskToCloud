@@ -105,7 +105,7 @@ export class PaymentSuccessComponent implements OnInit {
       });
   }
 
-  
+
   startRedirectCountdown(): void {
     this.countdownInterval = setInterval(() => {
       this.redirectCountdown--;
@@ -159,7 +159,10 @@ const adresseComplete = this.formatAdresse(adresse);
 ⭐ Bonus/Malus: ${bonusMalus}
 💳 Montant: ${this.verificationResult.amount || 'N/A'} DT
 📅 Date: ${new Date().toLocaleDateString()}`;
- const notificationResult = await this.notificationService.notifyAllUsers(message).toPromise();
+const notificationResult = await this.notificationService.notifyAllUsers(
+  message,
+  'pending' 
+).toPromise();
 
         if (notificationResult) {
           console.log('Notification de paiement envoyée à tous les agents avec succès');

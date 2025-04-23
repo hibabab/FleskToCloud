@@ -34,12 +34,26 @@ export class NotificationService {
     return this.http.post<Notification[]>(`${this.apiUrl}/get`, { userId });
   }
 
-  createNotification(userId: number, message: string): Observable<Notification> {
-    return this.http.post<Notification>(`${this.apiUrl}/create`, { userId, message });
+  createNotification(
+    userId: number,
+    message: string,
+    status?: string
+  ): Observable<Notification> {
+    return this.http.post<Notification>(`${this.apiUrl}/create`, {
+      userId,
+      message,
+      status
+    });
   }
 
-  notifyAllUsers(message: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/notify-all`, { message });
+  notifyAllUsers(
+    message: string,
+    status?: string
+  ): Observable<Notification[]> {
+    return this.http.post<Notification[]>(`${this.apiUrl}/notify-all`, {
+      message,
+      status
+    });
   }
 
   createSubscriptionRequest(user: any, formData: any): Observable<Notification> {
@@ -110,12 +124,22 @@ export class NotificationService {
   getUnreadCount(notifications: Notification[]): number {
     return notifications.filter(notification => !notification.isRead).length;
   }
-  
+
 sendPaymentSuccessNotification(data: {
   contractId: number;
   agentId: number;
   contractNumber: string | number;
 }): Observable<Notification> {
   return this.http.post<Notification>(`${this.apiUrl}/payment-success-notification`, data);
+}
+
+processPaymentNotification(
+  agent: any,
+  notificationId: number
+): Observable<Notification> {
+  return this.http.post<Notification>(`${this.apiUrl}/process-payment-notification`, {
+    agent,
+    notificationId
+  });
 }
 }

@@ -96,7 +96,7 @@ export class NotificationComponent implements OnInit {
     this.loading = true;
     this.notificationService.getNotifications(this.userId).subscribe(
       (data) => {
-        this.notifications = data;
+        this.notifications = this.notificationService.sortNotificationsByDate(data);
         this.loading = false;
       },
       (error) => {
@@ -140,10 +140,20 @@ export class NotificationComponent implements OnInit {
             this.showDetailsModal = true;
             this.loading = false;
 
+            // Marquer la notification comme lue sur le serveur et dans l'interface locale
             if (!notification.isRead) {
-              this.notificationService.markAsRead(notificationId).subscribe(() => {
-                notification.isRead = true;
-              });
+              this.notificationService.markAsRead(notification.id).subscribe(
+                (updatedNotif) => {
+                  // Mettre à jour la notification dans la liste locale
+                  const index = this.notifications.findIndex(n => n.id === notification.id);
+                  if (index !== -1) {
+                    this.notifications[index].isRead = true;
+                  }
+                },
+                (error) => {
+                  console.error('Erreur lors du marquage comme lu:', error);
+                }
+              );
             }
           },
           (error) => {
@@ -155,9 +165,24 @@ export class NotificationComponent implements OnInit {
     } else {
       this.selectedNotification = notification;
       this.showDetailsModal = true;
+
+      // Marquer la notification comme lue
+      if (!notification.isRead) {
+        this.notificationService.markAsRead(notification.id).subscribe(
+          (updatedNotif) => {
+            // Mettre à jour la notification dans la liste locale
+            const index = this.notifications.findIndex(n => n.id === notification.id);
+            if (index !== -1) {
+              this.notifications[index].isRead = true;
+            }
+          },
+          (error) => {
+            console.error('Erreur lors du marquage comme lu:', error);
+          }
+        );
+      }
     }
   }
-
   formatMetadata(metadata: any): void {
     this.formattedMetadata = {};
 
@@ -267,7 +292,7 @@ export class NotificationComponent implements OnInit {
                             return;
                         }
 
-                    
+
                         console.log('Contrat créé:', response.data);
 
                         const contratID = response.data.num;
@@ -716,6 +741,7 @@ export class NotificationComponent implements OnInit {
     });
   }
 
+
   isObject(value: any): boolean {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
@@ -724,4 +750,36 @@ export class NotificationComponent implements OnInit {
     return Object.keys(obj);
   }
 
+processPaymentNotification(): void {
+  if (!this.selectedNotification?.id) {
+    return;
+  }
+
+  this.loading = true;
+  const agent = { id: this.userId };
+  const notificationId = this.selectedNotification.id;
+
+  this.notificationService.processPaymentNotification(
+    agent,
+    notificationId
+  ).subscribe({
+    next: (result) => {
+      this.loading = false;
+      this.closeModal();
+      this.loadNotifications();  // Recharger les notifications pour voir les mises à jour
+
+      // Notifier les autres agents que le contrat est en cours de livraison
+      if (this.selectedNotification?.metadata?.contratId) {
+        const contratId = this.selectedNotification.metadata.contratId;
+        this.notificationService.notifyAllUsers(
+          `Le contrat n°${contratId} est en cours de livraison par l'agent ${this.userId}.`
+        ).subscribe();
+      }
+    },
+    error: (error) => {
+      console.error('Erreur lors du traitement de la notification de paiement:', error);
+      this.loading = false;
+    }
+  });
+}
 }

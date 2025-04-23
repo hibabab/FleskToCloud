@@ -18,14 +18,13 @@
               [ngClass]="{
                 'bg-gray-50': notif.isRead,
                 'bg-green-50': !notif.isRead,
-                'bg-blue-50': notif.type === 'subscription_accepted',
-                'cursor-pointer': notif.type === 'subscription_accepted'
+                'bg-blue-50': notif.type === 'subscription_accepted'
               }"
               class="border-l-4 p-4 rounded-lg transition-all duration-200 ease-in-out"
               [class.border-gray-300]="notif.isRead"
               [class.border-green-500]="!notif.isRead && notif.type !== 'subscription_accepted'"
               [class.border-blue-500]="notif.type === 'subscription_accepted'"
-              (click)="notif.type === 'subscription_accepted' ? showNotificationDetails(notif) : null">
+              (click)="handleNotificationClick(notif)">
             <div class="flex justify-between items-start">
               <div class="flex items-start">
                 <div [ngClass]="{
