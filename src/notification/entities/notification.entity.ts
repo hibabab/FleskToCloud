@@ -29,7 +29,7 @@ export class NotificationEntity {
   metadata: any; // Pour stocker les données du formulaire
 
   @Column({ type: 'varchar', nullable: true })
-  status: 'pending' | 'accepted' | 'rejected' | null; 
+  status: string| null; 
   @Column({ type: 'varchar', nullable: true })
   link: string; 
   @Column({ default: true })

@@ -18,15 +18,23 @@ export class NotificationService {
   async creerNotification(
     userId: number,
     message: string,
+    status?: string,
   ): Promise<NotificationEntity> {
     try {
       // Créer une nouvelle notification
       const notification = new NotificationEntity();
       notification.message = message;
-
+      
       // Associer l'utilisateur à la notification
-      notification.user = { id: userId } as User; // On utilise le type User pour une meilleure sécurité de type
-
+      notification.user = { id: userId } as User;
+      
+      // Gestion correcte du statut optionnel
+      if (status !== undefined) {
+        notification.status = status;
+      } else {
+        notification.status = null; // ou une valeur par défaut si nécessaire
+      }
+      
       // Sauvegarder la notification dans la base de données
       return await this.notificationRepository.save(notification);
     } catch (error) {
@@ -50,28 +58,31 @@ export class NotificationService {
   }
   async envoyerNotificationTousAgentsDeService(
     message: string,
+    status?: string
   ): Promise<NotificationEntity[]> {
     try {
-      // On suppose que les agents de service ont le rôle 'AGENT_SERVICE'
+      // Récupération des agents de service
       const agents = await this.userRepository.find({
         where: { role: 'agent service' },
       });
-
+  
       if (!agents.length) {
-        return []; // Retourner un tableau vide plutôt que de throw une erreur
+        return [];
       }
-
-      // Créer les notifications en utilisant la méthode creerNotification
+  
+      // Création des notifications avec gestion propre du statut
       const notificationsPromises = agents.map((agent) =>
-        this.creerNotification(agent.id, message),
+        this.creerNotification(
+          agent.id, 
+          message,
+          status // On passe simplement le paramètre status (peut être undefined)
+        )
       );
-
-      // Attendre que toutes les notifications soient créées
+  
       return await Promise.all(notificationsPromises);
     } catch (error) {
-      console.error('Erreur lors de lenvoi des Notification:', error);
+      console.error('Erreur lors de l\'envoi des notifications:', error);
       throw new Error(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         `Échec de l'envoi des notifications aux agents de service: ${error.message}`,
       );
     }
@@ -224,7 +235,7 @@ export class NotificationService {
           user: { id: userId },
           isRead: false ,visibleToUser: true
         },
-        order: { createdAt: 'ASC' }
+        order: { createdAt: 'DESC' }
       });
     } catch (error) {
       console.error('Erreur lors de la récupération des notifications non lues:', error);
@@ -279,5 +290,28 @@ export class NotificationService {
       console.error('Erreur lors de la création de la notification avec lien:', error);
       throw new Error('Erreur interne lors de la création de la notification avec lien');
     }
+  }
+  async processPaymentNotification(
+    agent: User,
+    notificationId: number
+  ): Promise<NotificationEntity> {
+    // Récupérer la notification
+    const notification = await this.getNotificationById(notificationId);
+    if (!notification) {
+      throw new Error(`Notification avec l'ID ${notificationId} non trouvée`);
+    }
+  
+    // Vérifier si la notification est déjà traitée
+    if (notification.status !== 'pending') {
+      throw new Error('Cette notification de paiement a déjà été traitée');
+    }
+  
+    // Mettre à jour le statut et l'agent qui a traité
+    notification. status='processing';
+    notification.processedByAgent = agent;
+    notification.createdAt = new Date();
+  
+    // Sauvegarder les modifications
+    return await this.notificationRepository.save(notification);
   }
 }

@@ -22,10 +22,19 @@ import { NotificationService } from 'src/notification/services/notification/noti
     constructor(private readonly notificationService: NotificationService) {}
   
     @Post('create')
-    
-    async createNotification(@Body() data: { userId: number; message: string }): Promise<NotificationEntity> {
+    async createNotification(
+      @Body() data: { 
+        userId: number; 
+        message: string; 
+        status?: string  // Ajout du paramètre optionnel
+      }
+    ): Promise<NotificationEntity> {
       try {
-        return await this.notificationService.creerNotification(data.userId, data.message);
+        return await this.notificationService.creerNotification(
+          data.userId, 
+          data.message,
+          data.status  // Passage du statut optionnel
+        );
       } catch (error) {
         this.handleError(error, 'Erreur lors de la création de la notification');
       }
@@ -42,9 +51,14 @@ import { NotificationService } from 'src/notification/services/notification/noti
   
     @Post('notify-all')
     @HttpCode(HttpStatus.CREATED)
-    async notifyAllUsers(@Body() data: { message: string }): Promise<NotificationEntity[]> {
+    async notifyAllUsers(
+      @Body() data: { message: string; status?: string }
+    ): Promise<NotificationEntity[]> {
       try {
-        return await this.notificationService.envoyerNotificationTousAgentsDeService(data.message);
+        return await this.notificationService.envoyerNotificationTousAgentsDeService(
+          data.message,
+          data.status // Passage du statut optionnel
+        );
       } catch (error) {
         this.handleError(error, "Erreur lors de l'envoi aux agents");
       }
@@ -154,4 +168,17 @@ import { NotificationService } from 'src/notification/services/notification/noti
       }
       throw new InternalServerErrorException(`${defaultMessage}: ${error.message}`);
     }
+    @Post('process-payment-notification')
+async processPaymentNotification(
+  @Body() data: { agent: User; notificationId: number }
+): Promise<NotificationEntity> {
+  try {
+    return await this.notificationService.processPaymentNotification(
+      data.agent,
+      data.notificationId
+    );
+  } catch (error) {
+    this.handleError(error, 'Erreur lors du traitement de la notification de paiement');
+  }
+}
   }
