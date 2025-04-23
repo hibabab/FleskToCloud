@@ -1,4 +1,5 @@
-import { HttpClient } from '@angular/common/http';
+import { formatDate } from '@angular/common';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { jsPDF } from 'jspdf';
@@ -13,12 +14,15 @@ import autoTable from 'jspdf-autotable';
 export class ContratAutoSemestrielComponent {
   num!: number;
   isLoading: boolean = false;
-
+  errorMessage = '';
+  successMessage = '';
   constructor(private http: HttpClient) {}
 
   onSubmit() {
     if (!this.num) return;
 
+    this.errorMessage = '';
+    this.successMessage = '';
     this.isLoading = true;
 
     this.http.patch<any>(
@@ -28,22 +32,165 @@ export class ContratAutoSemestrielComponent {
       next: (response) => {
         this.isLoading = false;
         if (response.success) {
-          console.log('Paiement enregistré avec succès');
-          console.log(response.data);
-          this.generateContratPDF(response.data)
+          const contratNum = response.data?.contrat?.id
+            || response.data?.contrat?.num
+            || response.data?.id
+            || this.num;
+          this.successMessage = response.message || 'Opération réussie';
+          this.processPayment(contratNum, response.data);
         } else {
-          console.log(response.message || 'Erreur lors du traitement');
-          // Vous pouvez ajouter une notification d'erreur ici
+          this.errorMessage = response.message || 'Erreur lors du traitement';
+          console.log(this.errorMessage);
         }
       },
       error: (err) => {
         this.isLoading = false;
-        console.log(err.error?.message || 'Erreur serveur');
-        // Vous pouvez ajouter une notification d'erreur ici
+        this.errorMessage = err.error?.message || err.message || 'Erreur serveur';
+        console.log(this.errorMessage);
       }
     });
   }
+   private processPayment(contratNum: number, contractData: any) {
+      // Appel à l'API pour créer un paiement local
+      this.generateContratPDF(contractData);
+      this.http.post<{success: boolean, data: any, message: string}>(
+        'http://localhost:3000/payments/local',
+        { contratNum: contratNum },
+        { headers: { 'Content-Type': 'application/json' } }
+      ).subscribe({
+        next: (paymentResponse) => {
+          this.isLoading = false;
 
+          if (paymentResponse.success) {
+            console.log('Paiement local enregistré:', paymentResponse.data);
+            this.successMessage = 'Contrat renouvelé et paiement enregistré avec succès';
+
+
+
+
+            // Génération du reçu de paiement
+            this.generatePaymentReceipt({
+              paymentId: paymentResponse.data.paymentId,
+              status: paymentResponse.data.status,
+              amount: paymentResponse.data.amount,
+              paymentDate: paymentResponse.data.paymentDate,
+              contrat: {
+                num: contratNum
+              }
+            });
+          } else {
+            console.error('Réponse paiement inattendue:', paymentResponse);
+            this.errorMessage = paymentResponse.message || 'Erreur lors de l\'enregistrement du paiement';
+          }
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isLoading = false;
+          console.error('Erreur de paiement:', err);
+
+          let errorMessage = 'Erreur lors de l\'enregistrement du paiement';
+          if (err.error?.message) {
+            errorMessage = err.error.message;
+          } else if (err.message) {
+            errorMessage = err.message;
+          }
+
+          this.errorMessage = errorMessage;
+        }
+      });
+    }
+ async generatePaymentReceipt(paymentData: any): Promise<void> {
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4') as any;
+      doc.setFont('helvetica');
+
+      // Variables de position
+      let yOffset = 20;
+      const margin = 15;
+      const lineHeight = 7;
+      const sectionSpacing = 5;
+
+      // 1. En-tête avec logo
+      try {
+        const logoBase64 = await this.loadImageAsBase64('assets/images/logoFC.png');
+        doc.addImage(logoBase64, 'PNG', margin, yOffset, 30, 30);
+      } catch (error) {
+        console.warn('Logo non chargé');
+      }
+
+      // Titre principal
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text('REÇU DE PAIEMENT', 105, yOffset + 15, { align: 'center' });
+      yOffset += 30;
+
+      // 2. Informations du paiement
+      doc.setFontSize(10);
+      doc.text('INFORMATIONS DE PAIEMENT', margin, yOffset);
+      yOffset += lineHeight;
+
+      autoTable(doc, {
+        startY: yOffset,
+        body: [
+          ['Référence Paiement', 'Statut', 'Date Paiement', 'Montant'],
+          [
+            paymentData.paymentId || 'N/A',
+            paymentData.status || 'N/A',
+            paymentData.paymentDate ? new Date(paymentData.paymentDate).toLocaleDateString() : 'N/A',
+            paymentData.amount ? `${paymentData.amount.toFixed(3)} DT` : '0.000 DT'
+          ]
+        ],
+        styles: {
+          fontSize: 8,
+        },
+        columnStyles: {
+          0: { fontStyle: 'bold' },
+          1: { fontStyle: 'bold' },
+          2: { fontStyle: 'bold' },
+          3: { fontStyle: 'bold' }
+        }
+      });
+      yOffset = (doc as any).lastAutoTable.finalY + sectionSpacing;
+
+      // 3. Informations du contrat associé
+      doc.setFontSize(10);
+      doc.text('INFORMATIONS DU CONTRAT', margin, yOffset);
+      yOffset += lineHeight;
+
+      autoTable(doc, {
+        startY: yOffset,
+        body: [
+          ['N° Contrat', 'Date', 'Type de paiement'],
+          [
+            paymentData.contrat?.num || 'N/A',
+            new Date().toLocaleDateString(),
+            'Paiement en espèces'
+          ]
+        ],
+        styles: {
+          fontSize: 8,
+        },
+        columnStyles: {
+          0: { fontStyle: 'bold' },
+          1: { fontStyle: 'bold' },
+          2: { fontStyle: 'bold' }
+        }
+      });
+      yOffset = (doc as any).lastAutoTable.finalY + sectionSpacing;
+
+      // Pied de page
+      doc.setFontSize(6);
+      doc.setTextColor(100);
+      doc.text('Flesk Cover - Tél: 24051646 - Email: contact@fleskcover.com', 105, 285, { align: 'center' });
+
+      // Génération du fichier
+      const fileName = `Reçu_Paiement_${paymentData.paymentId || new Date().getTime()}.pdf`;
+      doc.save(fileName);
+
+    } catch (error) {
+      console.error('Erreur génération reçu PDF:', error);
+      throw error;
+    }
+  }
   async generateContratPDF(contratData: any): Promise<void> {
     try {
       const doc = new jsPDF('p', 'mm', 'a4') as any;
@@ -79,14 +226,33 @@ export class ContratAutoSemestrielComponent {
         body: [
           ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration', 'Nature', 'Échéances'],
           [
-            contratData.contrat.num || 'N/A',
-            133,
-            contratData.assure?.numSouscription || 'N/A',
-            contratData.contrat.dateSouscription || 'N/A',
-            contratData.contrat.dateSouscription || 'N/A',
-            contratData.contrat.dateExpiration || 'N/A',
-            contratData.contrat.NatureContrat || 'N/A',
-            contratData.contrat.echeances || 'N/A'
+
+
+
+            contratData?.contrat?.id ||
+          contratData?.contrat?.num ||
+          'N/A',
+
+          // Code agence (fixe ou dynamique)
+          133,
+
+          // N° Sociétaire - Accès selon la structure de l'API
+          contratData?.assure?.numSouscription ||
+          'N/A',
+
+          // Dates - Accès selon la structure de l'API avec formatage
+          contratData?.contrat?.dateSouscription,
+          contratData?.contrat?.dateSouscription, // Date effet = date souscription
+        contratData?.contrat?.dateExpiration,
+
+          // Nature contrat - Accès selon la structure de l'API
+          contratData?.contrat?.NatureContrat ||
+          'Standard',
+
+          // Échéances - Accès selon la structure de l'API
+          contratData?.contrat?.echeances ?
+          contratData.contrat.echeances :
+            'N/A'
           ]
         ],
         styles: {

@@ -1,0 +1,219 @@
+/* Styles généraux */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  margin-left: 15rem;
+}
+
+/* En-tête */
+.welcome-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #115e59;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #0f766e;
+}
+
+.welcome-message {
+  font-size: 1rem;
+  color: #4b5563;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Grille de cercles améliorée */
+.enhanced-circle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-items: center;
+}
+
+/* Cercles améliorés avec texte intégré */
+.enhanced-service-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 4px solid #0f766e;
+  padding: 1rem;
+  text-align: center;
+}
+
+.enhanced-service-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #0d9488;
+}
+
+.circle-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0.5rem;
+}
+
+.circle-icon {
+  font-size: 2.5rem;
+  color: #0f766e;
+  margin-bottom: 0.8rem;
+}
+
+.circle-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #115e59;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+
+.circle-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+/* Chargement */
+.loading-enhanced-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: 4px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+}
+
+.loading-icon {
+  width: 40px;
+  height: 40px;
+  background: #e5e7eb;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+.loading-text-line {
+  width: 80%;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  animation: pulse 2s infinite;
+}
+
+.loading-text-line-short {
+  width: 60%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  animation: pulse 2s infinite 0.5s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .enhanced-circle-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .enhanced-service-circle {
+    width: 160px;
+    height: 160px;
+  }
+
+  .circle-icon {
+    font-size: 2rem;
+  }
+
+  .circle-title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 1.5rem;
+  }
+
+  .enhanced-circle-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-circle-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .enhanced-service-circle {
+    width: 140px;
+    height: 140px;
+  }
+
+  .circle-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .circle-title {
+    font-size: 0.9rem;
+  }
+
+  .circle-description {
+    font-size: 0.8rem;
+  }
+}

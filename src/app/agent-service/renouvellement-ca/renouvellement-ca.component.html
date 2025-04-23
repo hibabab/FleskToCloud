@@ -1,140 +1,78 @@
-<div class="flex flex-col min-h-screen font-roboto">
-  <!-- Navbar fixe en haut -->
-  <nav class="bg-gray-50 text-gray-900 w-full z-50 p-2 shadow-lg">
-    <div class="container mx-auto flex justify-between items-center px-4">
-      <!-- Logo et message de bienvenue -->
-      <div class="flex items-center space-x-4 ml-4 sm:ml-6 md:ml-8 lg:ml-10 xl:ml-5">
-        <a routerLink="/" class="flex items-center text-2xl font-semibold text-teal-800">
-          <i class="fas fa-umbrella w-8 h-8 mr-2"></i>
-          Flesk Cover
-        </a>
-        <h2 class="text-lg font-medium text-gray-700">Roulez sereinement, vivez pleinement</h2>
+<div class="flex">
+  <app-dashbort></app-dashbort>
+
+  <div class="flex-1 mt-20 ml-60">
+<main class="flex-1 ml-60">
+  <div class="max-w-6xl mx-auto p-8">
+    <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-md w-full p-8">
+      <div class="flex flex-col items-center mb-8 text-2xl font-semibold text-teal-800">
+        <i class="fas fa-umbrella w-8 h-8 mr-1 text-teal-800"></i>
+        <p>Flesk Cover</p>
+        <h2 class="font-semibold text-xl text-gray-700 mt-2">Renouvellement contrat auto</h2>
       </div>
-
-      <!-- Profil et options -->
-      <div class="flex items-center space-x-4">
-        <!-- Icône Mail -->
-        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
-          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2.94 6.33a2 2 0 0 1 1.5-.66h11.12a2 2 0 0 1 1.5.66l-6.06 3.95-6.06-3.95zM2 7.67V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.67l-5.88 3.83a1 1 0 0 1-1.06 0L2 7.67z" />
-          </svg>
-        </button>
-
-        <!-- Icône Notification -->
-        <button class="h-10 w-10 flex items-center justify-center rounded-full border-2 border-teal-800 hover:bg-teal-100 focus:outline-none">
-          <svg class="h-5 w-5 text-teal-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
-          </svg>
-        </button>
-
-        <!-- Photo de profil et informations -->
-        <div class="flex items-center space-x-3 bg-gray-100 p-2 rounded-lg">
-          <div class="flex flex-col">
-            <span class="text-teal-800 font-medium">agent service</span>
-            <div class="flex space-x-3 text-sm text-gray-600 mt-1">
-              <a [routerLink]="['/dashboard-assure/account']" class="hover:text-teal-600">Mon compte</a>
-              <a href="#" class="hover:text-red-600">Déconnexion</a>
-            </div>
+      <form [formGroup]="renewalForm" (ngSubmit)="onSubmit()" class="w-full space-y-4">
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">CIN</label>
+          <input type="number" formControlName="Cin"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2"
+                placeholder="CIN d'assuré">
+          <div *ngIf="renewalForm.get('Cin')?.invalid && renewalForm.get('Cin')?.touched" class="text-red-500 text-sm mt-1">
+            Le CIN doit etre 8 chiffres
           </div>
         </div>
-      </div>
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">Matricule</label>
+          <input type="text" formControlName="Imat"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2"
+                placeholder="Matricule du véhicule">
+          <div *ngIf="renewalForm.get('Imat')?.invalid && renewalForm.get('Imat')?.touched" class="text-red-500 text-sm mt-1">
+            Le matricule doit etre sous cette forme 4567TU123
+          </div>
+        </div>
+
+        <!-- Ajout de la sélection de pack -->
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-700">Pack d'assurance</label>
+          <div class="mb-2">
+            <div class="flex items-center mb-2">
+              <input type="radio" id="keepSamePack" formControlName="packOption" value="same"
+                     class="w-4 h-4 text-teal-800 bg-gray-100 border-gray-300 focus:ring-teal-800">
+              <label for="keepSamePack" class="ml-2 text-sm font-medium text-gray-700">Garder mon pack actuel</label>
+            </div>
+            <div class="flex items-center">
+              <input type="radio" id="changePack" formControlName="packOption" value="change"
+                     class="w-4 h-4 text-teal-800 bg-gray-100 border-gray-300 focus:ring-teal-800">
+              <label for="changePack" class="ml-2 text-sm font-medium text-gray-700">Changer de pack</label>
+            </div>
+          </div>
+
+          <div *ngIf="renewalForm.get('packOption')?.value === 'change'" class="mt-3">
+            <select formControlName="packValue"
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2">
+      <option value="" disabled selected>Sélectionnez un pack</option>
+      <option value="essentiel">Pack Essentiel</option>
+      <option value="dommage">Pack Dommage et Collision</option>
+      <option value="tierce">Pack Tierce</option>
+    </select>
+    <div *ngIf="renewalForm.get('packOption')?.value === 'change' && renewalForm.get('packValue')?.invalid && renewalForm.get('packValue')?.touched" class="text-red-500 text-sm mt-1">
+      Veuillez sélectionner un pack
     </div>
-  </nav>
-
-  <!-- Contenu principal avec sidebar et contenu -->
-  <div class="flex flex-1"> <!-- pt-16 pour compenser la hauteur de la navbar -->
-    <!-- Sidebar -->
-    <aside id="default-sidebar" class="fixed bg-teal-600 z-40 w-60 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-      <div class="h-full py-4 overflow-y-auto px-10">
-        <ul class="space-y-2 font-medium">
-          <!-- Accueil -->
-          <li>
-            <a [routerLink]="['/agent/interface']" class="flex items-center p-2 rounded-lg text-white hover:bg-teal-700 group">
-              <i class="fas fa-home w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
-              <span class="flex-1 ms-3 whitespace-nowrap">Accueil</span>
-            </a>
-          </li>
-
-          <!-- Liste assuré automobile -->
-          <li>
-            <a [routerLink]="['/agent/liste-auto']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
-              <i class="fas fa-car w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
-              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré automobile</span>
-            </a>
-          </li>
-
-          <!-- Liste assuré vie -->
-          <li>
-            <a [routerLink]="['/agent/liste-vie']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
-              <i class="fas fa-heart w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
-              <span class="flex-1 ms-3 whitespace-nowrap">Liste assuré vie</span>
-            </a>
-          </li>
-
-          <!-- Liste expert -->
-          <li>
-            <a [routerLink]="['/agent/liste-expert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-700 group">
-              <i class="fas fa-user-tie w-5 h-5 text-white transition duration-75 group-hover:text-white"></i>
-              <span class="flex-1 ms-3 whitespace-nowrap">Liste expert</span>
-            </a>
-          </li>
-        </ul>
-
-        <!-- Ligne de séparation -->
-        <hr class="my-4 border-teal-500">
-        <div class="flex flex-col items-center justify-center space-y-2">
-          <p class="text-white text-sm text-center">Merci de votre visite !</p>
-          <p class="text-white text-xs text-center"> © 2025 Flesk Cover </p>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Contenu principal centré -->
-    <main class="flex-1 ml-60">
-      <div class="max-w-6xl mx-auto p-8">
-        <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-md w-full p-8">
-          <div class="flex flex-col items-center mb-8 text-2xl font-semibold text-teal-800">
-            <i class="fas fa-umbrella w-8 h-8 mr-1 text-teal-800"></i>
-            <p>Flesk Cover</p>
-            <h2 class="font-semibold text-xl text-gray-700 mt-2">Renouvellement contrat auto</h2>
           </div>
-
-          <form [formGroup]="renewalForm" (ngSubmit)="onSubmit()" class="w-full space-y-4">
-            <div>
-              <label class="block mb-1 text-sm font-medium text-gray-700">CIN</label>
-              <input type="text" formControlName="Cin"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2"
-                    placeholder=" CIN d'assuré">
-              <div *ngIf="renewalForm.get('Cin')?.invalid && renewalForm.get('Cin')?.touched" class="text-red-500 text-sm mt-1">
-                Le CIN est requis
-              </div>
-            </div>
-
-            <div>
-              <label class="block mb-1 text-sm font-medium text-gray-700">Matricule</label>
-              <input type="text" formControlName="Imat"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2"
-                    placeholder="Matricule du véhicule">
-              <div *ngIf="renewalForm.get('Imat')?.invalid && renewalForm.get('Imat')?.touched" class="text-red-500 text-sm mt-1">
-                Le matricule est requis
-              </div>
-            </div>
-
-            <button type="submit" [disabled]="renewalForm.invalid"
-                    class="w-full py-2 px-4 bg-teal-800 text-white rounded-lg mt-6 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">
-              <span *ngIf="!isLoading">Valider</span>
-              <span *ngIf="isLoading">Traitement...</span>
-            </button>
-
-            <div *ngIf="errorMessage" class="text-red-500 text-sm text-center mt-2">
-              {{ errorMessage }}
-            </div>
-            <div *ngIf="successMessage" class="text-teal-600 text-sm text-center mt-2">
-              {{ successMessage }}
-            </div>
-          </form>
         </div>
-      </div>
-    </main>
+
+        <button type="submit" [disabled]="renewalForm.invalid"
+                class="w-full py-2 px-4 bg-teal-800 text-white rounded-lg mt-6 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!isLoading">Valider</span>
+          <span *ngIf="isLoading">Traitement...</span>
+        </button>
+        <div *ngIf="errorMessage" class="text-red-500 text-sm text-center mt-2">
+          {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="text-teal-600 text-sm text-center mt-2">
+          {{ successMessage }}
+        </div>
+      </form>
+    </div>
   </div>
+</main>
 </div>

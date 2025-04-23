@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ConstatService } from '../services/constat.service';
 import { jwtDecode } from 'jwt-decode';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-constat-list',
@@ -12,7 +13,9 @@ export class ConstatListComponent implements OnInit {
   constats: any[] = [];
 
 
-  constructor(private constatService: ConstatService) {}
+  constructor(private constatService: ConstatService,
+     private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.fetchConstats(); // Appeler la méthode pour récupérer les constats lors du chargement du composant
@@ -26,15 +29,15 @@ export class ConstatListComponent implements OnInit {
 
   fetchConstats(): void {
     const token = this.getCookie('access_token');
-              
+
               if (token) {
                 const decoded: any = jwtDecode(token); // Décode le token
                 const userId = Number(decoded.sub);
     this.constatService.getConstatsByUser(userId).subscribe(
       (data: any[]) => {
         this.constats = data;
-        console.log(data) 
-       
+        console.log(data)
+
       },
       (error) => {
         console.error('Erreur lors de la récupération des constats', error);

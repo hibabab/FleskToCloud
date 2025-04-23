@@ -14,14 +14,19 @@ export class ListeAutoComponent {
 
   ngOnInit(): void {
     // Récupérer la liste des assurés depuis le backend
-    this.http.get<any[]>('http://localhost:3000/contrat-auto-geteway/assures').subscribe(
-      (data) => {
-        console.log('Données reçues:', data); 
-        this.assures = data;
+    this.http.get<any>('http://localhost:3000/contrat-auto-geteway/assures').subscribe(
+      (response) => {
+        console.log('Données reçues:', response);
+
+        if (response && response.success && Array.isArray(response.data)) {
+          this.assures = response.data;
+        } else {
+          console.error('Format de réponse inattendu ou erreur:', response);
+          this.assures = [];
+        }
       },
       (error) => {
         console.error('Erreur lors de la récupération des assurés:', error);
       },
-    );
-  }
+    );}
 }

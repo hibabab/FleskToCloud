@@ -94,43 +94,44 @@ export class MesCAComponent implements OnInit {
   }
 
   loadUserContrats(): void {
-    if (!this.userCin) {
-      this.errorMessage = 'CIN utilisateur non disponible';
-      return;
-    }
+    if (!this.userCin) return;
 
     this.isLoading = true;
     this.errorMessage = '';
     this.contrats = [];
 
-    this.http.get<any>(
-      `http://localhost:3000/contrat-auto-geteway/contrats/assure/${this.userCin}`
-    ).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        if (response?.success) {
-          this.contrats = Array.isArray(response.data)
-            ? response.data.map((item: { contrat: any; assure: any; vehicule: any; garanties: any; }) => ({
-                contrat: item.contrat || {},
-                assure: item.assure || {},
+     this.http.get<any>(
+    `http://localhost:3000/contrat-auto-geteway/contrats/assure/${this.userCin}`)
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response?.success) {
+            this.contrats = Array.isArray(response.data)
+            ? response.data.map((item: any) => ({
+                contrat: {
+                  num: item.num,
+                  dateSouscription: item.dateSouscription,
+                  dateExpiration: item.dateExpiration
+                },
                 vehicule: item.vehicule || {},
+                assure: item.assure || {},
                 garanties: item.garanties || []
               }))
             : [];
 
-          if (this.contrats.length === 0) {
-            this.errorMessage = 'Aucun contrat trouvé pour cet assuré';
+            if (this.contrats.length === 0) {
+              this.errorMessage = 'Aucun contrat trouvé pour ce CIN';
+            }
+          } else {
+            this.errorMessage = response?.message || 'Réponse inattendue du serveur';
           }
-        } else {
-          this.errorMessage = response?.message || 'Réponse inattendue du serveur';
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = err.error?.message || 'Erreur lors de la recherche';
+          console.error('Erreur:', err);
         }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Erreur lors de la récupération des contrats';
-        console.error('Erreur:', err);
-      }
-    });
+      });
   }
   onContratClick(contrat: any) {
     this.http.get<ApiResponse<any>>(
@@ -152,7 +153,8 @@ export class MesCAComponent implements OnInit {
     });
   }
 
- async generateContratPDF(contratData: any): Promise<void> {
+
+async generateContratPDF(contratData: any): Promise<void> {
    try {
      const doc = new jsPDF('p', 'mm', 'a4') as any;
      doc.setFont('helvetica');

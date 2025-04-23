@@ -106,18 +106,18 @@
   <!-- Message si aucun paiement ne peut être effectué -->
   <div *ngIf="error && error.includes('montant') && !loading && !paymentData" class="text-center py-6">
     <button
-      [routerLink]="['/contrats', contratNum]"
+      [routerLink]="['/dashboard-assure', 'interface']"
       class="bg-teal-800 hover:bg-teal-900 text-white py-2 px-4 rounded shadow-md flex items-center justify-center mx-auto">
       <mat-icon class="mr-2">account_balance</mat-icon>
-      Retour aux détails du contrat
+      Retour 
     </button>
   </div>
 
   <!-- Lien de retour -->
   <div class="back-link mt-8 border-t border-gray-200 pt-4">
-    <a [routerLink]="['/contrats', contratNum]" class="text-teal-800 hover:text-teal-900 flex items-center">
+    <a [routerLink]="['/dashboard-assure', 'interface']" class="text-teal-800 hover:text-teal-900 flex items-center">
       <mat-icon>arrow_back</mat-icon>
-      <span class="ml-1">Retour au détail du contrat</span>
+      <span class="ml-1">Retour </span>
     </a>
   </div>
 </div>

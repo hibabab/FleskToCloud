@@ -36,13 +36,17 @@ export class ContratListComponent {
           this.isLoading = false;
           if (response?.success) {
             this.contrats = Array.isArray(response.data)
-              ? response.data.map((item: { contrat: any; assure: any; vehicule: any; garanties: any; }) => ({
-                  contrat: item.contrat || {},
-                  assure: item.assure || {},
-                  vehicule: item.vehicule || {},
-                  garanties: item.garanties || []
-                }))
-              : [];
+            ? response.data.map((item: any) => ({
+                contrat: {
+                  num: item.num,
+                  dateSouscription: item.dateSouscription,
+                  dateExpiration: item.dateExpiration
+                },
+                vehicule: item.vehicule || {},
+                assure: item.assure || {},
+                garanties: item.garanties || []
+              }))
+            : [];
 
             if (this.contrats.length === 0) {
               this.errorMessage = 'Aucun contrat trouvé pour ce CIN';

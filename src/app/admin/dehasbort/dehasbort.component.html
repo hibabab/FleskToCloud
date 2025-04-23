@@ -3,19 +3,19 @@
     <div class="h-full mt-2 py-2 overflow-y-auto px-3">
       <ul class="space-y-1 font-medium">
         <li>
-          <a [routerLink]="['/admin/listUser']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a [routerLink]="['/admin/interface']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>home</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Accueil</span>
           </a>
         </li>
         <li>
-          <a href="['/admin/listExpert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a  [routerLink]="['/admin/listExpert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>people</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Liste d'expert</span>
           </a>
         </li>
         <li>
-          <a href="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
+          <a  [routerLink]="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
             <mat-icon>engineering</mat-icon>
             <span class="flex-1 ml-2 whitespace-nowrap">Agent de service</span>
           </a>
@@ -35,6 +35,7 @@
     </div>
   </aside>
 
+  <!-- Barre de navigation -->
   <nav class="bg-gray-50 text-gray-900 fixed top-0 left-0 w-full z-50 p-1 shadow-lg">
     <div class="container mx-auto flex justify-between items-center px-3">
       <div class="flex items-center space-x-2 ml-2">

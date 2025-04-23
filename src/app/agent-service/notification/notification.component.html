@@ -1,4 +1,7 @@
-<div class="flex min-h-screen bg-gray-50">
+<div class="flex">
+  <app-dashbort></app-dashbort>
+
+  <div class="flex-1 mt-20 ml-60">
   <div class="max-w-4xl w-full mx-auto p-6">
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
       <div class="flex items-center justify-between mb-8">
@@ -168,7 +171,7 @@
               </svg>
               <p class="font-medium">
                 Demande {{ selectedNotification.status === 'accepted' ? 'acceptée' : 'refusée' }}
-                
+
                 <span *ngIf="selectedNotification.processedByAgent">par {{ selectedNotification.processedByAgent?.email || 'un agent' }}</span>
               </p>
             </div>

@@ -203,129 +203,112 @@ export class NotificationComponent implements OnInit {
   }
 
   processRequest(decision: 'accept' | 'reject'): void {
-    if (!this.selectedNotification || !this.selectedNotification.id) return;
+    if (!this.selectedNotification?.id) {
+        return;
+    }
 
     this.loading = true;
     const agent = { id: this.userId };
+    const notificationId = this.selectedNotification.id;
+    const userId = this.selectedNotification.user?.id;
 
-    if (decision === 'reject') {
-      this.notificationService.processSubscriptionRequest(
+    const handleFinalize = () => {
+        this.loading = false;
+        this.closeModal();
+        this.loadNotifications();
+    };
+
+    const handleError = (error: any, context: string) => {
+        console.error(`Erreur lors de ${context}:`, error);
+        this.loading = false;
+    };
+
+    this.notificationService.processSubscriptionRequest(
         agent,
-        this.selectedNotification.id,
-        'reject'
-      ).subscribe(
-        (result) => {
-          const userId = this.selectedNotification?.user?.id;
-          if (userId) {
-            this.notificationService.sendNotification({
-              userId: userId,
-              message: "Votre demande de souscription a été refusée. Veuillez vous rendre à notre local pour faire la souscription en personne.",
-              type: "subscription_rejected"
-            }).subscribe(
-              () => {
-                this.loading = false;
-                this.closeModal();
-                this.loadNotifications();
-              },
-              (error) => {
-                console.error('Erreur lors de l\'envoi de la notification de refus:', error);
-                this.loading = false;
-              }
-            );
-          } else {
-            this.loading = false;
-            this.closeModal();
-            this.loadNotifications();
-          }
-        },
-        (error) => {
-          console.error('Erreur lors du traitement de la demande de refus:', error);
-          this.loading = false;
-        }
-      );
-    } else if (decision === 'accept') {
-      this.notificationService.processSubscriptionRequest(
-        agent,
-        this.selectedNotification.id,
-        'accept'
-      ).subscribe(
-        (result) => {
-          const contratData = this.formatContractData(this.selectedNotification!);
-
-          const requestData = {
-            assure: contratData.assure,
-            Cin: contratData.Cin || '',
-            vehicule: contratData.vehicule,
-            contrat: contratData.contrat
-          };
-
-          this.http.post<{success: boolean, data: any, message: string}>(
-            'http://localhost:3000/contrat-auto-geteway/createCA',
-            requestData
-          ).subscribe(
-            (response) => {
-              if (response.success) {
-                // Utiliser la structure correcte de la réponse
-                const contratID = response.data.contrat.id;
-                const userId = this.selectedNotification?.user?.id;
-
-                if (userId && contratID) {
-                  const paymentLink = `/dashboard-assure/contrat/${contratID}/payment`;
-
-                  // Notification avec toutes les informations nécessaires
-                  const notificationPayload = {
-                    userId: userId,
-                    message: "Votre demande de souscription a été acceptée! Vous pouvez maintenant procéder au paiement pour finaliser votre contrat.",
-                    type: "subscription_accepted",
-                    link: paymentLink,
-                    contractId: contratID,  // Utiliser directement le contractId
-                    metadata: {
-                      contratId: contratID,
-                      paymentLink: paymentLink,
-                      status: "pending_payment",
-                      contratNumero: response.data.contrat.id,
-                      contratDetails: {
-                        dateDebut: response.data.contrat.dateSouscription,
-                        dateFin: response.data.contrat.dateExpiration,
-                        montant: response.data.contrat.cotisationTotale || 0
-                      }
-                    }
-                  };
-
-                  this.notificationService.sendNotification(notificationPayload).subscribe(
-                    () => {
-                      this.loading = false;
-                      this.closeModal();
-                      this.loadNotifications();
-                    },
-                    (error) => {
-                      console.error('Erreur lors de l\'envoi de la notification d\'acceptation:', error);
-                      this.loading = false;
-                    }
-                  );
-                } else {
-                  this.loading = false;
-                  this.closeModal();
-                  this.loadNotifications();
+        notificationId,
+        decision
+    ).subscribe({
+        next: (result) => {
+            if (decision === 'reject') {
+                if (!userId) {
+                    handleFinalize();
+                    return;
                 }
-              } else {
-                console.error('Erreur lors de la création du contrat:', response.message);
-                this.loading = false;
-              }
-            },
-            (error) => {
-              console.error('Erreur lors de la création du contrat:', error);
-              this.loading = false;
+
+                this.notificationService.sendNotification({
+                    userId: userId,
+                    message: "Votre demande de souscription a été refusée. Veuillez vous rendre à notre local pour faire la souscription en personne.",
+                    type: "subscription_rejected"
+                }).subscribe({
+                    next: handleFinalize,
+                    error: (error) => handleError(error, "l'envoi de la notification de refus")
+                });
+            } else if (decision === 'accept') {
+                if (!this.selectedNotification) {
+                    this.loading = false;
+                    return;
+                }
+
+                const contratData = this.formatContractData(this.selectedNotification);
+                const requestData = {
+                    assure: contratData.assure,
+                    Cin: contratData.Cin || '',
+                    vehicule: contratData.vehicule,
+                    contrat: contratData.contrat
+                };
+
+                this.http.post<{success: boolean, data: any, message: string}>(
+                    'http://localhost:3000/contrat-auto-geteway/createCA',
+                    requestData
+                ).subscribe({
+                    next: (response) => {
+                        if (!response.success) {
+                            handleError(response.message, "la création du contrat");
+                            return;
+                        }
+
+                    
+                        console.log('Contrat créé:', response.data);
+
+                        const contratID = response.data.num;
+
+                        if (!userId || !contratID) {
+                            handleFinalize();
+                            return;
+                        }
+
+                        const paymentLink = `/dashboard-assure/contrat/${contratID}/payment`;
+                        const notificationPayload = {
+                            userId: userId,
+                            message: "Votre demande de souscription a été acceptée! Vous pouvez maintenant procéder au paiement pour finaliser votre contrat.",
+                            type: "subscription_accepted",
+                            link: paymentLink,
+                            contractId: contratID,
+                            metadata: {
+                                contratId: contratID,
+                                paymentLink: paymentLink,
+                                status: "pending_payment",
+                                contratNumero: response.data.num,
+                                contratDetails: {
+                                    dateDebut: response.data.dateSouscription,
+                                    dateFin: response.data.dateExpiration,
+                                    montant: response.data.cotisationTotale || 0
+                                }
+                            }
+                        };
+
+                        this.notificationService.sendNotification(notificationPayload).subscribe({
+                            next: handleFinalize,
+                            error: (error) => handleError(error, "l'envoi de la notification d'acceptation")
+                        });
+                    },
+                    error: (error) => handleError(error, "la création du contrat")
+                });
             }
-          );
         },
-        (error) => {
-          console.error('Erreur lors du traitement de la demande d\'acceptation:', error);
-          this.loading = false;
-        }
-      );
-    }
-  }
+        error: (error) => handleError(error, `du traitement de la demande d'${decision === 'accept' ? 'acceptation' : 'refus'}`)
+    });
+}
 
   private formatContractData(notification: Notification): any {
     const metadata = notification.metadata || {};
@@ -740,5 +723,5 @@ export class NotificationComponent implements OnInit {
   getObjectKeys(obj: any): string[] {
     return Object.keys(obj);
   }
-  
+
 }

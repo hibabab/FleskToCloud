@@ -1,232 +1,308 @@
-<div class="flex h-screen font-roboto">
-  <!-- Barre latérale -->
-  <aside id="default-sidebar" class="fixed top-16 bg-teal-600 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-    <div class="h-full mt-2 py-2 overflow-y-auto px-3">
-      <ul class="space-y-1 font-medium">
-        <li>
-          <a [routerLink]="['/admin/interface']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>home</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Accueil</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>people</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Liste d'expert</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>engineering</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Agent de service</span>
-          </a>
-        </li>
-        <li>
-          <a [routerLink]="['/admin/listUser']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>person</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Liste d'utilisateur</span>
-          </a>
-        </li>
-      </ul>
-      <hr class="my-2 border-teal-500">
-      <div class="flex flex-col items-center justify-center space-y-1">
-        <p class="text-white text-xs text-center">Merci de votre visite !</p>
-        <p class="text-white text-xs text-center">© Flesk Cover</p>
+<div class="flex min-h-screen bg-gray-50">
+  <app-dehasbort/>
+
+  <div class="flex-1 p-8 mt-20 ml-60">
+    <!-- En-tête du formulaire -->
+    <div class="mb-8">
+      <div class="flex items-center text-2xl font-semibold text-teal-800 mb-2">
+        <i class="fas fa-user-tie w-8 h-8 text-teal-800 mr-2"></i>
+        <h1>Ajouter un agent de service</h1>
       </div>
+      <p class="text-gray-600 text-sm">Remplissez les informations nécessaires pour ajouter un nouvel agent de service au système.</p>
     </div>
-  </aside>
 
-  <!-- Barre de navigation -->
-  <nav class="bg-gray-50 text-gray-900 fixed top-0 left-0 w-full z-50 p-1 shadow-lg">
-    <div class="container mx-auto flex justify-between items-center px-3">
-      <div class="flex items-center space-x-2 ml-2">
-        <a routerLink="/" class="flex items-center text-xl font-semibold text-teal-800">
-          <i class="fas fa-umbrella w-6 h-6 mr-1"></i>
-          Flesk Cover
-        </a>
-        <h2 class="text-sm font-medium text-gray-700">Roulez sereinement, vivez pleinement</h2>
-      </div>
+    <!-- Formulaire -->
+    <form [formGroup]="agentServiceForm" (ngSubmit)="onSubmit()" class="bg-white shadow-md rounded-lg p-6">
+      <!-- Sections avec séparateurs -->
+      <div class="mb-6">
+        <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Informations personnelles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Nom -->
+          <div>
+            <label for="nom" class="block mb-2 text-sm font-medium text-gray-700">Nom <span class="text-red-500">*</span></label>
+            <input
+              id="nom"
+              type="text"
+              formControlName="nom"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              placeholder="Entrez le nom"
+            >
+            <div *ngIf="agentServiceForm.get('nom')?.invalid && agentServiceForm.get('nom')?.touched" class="text-red-500 text-xs mt-1">
+              Le nom est requis.
+            </div>
+          </div>
 
-      <div class="flex items-center space-x-2">
-        <button class="h-8 w-8 flex items-center justify-center rounded-full border border-teal-800 hover:bg-teal-100 focus:outline-none">
-          <svg class="h-4 w-4 text-teal-800" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2.94 6.33a2 2 0 0 1 1.5-.66h11.12a2 2 0 0 1 1.5.66l-6.06 3.95-6.06-3.95zM2 7.67V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.67l-5.88 3.83a1 1 0 0 1-1.06 0L2 7.67z" />
-          </svg>
-        </button>
+          <!-- Prénom -->
+          <div>
+            <label for="prenom" class="block mb-2 text-sm font-medium text-gray-700">Prénom <span class="text-red-500">*</span></label>
+            <input
+              id="prenom"
+              type="text"
+              formControlName="prenom"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              placeholder="Entrez le prénom"
+            >
+            <div *ngIf="agentServiceForm.get('prenom')?.invalid && agentServiceForm.get('prenom')?.touched" class="text-red-500 text-xs mt-1">
+              Le prénom est requis.
+            </div>
+          </div>
 
-        <button class="h-8 w-8 flex items-center justify-center rounded-full border border-teal-800 hover:bg-teal-100 focus:outline-none">
-          <svg class="h-4 w-4 text-teal-800" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
-          </svg>
-        </button>
+          <!-- CIN -->
+          <div>
+            <label for="cin" class="block mb-2 text-sm font-medium text-gray-700">CIN <span class="text-red-500">*</span></label>
+            <input
+              id="cin"
+              type="number"
+              formControlName="cin"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              placeholder="Entrez le CIN"
+            >
+            <div *ngIf="agentServiceForm.get('cin')?.invalid && agentServiceForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
+              Le CIN est requis.
+            </div>
+          </div>
 
-        <div class="flex items-center space-x-2 bg-gray-100 p-1 rounded-lg">
-          <div class="flex flex-col">
-            <span class="text-teal-800 font-medium text-sm">admin</span>
-            <div class="flex space-x-2 text-xs text-gray-600 mt-1">
-              <a href="#" class="hover:text-red-600">Déconnexion</a>
+          <!-- Date de naissance -->
+          <div>
+            <label for="dateNaissance" class="block mb-2 text-sm font-medium text-gray-700">Date de naissance <span class="text-red-500">*</span></label>
+            <input
+              id="dateNaissance"
+              type="date"
+              formControlName="dateNaissance"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+            >
+            <div *ngIf="agentServiceForm.get('dateNaissance')?.invalid && agentServiceForm.get('dateNaissance')?.touched" class="text-red-500 text-xs mt-1">
+              La date de naissance est requise.
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </nav>
 
-  <!-- Contenu principal -->
-  <div class="flex-1 p-4 sm:ml-64 mt-16">
-    <!-- Titre du formulaire -->
-    <div class="flex items-center text-2xl font-semibold text-teal-800">
-      <i class="fas fa-user-tie w-8 h-8 text-teal-800 mr-2"></i>
-      <p>Ajouter un agent de service</p>
-    </div>
-    <p class="text-gray-500 text-sm">Remplissez les informations nécessaires pour ajouter un nouvel agent de service.</p>
-
-    <!-- Formulaire -->
-    <form [formGroup]="agentServiceForm" (ngSubmit)="onSubmit()" class="space-y-4 mt-6">
-      <!-- Informations de l'utilisateur -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Nom -->
-        <div>
-          <label for="nom" class="block mb-2 text-sm font-medium text-gray-700">Nom <span class="text-red-500">*</span></label>
-          <input id="nom" type="text" formControlName="nom" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le nom" required>
-          <div *ngIf="agentServiceForm.get('nom')?.invalid && agentServiceForm.get('nom')?.touched" class="text-red-500 text-sm mt-1">
-            Le nom est requis.
+      <!-- Coordonnées -->
+      <div class="mb-6">
+        <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Coordonnées</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Téléphone -->
+          <div>
+            <label for="telephone" class="block mb-2 text-sm font-medium text-gray-700">Téléphone <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                <i class="fas fa-phone"></i>
+              </span>
+              <input
+                id="telephone"
+                type="tel"
+                formControlName="telephone"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 pl-10 transition-all hover:border-teal-600"
+                placeholder="Entrez le téléphone"
+              >
+            </div>
+            <div *ngIf="agentServiceForm.get('telephone')?.invalid && agentServiceForm.get('telephone')?.touched" class="text-red-500 text-xs mt-1">
+              Le téléphone est requis.
+            </div>
           </div>
-        </div>
 
-        <!-- Prénom -->
-        <div>
-          <label for="prenom" class="block mb-2 text-sm font-medium text-gray-700">Prénom <span class="text-red-500">*</span></label>
-          <input id="prenom" type="text" formControlName="prenom" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le prénom" required>
-          <div *ngIf="agentServiceForm.get('prenom')?.invalid && agentServiceForm.get('prenom')?.touched" class="text-red-500 text-sm mt-1">
-            Le prénom est requis.
-          </div>
-        </div>
-
-        <!-- CIN -->
-        <div>
-          <label for="cin" class="block mb-2 text-sm font-medium text-gray-700">CIN <span class="text-red-500">*</span></label>
-          <input id="cin" type="text" formControlName="cin" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le CIN" required>
-          <div *ngIf="agentServiceForm.get('cin')?.invalid && agentServiceForm.get('cin')?.touched" class="text-red-500 text-sm mt-1">
-            Le CIN est requis.
-          </div>
-        </div>
-
-        <!-- Téléphone -->
-        <div>
-          <label for="telephone" class="block mb-2 text-sm font-medium text-gray-700">Téléphone <span class="text-red-500">*</span></label>
-          <input id="telephone" type="text" formControlName="telephone" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le téléphone" required>
-          <div *ngIf="agentServiceForm.get('telephone')?.invalid && agentServiceForm.get('telephone')?.touched" class="text-red-500 text-sm mt-1">
-            Le téléphone est requis.
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
-          <input id="email" type="email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez l'email" required>
-          <div *ngIf="agentServiceForm.get('email')?.invalid && agentServiceForm.get('email')?.touched" class="text-red-500 text-sm mt-1">
-            L'email est requis et doit être valide.
-          </div>
-        </div>
-
-        <!-- Date de naissance -->
-        <div>
-          <label for="dateNaissance" class="block mb-2 text-sm font-medium text-gray-700">Date de naissance <span class="text-red-500">*</span></label>
-          <input id="dateNaissance" type="date" formControlName="dateNaissance" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" required>
-          <div *ngIf="agentServiceForm.get('dateNaissance')?.invalid && agentServiceForm.get('dateNaissance')?.touched" class="text-red-500 text-sm mt-1">
-            La date de naissance est requise.
-          </div>
-        </div>
-
-        <!-- Mot de passe -->
-        <div>
-          <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Mot de passe <span class="text-red-500">*</span></label>
-          <input id="password" type="password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre mot de passe" required>
-          <div *ngIf="agentServiceForm.get('password')?.invalid && agentServiceForm.get('password')?.touched" class="text-red-500 text-sm mt-1">
-            <div *ngIf="agentServiceForm.get('password')?.errors?.['required']">Le mot de passe est requis.</div>
-            <div *ngIf="agentServiceForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères.</div>
-          </div>
-        </div>
-
-        <!-- Confirmation de mot de passe -->
-        <div>
-          <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-700">Confirmer le mot de passe <span class="text-red-500">*</span></label>
-          <input id="confirmPassword" type="password" formControlName="confirmPassword" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Confirmez le mot de passe" required>
-          <div *ngIf="agentServiceForm.get('confirmPassword')?.invalid && agentServiceForm.get('confirmPassword')?.touched" class="text-red-500 text-sm mt-1">
-            <div *ngIf="agentServiceForm.get('confirmPassword')?.errors?.['required']">La confirmation du mot de passe est requise.</div>
-            <div *ngIf="agentServiceForm.get('confirmPassword')?.errors?.['passwordMismatch']">Les mots de passe ne correspondent pas.</div>
-          </div>
-        </div>
-      </div>
- <!-- Adresse -->
- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <!-- Rue -->
-  <div>
-    <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-red-500">*</span></label>
-    <input id="rue" type="text" formControlName="rue" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez la rue" required>
-    <div *ngIf="agentServiceForm.get('rue')?.invalid && agentServiceForm.get('rue')?.touched" class="text-red-500 text-sm mt-1">
-      La rue est requise.
-    </div>
-  </div>
-
-  <!-- Ville -->
-  <div>
-    <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
-    <input id="ville" type="text" formControlName="ville" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez la ville" required>
-    <div *ngIf="agentServiceForm.get('ville')?.invalid && agentServiceForm.get('ville')?.touched" class="text-red-500 text-sm mt-1">
-      La ville est requise.
-    </div>
-  </div>
-
-  <!-- Code postal -->
-  <div>
-    <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-red-500">*</span></label>
-    <input id="codePostal" type="text" formControlName="codePostal" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le code postal" required>
-    <div *ngIf="agentServiceForm.get('codePostal')?.invalid && agentServiceForm.get('codePostal')?.touched" class="text-red-500 text-sm mt-1">
-      Le code postal est requis.
-    </div>
-  </div>
-
-  <!-- Pays -->
-  <div>
-    <label for="pays" class="block mb-2 text-sm font-medium text-gray-700">Pays <span class="text-red-500">*</span></label>
-    <input id="pays" type="text" formControlName="pays" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez le pays" required>
-    <div *ngIf="agentServiceForm.get('pays')?.invalid && agentServiceForm.get('pays')?.touched" class="text-red-500 text-sm mt-1">
-      Le pays est requis.
-    </div>
-  </div>
-</div>
-
-      <!-- Informations spécifiques à l'agent de service -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Spécialité -->
-        <div>
-          <label for="specialite" class="block mb-2 text-sm font-medium text-gray-700">Spécialité <span class="text-red-500">*</span></label>
-          <input id="specialite" type="text" formControlName="specialite" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez la spécialité" required>
-          <div *ngIf="agentServiceForm.get('specialite')?.invalid && agentServiceForm.get('specialite')?.touched" class="text-red-500 text-sm mt-1">
-            La spécialité est requise.
-          </div>
-        </div>
-
-        <!-- Date d'embauche -->
-        <div>
-          <label for="dateEmbauche" class="block mb-2 text-sm font-medium text-gray-700">Date d'embauche <span class="text-red-500">*</span></label>
-          <input id="dateEmbauche" type="date" formControlName="dateEmbauche" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" required>
-          <div *ngIf="agentServiceForm.get('dateEmbauche')?.invalid && agentServiceForm.get('dateEmbauche')?.touched" class="text-red-500 text-sm mt-1">
-            La date d'embauche est requise.
+          <!-- Email -->
+          <div>
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                <i class="fas fa-envelope"></i>
+              </span>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 pl-10 transition-all hover:border-teal-600"
+                placeholder="exemple@domaine.com"
+              >
+            </div>
+            <div *ngIf="agentServiceForm.get('email')?.invalid && agentServiceForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
+              <span *ngIf="agentServiceForm.get('email')?.errors?.['required']">L'email est requis.</span>
+              <span *ngIf="agentServiceForm.get('email')?.errors?.['email']">Veuillez entrer un email valide.</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Bouton de soumission -->
-      <div class="mt-6 flex justify-center">
+      <!-- Adresse -->
+      <div class="mb-6">
+        <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Adresse</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Rue -->
+          <div>
+            <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-red-500">*</span></label>
+            <input
+              id="rue"
+              type="text"
+              formControlName="rue"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              placeholder="Entrez la rue"
+            >
+            <div *ngIf="agentServiceForm.get('rue')?.invalid && agentServiceForm.get('rue')?.touched" class="text-red-500 text-xs mt-1">
+              La rue est requise.
+            </div>
+          </div>
+
+          <!-- Gouvernorat -->
+          <div>
+            <label for="gouvernat" class="block mb-2 text-sm font-medium text-gray-700">Gouvernorat <span class="text-red-500">*</span></label>
+            <select
+              id="gouvernat"
+              formControlName="gouvernat"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+            >
+              <option value="" disabled selected>Sélectionnez un gouvernorat</option>
+              <option *ngFor="let g of gouvernorats" [value]="g">{{ g }}</option>
+            </select>
+            <div *ngIf="agentServiceForm.get('gouvernat')?.invalid && agentServiceForm.get('gouvernat')?.touched" class="text-red-500 text-xs mt-1">
+              Le gouvernorat est requis.
+            </div>
+          </div>
+
+          <!-- Ville -->
+          <div>
+            <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
+            <select
+              id="ville"
+              formControlName="ville"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              [disabled]="!agentServiceForm.get('gouvernat')?.value"
+            >
+              <option value="" disabled selected>Sélectionnez une ville</option>
+              <option *ngFor="let v of villes" [value]="v">{{ v }}</option>
+            </select>
+            <div *ngIf="agentServiceForm.get('ville')?.invalid && agentServiceForm.get('ville')?.touched" class="text-red-500 text-xs mt-1">
+              La ville est requise.
+            </div>
+          </div>
+
+          <!-- Code postal -->
+          <div>
+            <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-red-500">*</span></label>
+            <input
+              id="codePostal"
+              type="number"
+              formControlName="codePostal"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              readonly
+            >
+            <div *ngIf="agentServiceForm.get('codePostal')?.invalid && agentServiceForm.get('codePostal')?.touched" class="text-red-500 text-xs mt-1">
+              Le code postal est requis.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations professionnelles -->
+      <div class="mb-6">
+        <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Informations professionnelles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Date d'embauche -->
+          <div>
+            <label for="dateEmbauche" class="block mb-2 text-sm font-medium text-gray-700">Date d'embauche <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                <i class="fas fa-calendar-alt"></i>
+              </span>
+              <input
+                id="dateEmbauche"
+                type="date"
+                formControlName="dateEmbauche"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 pl-10 transition-all hover:border-teal-600"
+              >
+            </div>
+            <div *ngIf="agentServiceForm.get('dateEmbauche')?.invalid && agentServiceForm.get('dateEmbauche')?.touched" class="text-red-500 text-xs mt-1">
+              La date d'embauche est requise.
+            </div>
+          </div>
+
+          <!-- Spécialité (modifiée avec les nouvelles options) -->
+          <div>
+            <label for="specialite" class="block mb-2 text-sm font-medium text-gray-700">Spécialité <span class="text-red-500">*</span></label>
+            <select
+              id="specialite"
+              formControlName="specialite"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+            >
+              <option value="" disabled selected>Sélectionnez une spécialité</option>
+              <option value="service_client">Service Client / Accueil</option>
+              <option value="gestion_contrats">Service Gestion des Contrats</option>
+              <option value="service_sinistres"> Service Sinistres</option>
+              <option value="comptabilite_facturation">Service Comptabilité / Facturation</option>
+              <option value="contentieux_recouvrement"> Service Contentieux / Recouvrement</option>
+            </select>
+            <div *ngIf="agentServiceForm.get('specialite')?.invalid && agentServiceForm.get('specialite')?.touched" class="text-red-500 text-xs mt-1">
+              La spécialité est requise.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Identifiants de connexion -->
+      <div class="mb-6">
+        <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Identifiants de connexion</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Mot de passe -->
+          <div>
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Mot de passe <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <input
+                id="password"
+                type="password"
+                formControlName="password"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600 pr-10"
+                placeholder="••••••••"
+              >
+              <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div *ngIf="agentServiceForm.get('password')?.invalid && agentServiceForm.get('password')?.touched" class="text-red-500 text-xs mt-1">
+              <div *ngIf="agentServiceForm.get('password')?.errors?.['required']">Le mot de passe est requis.</div>
+              <div *ngIf="agentServiceForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères.</div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Le mot de passe doit contenir au moins 6 caractères.</p>
+          </div>
+
+          <!-- Confirmation de mot de passe -->
+          <div>
+            <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-700">Confirmer le mot de passe <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <input
+                id="confirmPassword"
+                type="password"
+                formControlName="confirmPassword"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600 pr-10"
+                placeholder="••••••••"
+              >
+              <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div *ngIf="agentServiceForm.get('confirmPassword')?.invalid && agentServiceForm.get('confirmPassword')?.touched" class="text-red-500 text-xs mt-1">
+              <div *ngIf="agentServiceForm.get('confirmPassword')?.errors?.['required']">La confirmation du mot de passe est requise.</div>
+              <div *ngIf="agentServiceForm.get('confirmPassword')?.errors?.['passwordMismatch']">Les mots de passe ne correspondent pas.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons de soumission -->
+      <div class="flex justify-end gap-4 mt-8">
+        <button
+          type="button"
+          class="py-2.5 px-6 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors"
+        >
+          Annuler
+        </button>
         <button
           type="submit"
           [disabled]="agentServiceForm.invalid"
-          class="w-40 py-2 px-4 bg-teal-800 text-white rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800"
+          class="py-2.5 px-6 bg-teal-800 text-white rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center"
         >
-          Ajouter Agent
+          <i class="fas fa-user-plus mr-2"></i>
+          Ajouter l'agent
         </button>
       </div>
     </form>

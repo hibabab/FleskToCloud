@@ -1,94 +1,28 @@
-<div class="flex h-screen font-roboto">
-  <!-- Barre latérale -->
-  <aside id="default-sidebar" class="fixed top-16 bg-teal-600 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-    <div class="h-full mt-2 py-2 overflow-y-auto px-3">
-      <ul class="space-y-1 font-medium">
-        <li>
-          <a href="#" class="flex items-center p-2 rounded-lg text-white bg-teal-700 hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>home</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Accueil</span>
-          </a>
-        </li>
-        <li>
-          <a [routerLink]="['/admin/listExpert']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>people</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Liste d'expert</span>
-          </a>
-        </li>
-        <li>
-          <a  [routerLink]="['/admin/listAgentService']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>engineering</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Agent de service</span>
-          </a>
-        </li>
-        <li>
-          <a [routerLink]="['/admin/listUser']" class="flex items-center p-2 text-white rounded-lg hover:bg-teal-600 transition duration-300 ease-in-out">
-            <mat-icon>person</mat-icon>
-            <span class="flex-1 ml-2 whitespace-nowrap">Liste d'utilisateur</span>
-          </a>
-        </li>
-      </ul>
-      <hr class="my-2 border-teal-500">
-      <div class="flex flex-col items-center justify-center space-y-1">
-        <p class="text-white text-xs text-center">Merci de votre visite !</p>
-        <p class="text-white text-xs text-center">© Flesk Cover</p>
-      </div>
+<div class="flex">
+  <app-dehasbort/>
+
+  <div class="flex-1 mt-20 ml-60">
+    <!-- Titre et sous-titre de la page -->
+    <div class="max-w-6xl mx-auto mb-10 text-center">
+      <h1 class="text-3xl font-bold text-teal-800 mb-3">Tableau de Bord Administrateur</h1>
+      <p class="text-gray-600 text-lg">Gardez le contrôle total sur les activités de Flesk Cover et gérez vos utilisateurs en toute simplicité depuis votre espace administrateur.</p>
     </div>
-  </aside>
-
-  <!-- Barre de navigation -->
-  <nav class="bg-gray-50 text-gray-900 fixed top-0 left-0 w-full z-50 p-1 shadow-lg">
-    <div class="container mx-auto flex justify-between items-center px-3">
-      <div class="flex items-center space-x-2 ml-2">
-        <a routerLink="/" class="flex items-center text-xl font-semibold text-teal-800">
-          <i class="fas fa-umbrella w-6 h-6 mr-1"></i>
-          Flesk Cover
-        </a>
-        <h2 class="text-sm font-medium text-gray-700">Roulez sereinement, vivez pleinement</h2>
-      </div>
-
-      <div class="flex items-center space-x-2">
-        <button class="h-8 w-8 flex items-center justify-center rounded-full border border-teal-800 hover:bg-teal-100 focus:outline-none">
-          <svg class="h-4 w-4 text-teal-800" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2.94 6.33a2 2 0 0 1 1.5-.66h11.12a2 2 0 0 1 1.5.66l-6.06 3.95-6.06-3.95zM2 7.67V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.67l-5.88 3.83a1 1 0 0 1-1.06 0L2 7.67z" />
-          </svg>
-        </button>
-
-        <button class="h-8 w-8 flex items-center justify-center rounded-full border border-teal-800 hover:bg-teal-100 focus:outline-none">
-          <svg class="h-4 w-4 text-teal-800" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 2a6 6 0 0 0-6 6v2c0 1.06-.57 2.02-1.5 2.58-.23.14-.5.42-.5.92v1c0 .55.45 1 1 1h15a1 1 0 0 0 1-1v-1c0-.5-.27-.78-.5-.92C16.57 12.02 16 11.06 16 10V8a6 6 0 0 0-6-6zM8 17a2 2 0 1 0 4 0H8z" />
-          </svg>
-        </button>
-
-        <div class="flex items-center space-x-2 bg-gray-100 p-1 rounded-lg">
-          <div class="flex flex-col">
-            <span class="text-teal-800 font-medium text-sm">admin</span>
-            <div class="flex space-x-2 text-xs text-gray-600 mt-1">
-              <a href="#" class="hover:text-red-600">Déconnexion</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <div class="flex-1 p-6 sm:ml-64 mt-16">
-    <!-- Titre de la page -->
-    <h1 class="text-3xl text-center font-semibold text-teal-800 mb-8">Tableau de Bord Administrateur</h1>
 
     <!-- Grille pour les cartes -->
     <div class="flex justify-center">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
         <!-- Carte "Ajouter Expert" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+        <div class="bg-gradient-to-br from-white to-teal-50 p-6 rounded-xl shadow-lg border-t border-l border-gray-100 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-user-plus text-4xl text-teal-600"></i>
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-user-plus text-3xl text-teal-600"></i>
+            </div>
           </div>
           <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Ajouter Expert</h2>
           <p class="text-gray-600 text-center text-sm mb-4">Ajoutez un nouvel expert à la plateforme.</p>
           <div class="mt-4 flex justify-center">
             <button
-              class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition-all"
+              class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 shadow-md hover:shadow-lg transition-all"
               (click)="navigateToAddExpert()"
             >
               <i class="fas fa-plus mr-2"></i>Ajouter
@@ -97,15 +31,17 @@
         </div>
 
         <!-- Carte "Ajouter Agent de Service" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+        <div class="bg-gradient-to-br from-white to-teal-50 p-6 rounded-xl shadow-lg border-t border-l border-gray-100 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-user-tie text-4xl text-teal-600"></i>
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-user-tie text-3xl text-teal-600"></i>
+            </div>
           </div>
           <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Ajouter Agent de Service</h2>
           <p class="text-gray-600 text-center text-sm mb-4">Ajoutez un nouvel agent de service à la plateforme.</p>
           <div class="mt-4 flex justify-center">
             <button
-              class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition-all"
+              class="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 shadow-md hover:shadow-lg transition-all"
               (click)="navigateToAddAgent()"
             >
               <i class="fas fa-plus mr-2"></i>Ajouter
@@ -114,21 +50,25 @@
         </div>
 
         <!-- Carte "Statistiques Utilisateurs" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+        <div class="bg-gradient-to-br from-white to-teal-50 p-6 rounded-xl shadow-lg border-t border-l border-gray-100 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-users text-4xl text-teal-600"></i>
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-users text-3xl text-teal-600"></i>
+            </div>
           </div>
           <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Utilisateurs</h2>
           <p class="text-gray-600 text-center text-sm mb-4">Nombre total d'utilisateurs inscrits.</p>
           <div class="mt-4 flex justify-center">
-            <span class="text-2xl font-bold text-teal-800">{{  usersCount }}</span>
+            <span class="text-2xl font-bold text-teal-800">{{ usersCount }}</span>
           </div>
         </div>
 
         <!-- Carte "Statistiques Experts" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+        <div class="bg-gradient-to-br from-white to-teal-50 p-6 rounded-xl shadow-lg border-t border-l border-gray-100 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-user-md text-4xl text-teal-600"></i>
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-user-md text-3xl text-teal-600"></i>
+            </div>
           </div>
           <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Experts</h2>
           <p class="text-gray-600 text-center text-sm mb-4">Nombre total d'experts enregistrés.</p>
@@ -138,40 +78,71 @@
         </div>
 
         <!-- Carte "Statistiques Agents de Service" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transform hover:scale-105 transition-transform">
+        <div class="bg-gradient-to-br from-white to-teal-50 p-6 rounded-xl shadow-lg border-t border-l border-gray-100 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-user-cog text-4xl text-teal-600"></i>
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-user-cog text-3xl text-teal-600"></i>
+            </div>
           </div>
           <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Agents de Service</h2>
           <p class="text-gray-600 text-center text-sm mb-4">Nombre total d'agents de service.</p>
           <div class="mt-4 flex justify-center">
-            <span class="text-2xl font-bold text-teal-800">{{  agentsCount }}</span>
+            <span class="text-2xl font-bold text-teal-800">{{ agentsCount }}</span>
           </div>
         </div>
 
         <!-- Carte "Dernières Activités" -->
-        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow transform hover:scale-105">
+        <div class="bg-gradient-to-br from-white to-teal-50 p-6 rounded-xl shadow-lg border-t border-l border-gray-100 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
           <div class="flex items-center justify-center mb-4">
-            <i class="fas fa-history text-4xl text-teal-600"></i>
+            <div class="bg-teal-100 p-4 rounded-full">
+              <i class="fas fa-history text-3xl text-teal-600"></i>
+            </div>
           </div>
           <h2 class="text-xl font-semibold text-teal-800 text-center mb-2">Dernières Activités</h2>
           <p class="text-gray-600 text-center text-sm mb-4">Aperçu des dernières actions sur la plateforme.</p>
           <div class="mt-4">
-            <ul class="text-sm text-gray-600">
-              <li class="mb-2">- Nouvel expert ajouté</li>
-              <li class="mb-2">- Utilisateur bloqué</li>
-              <li class="mb-2">- Agent de service mis à jour</li>
+            <ul class="text-sm text-gray-600 bg-white p-3 rounded-lg">
+              <li class="mb-2 flex items-center">
+                <span class="bg-teal-100 rounded-full h-2 w-2 mr-2"></span>
+                Nouvel expert ajouté
+              </li>
+              <li class="mb-2 flex items-center">
+                <span class="bg-red-100 rounded-full h-2 w-2 mr-2"></span>
+                Utilisateur bloqué
+              </li>
+              <li class="mb-2 flex items-center">
+                <span class="bg-blue-100 rounded-full h-2 w-2 mr-2"></span>
+                Agent de service mis à jour
+              </li>
             </ul>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Image admin.jpg en bas à droite -->
-    <div class="fixed bottom-4 right-4">
-      <img src="assets/images/admin.jpg" alt="Admin" class="w-24 h-24 rounded-full shadow-lg">
+    <!-- Image admin.jpg en bas à droite avec effet d'animation -->
+    <div class="fixed bottom-4 right-4 animate-pulse-slow">
+      <img src="assets/images/admin.jpg" alt="Admin" class="w-24 h-24 rounded-full shadow-lg ring-4 ring-teal-500 ring-opacity-50">
     </div>
 
     <!-- Zone d'affichage des composants routés -->
     <router-outlet></router-outlet>
   </div>
+</div>
+
+<!-- Style supplémentaire pour l'animation personnalisée -->
+<style>
+  @keyframes pulse-slow {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 10px rgba(20, 184, 166, 0);
+    }
+  }
+  .animate-pulse-slow {
+    animation: pulse-slow 3s infinite;
+  }
+</style>

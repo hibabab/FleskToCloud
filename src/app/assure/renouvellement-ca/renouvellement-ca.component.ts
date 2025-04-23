@@ -52,7 +52,24 @@ export class RenouvellementCAComponent implements OnInit {
     private paymentService: PaymentService
   ) {
     this.renewalForm = this.fb.group({
-      Imat: ['', Validators.required]
+      Imat: ['', [
+        Validators.required,
+        Validators.pattern(/^\d{4}TU\d{3}$/)
+      ]],
+      packOption: ['same', Validators.required],
+      packValue: ['same']  // Default value aligned with backend
+    }); this.renewalForm.get('packOption')?.valueChanges.subscribe(option => {
+      const packValueControl = this.renewalForm.get('packValue');
+
+      if (option === 'same') {
+        packValueControl?.setValue('same');
+        packValueControl?.clearValidators();
+      } else if (option === 'change') {
+        packValueControl?.setValue(''); // Clear the value when changing
+        packValueControl?.setValidators(Validators.required);
+      }
+
+      packValueControl?.updateValueAndValidity();
     });
   }
 
@@ -116,9 +133,31 @@ export class RenouvellementCAComponent implements OnInit {
       return;
     }
 
+    let packChoice: 'same' | 'Pack1' | 'Pack2' | 'Pack3';
+
+    if (this.renewalForm.get('packOption')?.value === 'same') {
+      packChoice = 'same';
+    } else {
+      // Map the selected pack to the backend expected values
+      switch (this.renewalForm.get('packValue')?.value) {
+        case 'essentiel':
+          packChoice = 'Pack1';
+          break;
+        case 'dommage':
+          packChoice = 'Pack2';
+          break;
+        case 'tierce':
+          packChoice = 'Pack3';
+          break;
+        default:
+          packChoice = 'same';
+      }
+    }
+
     const requestData = {
       Cin: this.userCin,
-      Imat: this.renewalForm.get('Imat')?.value
+      Imat: this.renewalForm.get('Imat')?.value,
+      packChoice: packChoice
     };
 
     this.isLoading = true;
@@ -130,9 +169,10 @@ export class RenouvellementCAComponent implements OnInit {
       requestData
     ).subscribe({
       next: async (response) => {
-        this.isLoading = false;
-
         if (response.success) {
+          console.log('Contrat renouvelé:', response.data);
+          const contratNum = response.data.contrat.id;
+          this.contratNum = contratNum;
           this.successMessage = 'Contrat renouvelé avec succès!';
           await this.generateContratPDF(response.data);
           this.contratNum = response.data.contrat.id;

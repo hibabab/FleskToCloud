@@ -111,45 +111,45 @@ export class MesReCuComponent  implements OnInit {
   }
 
   loadUserContrats(): void {
-    if (!this.userCin) {
-      this.errorMessage = 'CIN utilisateur non disponible';
-      return;
-    }
+    if (!this.userCin) return;
 
     this.isLoading = true;
     this.errorMessage = '';
     this.contrats = [];
 
-    this.http.get<any>(
-      `http://localhost:3000/contrat-auto-geteway/contrats/assure/${this.userCin}`
-    ).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        if (response?.success) {
-          this.contrats = Array.isArray(response.data)
+     this.http.get<any>(
+    `http://localhost:3000/contrat-auto-geteway/contrats/assure/${this.userCin}`)
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response?.success) {
+            this.contrats = Array.isArray(response.data)
             ? response.data.map((item: any) => ({
-                contrat: item.contrat || {},
-                assure: item.assure || {},
+                contrat: {
+                  num: item.num,
+                  dateSouscription: item.dateSouscription,
+                  dateExpiration: item.dateExpiration
+                },
                 vehicule: item.vehicule || {},
+                assure: item.assure || {},
                 garanties: item.garanties || []
               }))
             : [];
 
-          if (this.contrats.length === 0) {
-            this.errorMessage = 'Aucun contrat trouvé pour cet assuré';
+            if (this.contrats.length === 0) {
+              this.errorMessage = 'Aucun contrat trouvé pour ce CIN';
+            }
+          } else {
+            this.errorMessage = response?.message || 'Réponse inattendue du serveur';
           }
-        } else {
-          this.errorMessage = response?.message || 'Réponse inattendue du serveur';
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = err.error?.message || 'Erreur lors de la recherche';
+          console.error('Erreur:', err);
         }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Erreur lors de la récupération des contrats';
-        console.error('Erreur:', err);
-      }
-    });
+      });
   }
-
   toggleContratsList(): void {
     this.showContratsList = !this.showContratsList;
   }
@@ -273,12 +273,12 @@ export class MesReCuComponent  implements OnInit {
       autoTable(doc, {
         startY: yOffset,
         body: [
-          ['N° Contrat', 'Date Effet', 'Date Expiration', 'Prochaine Échéance'],
+          ['N° Contrat', 'Date Effet', 'Date Expiration'],
           [
             paymentData.contrat?.num || 'N/A',
             this.selectedContrat?.contrat?.dateSouscription ? new Date(this.selectedContrat.contrat.dateSouscription).toLocaleDateString() : 'N/A',
             this.selectedContrat?.contrat?.dateExpiration ? new Date(this.selectedContrat.contrat.dateExpiration).toLocaleDateString() : 'N/A',
-            this.selectedContrat?.contrat?.echeances ? new Date(this.selectedContrat.contrat.echeances).toLocaleDateString() : 'N/A'
+            
           ]
         ],
         styles: {
@@ -302,12 +302,12 @@ export class MesReCuComponent  implements OnInit {
       autoTable(doc, {
         startY: yOffset,
         body: [
-          ['Immatriculation', 'Marque', 'Modèle', 'Type'],
+          ['Immatriculation', 'Marque', 'Modèle'],
           [
             vehicule.Imat || 'N/A',
             vehicule.marque || 'N/A',
             vehicule.model || 'N/A',
-            vehicule.type || 'N/A'
+
           ]
         ],
         styles: {
