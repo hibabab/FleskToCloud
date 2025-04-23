@@ -6,7 +6,12 @@ import { Logger } from '@nestjs/common'; // Importation du Logger pour ajouter d
 async function bootstrap() {
   // Création de l'application NestJS normale
   const app = await NestFactory.create(AppModule);
-
+  app.enableCors({
+    origin: 'http://localhost:4200', // Your Angular app's origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // If you need to pass cookies/authentication
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
   // Utilisation du ValidationPipe globalement pour valider les requêtes
   app.useGlobalPipes(
     new ValidationPipe({
@@ -15,7 +20,7 @@ async function bootstrap() {
     }),
   );
 
-  // Démarrage de l'application sur le port 3000
+
   await app.listen(3000);
   Logger.log('Application started on port 3000', 'Bootstrap'); // Log lorsque l'application commence à écouter
 }

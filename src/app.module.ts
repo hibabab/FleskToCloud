@@ -12,6 +12,8 @@ import { MailService } from './service/mail.service';
 import { AssuranceAutoModule } from './assurance-auto/assurance-auto.module';
 import { PaiementModule } from './paiement/paiement.module';
 import { NotificationModule } from './notification/notification.module';
+import { GestionUtilisateurModule } from './gestion-utilisateur/gestion-utilisateur.module';
+import { SinistreModule } from './sinistre/sinistre.module';
 
 @Module({
   imports: [
@@ -64,6 +66,10 @@ import { NotificationModule } from './notification/notification.module';
     PaiementModule,
 
     NotificationModule,
+
+    GestionUtilisateurModule,
+
+    SinistreModule,
   ],
   controllers: [AppController],
   providers: [AppService, MailService],

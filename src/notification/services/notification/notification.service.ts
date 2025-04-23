@@ -117,6 +117,7 @@ export class NotificationService {
     notification.type = 'subscription_request';
     notification.metadata = formData;
     notification.status = 'pending';
+    notification.visibleToUser = false; 
 
     const savedNotif = await this.notificationRepository.save(notification);
 
@@ -221,7 +222,7 @@ export class NotificationService {
       return await this.notificationRepository.find({
         where: { 
           user: { id: userId },
-          isRead: false 
+          isRead: false ,visibleToUser: true
         },
         order: { createdAt: 'ASC' }
       });

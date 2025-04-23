@@ -6,6 +6,8 @@ import {
   UseGuards,
   Req,
   Param,
+  InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/SignupDto';
@@ -14,6 +16,7 @@ import { ForgotPasswordDto } from './dto/ForgotPasswordDto.dto';
 import { ResetPasswordDto } from './dto/Restpassworld.dto';
 import { AuthenticationGuard } from '../guards/auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { User } from './entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -36,8 +39,13 @@ export class AuthController {
   }
 
   @Post('login')
-  login(@Body() credentials: LoginDto) {
-    return this.authService.login(credentials);
+  async login(@Body() credentials: LoginDto) {
+      try {
+          return await this.authService.login(credentials);
+      } catch (error) {
+          console.error('Controller login error:', error);
+          throw error; // Laissez passer l'erreur originale
+      }
   }
 
   // Endpoints de gestion de mot de passe
@@ -75,4 +83,26 @@ export class AuthController {
   getOk() {
     return 'OK';
   }
+  @Get('users')
+async getAllUsers() {
+  try {
+    return await this.authService.getAllUsers();
+  } catch (error) {
+    if (error instanceof InternalServerErrorException) {
+      throw error;
+    }
+    throw new InternalServerErrorException(
+      'Erreur lors de la récupération des utilisateurs'
+    );
+  }
+}
+@Get('users/:id')
+async getUserById(@Param('id') id: number): Promise<User> {
+  
+  if (isNaN(id)) {
+    throw new BadRequestException('ID invalide');
+  }
+  return this.authService.getUserById(id);
+}
+
 }

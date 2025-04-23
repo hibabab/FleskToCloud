@@ -9,14 +9,14 @@ import {
   import { Repository } from 'typeorm';
 
   import * as bcrypt from 'bcrypt';
-import { Admin } from 'src/auth/entities/admin.entity';
-import { CreateAdminDto } from 'src/auth/dto/create-admin.dto';
-import { UpdateAdminDto } from 'src/auth/dto/update-admin.dto';
+import { Admin } from 'src/gestion-utilisateur/entities/admin.entity';
+import { CreateAdminDto } from 'src/gestion-utilisateur/dto/create-admin.dto';
+import { UpdateAdminDto } from 'src/gestion-utilisateur/dto/update-admin.dto';
   
   @Injectable()
   export class AdminService {
     private readonly SALT_ROUNDS = 12;
-    private readonly logger = new Logger(AdminService.name); // Initialisation correcte du logger
+    private readonly logger = new Logger(AdminService.name); 
   
     constructor(
       @InjectRepository(Admin)

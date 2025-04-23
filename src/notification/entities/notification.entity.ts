@@ -32,7 +32,8 @@ export class NotificationEntity {
   status: 'pending' | 'accepted' | 'rejected' | null; 
   @Column({ type: 'varchar', nullable: true })
   link: string; 
-  
+  @Column({ default: true })
+visibleToUser: boolean;
   @Column({ type: 'int', nullable: true })
   contractId: number; 
   @ManyToOne(() => User, (user) => user.notifications, {

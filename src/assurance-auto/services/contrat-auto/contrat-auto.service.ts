@@ -773,25 +773,25 @@ async updateEcheancesAndGetFullContract(numContrat: number): Promise<any> {
   contrat.echeances = contrat.dateExpiration;
 
   // 3. Sauvegarder les modifications en base de données
-  await this.contratAutoRepository.save(contrat);
+  const savedContratAuto= await this.contratAutoRepository.save(contrat);
 
   // 4. Retourner l'objet complet avec les relations
-  return this.formatContractResponse(contrat);
+  return  savedContratAuto;
 }
 
 private formatContractResponse(contrat: ContratAuto): any {
   return {
     contrat: {
-      num: contrat.num,
-      dateSouscription: contrat.dateSouscription,
-      dateExpiration: contrat.dateExpiration,
-      echeances: contrat.echeances,
-      NatureContrat: contrat.NatureContrat,
-      typePaiement: contrat.typePaiement,
-      cotisationNette: contrat.cotisationNette,
-      cotisationTotale: contrat.cotisationTotale,
-      montantEcheance: contrat.montantEcheance,
-      packChoisi: contrat.packChoisi
+    num: contrat.num,
+    dateSouscription: contrat.dateSouscription,
+    dateExpiration: contrat.dateExpiration,
+    echeances: contrat.echeances,
+    NatureContrat: contrat.NatureContrat,
+    typePaiement: contrat.typePaiement,
+    cotisationNette: contrat.cotisationNette,
+    cotisationTotale: contrat.cotisationTotale,
+    montantEcheance: contrat.montantEcheance,
+    packChoisi: contrat.packChoisi,
     },
     assure: {
       NumSouscription: contrat.assure.NumSouscription,

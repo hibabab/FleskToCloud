@@ -9,11 +9,12 @@ import {
     InternalServerErrorException,
    
   } from '@nestjs/common';
-import { CreateAdminDto } from 'src/auth/dto/create-admin.dto';
+import { CreateAdminDto } from 'src/gestion-utilisateur/dto/create-admin.dto';
 
 
-import { UpdateAdminDto } from 'src/auth/dto/update-admin.dto';
-import { AdminService } from 'src/auth/services/admin/admin.service';
+import { UpdateAdminDto } from 'src/gestion-utilisateur/dto/update-admin.dto';
+import { AdminService } from 'src/gestion-utilisateur/services/admin/admin.service';
+
  
   
   

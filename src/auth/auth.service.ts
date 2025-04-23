@@ -130,27 +130,36 @@ export class AuthService {
 
   async login(loginDto: LoginDto): Promise<{ access_token: string }> {
     try {
-      const { email, password } = loginDto;
-      const user = await this.userRepository.findOne({ where: { email } });
-
+      console.log('Tentative de connexion avec:', loginDto.email);
+      
+      const user = await this.userRepository.findOne({ where: { email: loginDto.email } });
+      console.log('Utilisateur trouvé:', user);
+      
       if (!user) {
+        console.log('Aucun utilisateur trouvé avec cet email');
         throw new UnauthorizedException('Identifiants invalides');
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      console.log('Comparaison du mot de passe...');
+      const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+      
       if (!isPasswordValid) {
+        console.log('Mot de passe incorrect');
         throw new UnauthorizedException('Identifiants invalides');
       }
 
+      console.log('Génération du token JWT...');
       const payload = { sub: user.id, username: `${user.nom} ${user.prenom}` };
       const access_token = await this.jwtService.signAsync(payload);
-
+      
+      console.log('Connexion réussie');
       return { access_token };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      
     } catch (error) {
+      console.error('Erreur lors du login:', error);
       throw new InternalServerErrorException('Erreur interne du serveur');
     }
-  }
+}
 
   async forgotPassword(email: string) {
     const user = await this.userRepository.findOne({ where: { email } });
@@ -319,4 +328,52 @@ export class AuthService {
 
     return adresse;
   }
+  async getAllUsers(): Promise<User[]> {
+    try {
+      return await this.userRepository.find({ 
+        relations: ['adresse'],
+        select: [
+          'id',
+          'nom',
+          'prenom',
+          'email',
+          'Cin',
+          'telephone',
+          'date_naissance',
+          'role',
+          'isBlocked',
+         
+        ]
+      });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des utilisateurs:', error);
+      throw new InternalServerErrorException(
+        'Erreur interne lors de la récupération des utilisateurs'
+      );
+    }
+  }
+  async getUserById(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['adresse'],
+      select: [
+        'id',
+        'nom',
+        'prenom',
+        'email',
+        'Cin',
+        'telephone',
+        'date_naissance',
+        'role',
+        'isBlocked'
+      ]
+    });
+  
+    if (!user) {
+      throw new NotFoundException(`Aucun utilisateur trouvé avec l'ID ${id}`);
+    }
+  
+    return user;
+  }
+  
 }

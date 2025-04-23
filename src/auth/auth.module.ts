@@ -11,32 +11,49 @@ import { VerificationmailService } from '../service/verificationmail/verificatio
 import { User } from './entities/user.entity';
 import { ResetToken } from './entities/ResetToken.entity';
 import { Adresse } from './entities/adresse.entity';
-import { AdminService } from './services/admin/admin.service';
-import { AdminController } from './controllers/admin/admin.controller';
-import { Admin } from './entities/admin.entity';
+import { Admin } from '../gestion-utilisateur/entities/admin.entity';
+import { UserService } from './services/user/user.service';
+import { UserGatewayController } from './controllers/user/user.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, ResetToken, Adresse,Admin]),
+    // Configuration TypeORM pour les entités
+    TypeOrmModule.forFeature([User, ResetToken, Adresse, Admin]),
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    // Configuration du module Config
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      validationOptions: {
+        allowUnknown: true,
+        abortEarly: true,
+      },
     }),
 
+    // Configuration asynchrone du JwtModule
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        secret: configService.get<string>('PASS'),
-        signOptions: { expiresIn: '1h' },
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('PASS', '1234'), // Valeur par défaut '1234' si PASS non défini
+        signOptions: { 
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '1h') // Durée de validité du token
+        },
       }),
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthController, AdminController],
-  providers: [AuthService, MailService, VerificationmailService, AdminService],
-  exports: [TypeOrmModule,AuthService, TypeOrmModule, JwtModule, MailService],
+  controllers: [AuthController, UserGatewayController],
+  providers: [
+    AuthService, 
+    MailService, 
+    VerificationmailService, 
+    UserService
+  ],
+  exports: [
+    TypeOrmModule,
+    AuthService,
+    JwtModule,
+    MailService
+  ],
 })
 export class AuthModule {}

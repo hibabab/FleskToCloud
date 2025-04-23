@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Adresse } from './adresse.entity';
 import { NotificationEntity } from 'src/notification/entities/notification.entity';
+import { constat } from 'src/sinistre/entities/constat.entity';
 
 @Entity()
 export class User {
@@ -45,6 +46,8 @@ export class User {
 
   @Column({ default: false })
   isBlocked: boolean;
+  @OneToMany(() => constat, (constat) => constat.user, { nullable: true })
+  constats: constat[];
   @OneToMany(() => NotificationEntity, (notification) => notification.user, {
     cascade: true,
     nullable: true,
