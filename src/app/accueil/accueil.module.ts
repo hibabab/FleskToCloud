@@ -8,6 +8,8 @@ import { AutoComponent } from './auto/auto.component';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { AssistanceComponent } from './assistance/assistance.component';
+import { DevisCVieEpComponent } from './devis-cvie-ep/devis-cvie-ep.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -17,9 +19,12 @@ import { AssistanceComponent } from './assistance/assistance.component';
     AutoComponent,
     AboutComponent,
     ContactComponent,
-    AssistanceComponent
+    AssistanceComponent,
+    DevisCVieEpComponent
   ],
   imports: [
+    ReactiveFormsModule,
+      FormsModule,
     CommonModule,
     AccueilRoutingModule
   ]

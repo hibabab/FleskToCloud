@@ -91,11 +91,22 @@
               <i class="fas fa-file-contract text-teal-800"></i>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-800">Demander devis</h3>
+              <h3 class="font-semibold text-gray-800">Demander devis pour assurance automobile</h3>
               <p class="text-sm text-gray-600">Estimation personnalisée</p>
             </div>
           </div>
         </div>
+        <div (click)="navigateTo('/dashboard-assure/devisVie')"
+        class="bg-white rounded-lg shadow hover:shadow-md transition duration-300 cursor-pointer border-l-4 border-teal-800 flex items-center p-4 h-24">
+     <div class="bg-teal-100 p-3 rounded-full mr-4">
+       <i class="fas fa-file-contract text-teal-800"></i>
+     </div>
+     <div>
+       <h3 class="font-semibold text-gray-800">Demander devis pour assurance vie</h3>
+       <p class="text-sm text-gray-600">Estimation personnalisée</p>
+     </div>
+   </div>
+
 
         <!-- Squelette de chargement -->
         <div *ngIf="isLoading && !errorMessage" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">

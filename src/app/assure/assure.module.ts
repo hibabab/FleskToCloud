@@ -26,6 +26,7 @@ import { VehiculeComponent } from './vehicule/vehicule.component';
 import { ConstatComponent } from './constat/constat.component';
 import { NotificationComponent } from './notification/notification.component';
 import { MesReCuComponent } from './mes-re-cu/mes-re-cu.component';
+import { DevisAvieComponent } from './devis-avie/devis-avie.component';
 
 
 
@@ -50,7 +51,8 @@ import { MesReCuComponent } from './mes-re-cu/mes-re-cu.component';
     VehiculeComponent,
     ConstatComponent,
     NotificationComponent,
-    MesReCuComponent
+    MesReCuComponent,
+    DevisAvieComponent
 
   ],
   imports: [

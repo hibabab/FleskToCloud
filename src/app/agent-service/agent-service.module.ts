@@ -18,6 +18,8 @@ import { ListeExpertComponent } from './liste-expert/liste-expert.component';
 import { ListeAutoComponent } from './liste-auto/liste-auto.component';
 import { ConstatListComponent } from './constat-list/constat-list.component';
 import { NotificationComponent } from './notification/notification.component';
+import { CreationCVieComponent } from './creation-c-vie/creation-c-vie.component';
+import { DevisCVieComponent } from './devis-cvie/devis-cvie.component';
 
 
 
@@ -37,6 +39,8 @@ ListeExpertComponent,
 ListeAutoComponent,
 ConstatListComponent,
 NotificationComponent,
+CreationCVieComponent,
+DevisCVieComponent,
 
   ],
   imports: [

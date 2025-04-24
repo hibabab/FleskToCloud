@@ -15,6 +15,7 @@ import { ListeExpertComponent } from './liste-expert/liste-expert.component';
 import { ListeAutoComponent } from './liste-auto/liste-auto.component';
 import { ConstatListComponent } from './constat-list/constat-list.component';
 import { NotificationComponent } from './notification/notification.component';
+import { DevisCVieComponent } from './devis-cvie/devis-cvie.component';
 
 
 
@@ -22,6 +23,7 @@ import { NotificationComponent } from './notification/notification.component';
 
 const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent },
   { path: 'creationCA', component: CreationContratComponent },
+  { path: 'devisCVie', component: DevisCVieComponent },
   { path: '', redirectTo: 'interface', pathMatch: 'full' },
   { path: 'CA', component: ContratAutoComponent },
   { path: 'compte', component: CreationCompteComponent},
@@ -33,7 +35,7 @@ const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent 
   { path: 'liste-expert', component: ListeExpertComponent },
   { path: 'liste-auto', component: ListeAutoComponent },
   { path: 'liste-constat', component: ConstatListComponent},
-   {path:'notification',component:NotificationComponent}  
+   {path:'notification',component:NotificationComponent}
 
 
  ];

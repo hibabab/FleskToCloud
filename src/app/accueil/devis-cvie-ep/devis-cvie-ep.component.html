@@ -1,0 +1,168 @@
+<div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+  <!-- Header -->
+  <div class="bg-teal-800 py-4 px-6">
+    <h1 class="text-2xl font-bold text-white">Devis Contrat Assurance Vie - Emprunteur</h1>
+    <p class="text-teal-200">Remplissez le formulaire pour obtenir votre devis personnalisé</p>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="devisForm" class="p-6 space-y-6">
+    <!-- Section Informations Personnelles -->
+    <div class="border-b border-gray-200 pb-6">
+      <h2 class="text-lg font-medium text-teal-800 mb-4">Informations Personnelles</h2>
+      <div class="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6">
+        <div>
+          <label for="cin" class="block text-sm font-medium text-gray-700">CIN*</label>
+          <input type="number" id="cin" formControlName="cin"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+          <div *ngIf="devisForm.get('cin')?.invalid && (devisForm.get('cin')?.dirty || devisForm.get('cin')?.touched)"
+               class="text-red-500 text-xs mt-1">
+            <div *ngIf="devisForm.get('cin')?.errors?.['required']">Le CIN est obligatoire</div>
+            <div *ngIf="devisForm.get('cin')?.errors?.['pattern']">Format de CIN invalide</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="nom" class="block text-sm font-medium text-gray-700">Nom*</label>
+          <input type="text" id="nom" formControlName="nom"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+          <div *ngIf="devisForm.get('nom')?.invalid && (devisForm.get('nom')?.dirty || devisForm.get('nom')?.touched)"
+               class="text-red-500 text-xs mt-1">
+            <div *ngIf="devisForm.get('nom')?.errors?.['required']">Le nom est obligatoire</div>
+            <div *ngIf="devisForm.get('nom')?.errors?.['minlength']">Le nom doit contenir au moins 2 caractères</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="prenom" class="block text-sm font-medium text-gray-700">Prénom*</label>
+          <input type="text" id="prenom" formControlName="prenom"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+          <div *ngIf="devisForm.get('prenom')?.invalid && (devisForm.get('prenom')?.dirty || devisForm.get('prenom')?.touched)"
+               class="text-red-500 text-xs mt-1">
+            <div *ngIf="devisForm.get('prenom')?.errors?.['required']">Le prénom est obligatoire</div>
+            <div *ngIf="devisForm.get('prenom')?.errors?.['minlength']">Le prénom doit contenir au moins 2 caractères</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="age" class="block text-sm font-medium text-gray-700">Âge*</label>
+          <input type="number" id="age" formControlName="age"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+          <div *ngIf="devisForm.get('age')?.invalid && (devisForm.get('age')?.dirty || devisForm.get('age')?.touched)"
+               class="text-red-500 text-xs mt-1">
+            <div *ngIf="devisForm.get('age')?.errors?.['required']">L'âge est obligatoire</div>
+            <div *ngIf="devisForm.get('age')?.errors?.['min']">L'âge minimum est 18 ans</div>
+            <div *ngIf="devisForm.get('age')?.errors?.['max']">L'âge maximum est 70 ans</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Informations Emprunt -->
+    <div class="border-b border-gray-200 pb-6">
+      <h2 class="text-lg font-medium text-teal-800 mb-4">Informations sur l'Emprunt</h2>
+      <div class="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6">
+        <div class="sm:col-span-2">
+          <label for="organismePreteur" class="block text-sm font-medium text-gray-700">Organisme Prêteur*</label>
+          <input type="text" id="organismePreteur" formControlName="organismePreteur"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+          <div *ngIf="devisForm.get('organismePreteur')?.invalid && (devisForm.get('organismePreteur')?.dirty || devisForm.get('organismePreteur')?.touched)"
+               class="text-red-500 text-xs mt-1">
+            <div *ngIf="devisForm.get('organismePreteur')?.errors?.['required']">L'organisme prêteur est obligatoire</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="montantPret" class="block text-sm font-medium text-gray-700">Montant du Prêt (DT)*</label>
+          <input type="number" id="montantPret" formControlName="montantPret"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+          <div *ngIf="devisForm.get('montantPret')?.invalid && (devisForm.get('montantPret')?.dirty || devisForm.get('montantPret')?.touched)"
+               class="text-red-500 text-xs mt-1">
+            <div *ngIf="devisForm.get('montantPret')?.errors?.['required']">Le montant est obligatoire</div>
+            <div *ngIf="devisForm.get('montantPret')?.errors?.['min']">Le montant minimum est 1000 DT</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="dureeRemboursement" class="block text-sm font-medium text-gray-700">Durée de Remboursement (ans)*</label>
+          <input type="number" id="dureeRemboursement" formControlName="dureeRemboursement"
+                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+          <div *ngIf="devisForm.get('dureeRemboursement')?.invalid && (devisForm.get('dureeRemboursement')?.dirty || devisForm.get('dureeRemboursement')?.touched)"
+               class="text-red-500 text-xs mt-1">
+            <div *ngIf="devisForm.get('dureeRemboursement')?.errors?.['required']">La durée est obligatoire</div>
+            <div *ngIf="devisForm.get('dureeRemboursement')?.errors?.['min']">La durée minimum est 1 an</div>
+            <div *ngIf="devisForm.get('dureeRemboursement')?.errors?.['max']">La durée maximum est 30 ans</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Garanties -->
+    <div class="pb-6">
+      <h2 class="text-lg font-medium text-teal-800 mb-4">Choix des Garanties</h2>
+      <div class="space-y-4">
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input id="garantieDeces" formControlName="garantieDeces" type="checkbox"
+                   class="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded">
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="garantieDeces" class="font-medium text-gray-700">Décès</label>
+            <p class="text-gray-500">Garantie en cas de décès de l'emprunteur</p>
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input id="garantieInvalidite" formControlName="garantieInvalidite" type="checkbox"
+                   class="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded">
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="garantieInvalidite" class="font-medium text-gray-700">Invalidité Absolue et Définitive</label>
+            <p class="text-gray-500">Garantie en cas d'invalidité empêchant toute activité professionnelle</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="flex justify-end space-x-3">
+      <button type="button" (click)="genererDevisPDF()"
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+Demander Devis
+</button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal PDF Preview -->
+<div *ngIf="showPdfPreview" class="fixed inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Votre Devis</h3>
+            <div class="mt-2">
+              <pre class="text-sm text-gray-500 whitespace-pre-wrap">{{ pdfContent }}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" (click)="telechargerDevis()"
+                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-teal-600 text-base font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Télécharger le Devis
+        </button>
+        <button type="button" (click)="showPdfPreview = false"
+                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+

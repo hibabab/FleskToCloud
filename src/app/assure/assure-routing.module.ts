@@ -17,6 +17,7 @@ import { PaymentSuccessComponent } from './payment/payment-success/payment-succe
 import { PaymentInitiateComponent } from './payment/payment-initiate/payment-initiate.component';
 import { NotificationComponent } from './notification/notification.component';
 import { MesReCuComponent } from './mes-re-cu/mes-re-cu.component';
+import { DevisAvieComponent } from './devis-avie/devis-avie.component';
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
@@ -30,6 +31,7 @@ const routes: Routes = [
   { path: 'souscription-auto', component:CreationContratComponent },
   { path: 'mesRecu', component:MesReCuComponent },
   { path: 'interface', component:InterfaceComponent },
+  { path: 'devisVie', component:DevisAvieComponent },
   { path: 'NCA', component:RenouvellementCAComponent },
   { path: 'SmestrielCA', component:CASemstrielComponent },
   { path: '', redirectTo: '/dashboard-assure/aceuil', pathMatch: 'full' },
