@@ -35,7 +35,21 @@ import { ExpertService } from 'src/gestion-utilisateur/services/expert/expert.se
         throw new NotFoundException(error.message);
       }
     }
-  
+    @Get('specialite/:specialite')
+    async getExpertsBySpecialite(@Param('specialite') specialite: string) {
+      try {
+        const experts = await this.expertService.getExpertsBySpecialite(specialite);
+        if (!experts || experts.length === 0) {
+          throw new NotFoundException(`Aucun expert trouvé avec la spécialité ${specialite}`);
+        }
+        return experts;
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          throw error;
+        }
+        throw new BadRequestException(error.message);
+      }
+    }
     @Post('addExpert')
     async createExpert(@Body() createExpertDto: CreateExpertDto) {
       try {

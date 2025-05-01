@@ -14,6 +14,9 @@ import { PaiementModule } from './paiement/paiement.module';
 import { NotificationModule } from './notification/notification.module';
 import { GestionUtilisateurModule } from './gestion-utilisateur/gestion-utilisateur.module';
 import { SinistreModule } from './sinistre/sinistre.module';
+import { AssuranceVieModule } from './assurance-vie/assurance-vie.module';
+import { ContratvieService } from './assurance-vie/services/contratvie/contratvie.service';
+
 
 @Module({
   imports: [
@@ -70,8 +73,10 @@ import { SinistreModule } from './sinistre/sinistre.module';
     GestionUtilisateurModule,
 
     SinistreModule,
+
+    AssuranceVieModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MailService],
+  providers: [AppService, MailService, ContratvieService],
 })
 export class AppModule {}

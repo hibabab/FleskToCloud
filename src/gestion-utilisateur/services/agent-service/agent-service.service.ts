@@ -210,7 +210,22 @@ import { constat } from 'src/sinistre/entities/constat.entity';
         );
       }
     }
-  
+    async getAgentsBySpecialite(specialite: string): Promise<AgentService[]> {
+      try {
+        return await this.agentServiceRepository.find({
+          where: { specialite },
+          relations: ['user'],
+        });
+      } catch (error) {
+        console.error(
+          `❌ Erreur lors de la récupération des agents avec la spécialité ${specialite}:`,
+          error,
+        );
+        throw new InternalServerErrorException(
+          `Erreur interne lors de la récupération des agents avec la spécialité ${specialite}`,
+        );
+      }
+    }
     async getAgentById(id: number): Promise<AgentService> {
       const agent = await this.agentServiceRepository.findOne({
         // Changed from expertRepository

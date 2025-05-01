@@ -39,6 +39,31 @@ import { User } from 'src/auth/entities/user.entity';
       }
       return user;
     }
+    async getUserByCin(cin: number): Promise<User> {
+      const user = await this.userRepository.findOne({
+        where: { Cin: cin },
+        relations: ['adresse'],
+      });
+    
+      if (!user) {
+        throw new NotFoundException(`Utilisateur avec le CIN ${cin} non trouvé`);
+      }
+    
+      return user;
+    }
+    
+    async getUserByEmail(email: string): Promise<User> {
+      const user = await this.userRepository.findOne({
+        where: { email },
+        relations: ['adresse'],
+      });
+    
+      if (!user) {
+        throw new NotFoundException(`Utilisateur avec l'email ${email} non trouvé`);
+      }
+    
+      return user;
+    }
     // async updateUser(data: {
     //   id: number;
     //   updateUserDto: updateUserDto;

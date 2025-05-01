@@ -6,11 +6,14 @@ import { HttpModule } from '@nestjs/axios';
 import { ContratAuto } from 'src/assurance-auto/entities/ContratAuto.entity';
 import { AssuranceAutoModule } from 'src/assurance-auto/assurance-auto.module';
 import { PaymentGatewayController } from './controllers/payment/payment.controller';
+import { ContratVie } from 'src/assurance-vie/entities/contrat-vie.entity';
+import { AssuranceVieModule } from 'src/assurance-vie/assurance-vie.module';
 
 @Module({imports: [
-  TypeOrmModule.forFeature([Payment, ContratAuto]), // Ajoutez ici l'entité ContratAuto
+  TypeOrmModule.forFeature([Payment, ContratAuto,ContratVie]), 
   HttpModule,
-  forwardRef(() => AssuranceAutoModule), // Utilisez forwardRef pour briser la dépendance circulaire
+  forwardRef(() => AssuranceAutoModule),
+  forwardRef(() => AssuranceVieModule),
 ],
 providers: [PaymentService],
 controllers: [PaymentGatewayController],

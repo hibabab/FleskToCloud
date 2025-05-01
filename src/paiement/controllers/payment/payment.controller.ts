@@ -236,6 +236,21 @@ export class PaymentGatewayController {
       this.handleError(error);
     }
   }
+  @Post('cancelP/:contratNum')
+  async cancel(@Param('contratNum', ParseIntPipe) contratNum: number) {
+    try {
+      const result = await this.paymentGatewayService.cancel(contratNum);
+
+      return {
+        success: true,
+        data: result.data,
+        message: result.message
+      };
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
 
   private handleError(error: any) {
     if (error instanceof HttpException) {
@@ -308,4 +323,230 @@ export class PaymentGatewayController {
   }
 
  
+  @Post('vie/generate')
+async generatePaymentVie(
+  @Body() paymentData: GeneratePaymentDto
+): Promise<{
+  success: boolean;
+  data: {
+    paymentLink: string;
+    paymentId: string;
+    trackingId: string;
+    amount: number;
+    expiration?: string;
+  };
+  message: string;
+  timestamp: string;
+}> {
+  try {
+    const payment = await this.paymentGatewayService.generatePaymentLinkVie(
+      paymentData.contratNum,
+      paymentData.successUrl,
+      paymentData.failUrl
+    );
+
+    return {
+      success: true,
+      data: {
+        paymentLink: payment.paymentLink,
+        paymentId: payment.paymentId,
+        trackingId: payment.trackingId,
+        amount: payment.amount,
+        expiration: payment.expiration,
+      },
+      message: 'Lien de paiement vie généré avec succès',
+      timestamp: new Date().toISOString()
+    };
+
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw new HttpException({
+        success: false,
+        message: error.message,
+        timestamp: new Date().toISOString()
+      }, error.getStatus());
+    }
+
+    if (error.message.includes('Contrat non trouvé')) {
+      throw new HttpException({
+        success: false,
+        message: error.message,
+        timestamp: new Date().toISOString()
+      }, HttpStatus.NOT_FOUND);
+    }
+
+    if (error.message.includes('montant invalide')) {
+      throw new HttpException({
+        success: false,
+        message: 'Le montant de la cotisation vie n\'est pas valide',
+        timestamp: new Date().toISOString()
+      }, HttpStatus.BAD_REQUEST);
+    }
+
+    throw new HttpException({
+      success: false,
+      message: 'Erreur lors de la génération du paiement vie',
+      timestamp: new Date().toISOString()
+    }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Post('vie/local')
+async createLocalPaymentVie(@Body() paymentData: CreateLocalPaymentDto) {
+  try {
+    if (!paymentData.contratNum) {
+      throw new BadRequestException('Le numéro de contrat vie est requis');
+    }
+    
+    const paymentResult = await this.paymentGatewayService.createLocalPaymentVie(paymentData.contratNum);
+    
+    return {
+      success: true,
+      message: 'Paiement local vie créé avec succès',
+      data: {
+        paymentId: paymentResult.paymentId,
+        status: paymentResult.status,
+        amount: paymentResult.amount,
+        paymentDate: paymentResult.paymentDate,
+        contratNum: paymentResult.contratNum,
+        paymentType: paymentResult.paymentType
+      }
+    };
+    
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw new HttpException(
+        {
+          success: false,
+          message: error.message,
+          error: 'PAYMENT_ERROR'
+        },
+        error.getStatus()
+      );
+    }
+    
+    throw new BadRequestException({
+      success: false,
+      message: 'Erreur technique lors de la création du paiement vie',
+      error: 'SERVER_ERROR'
+    });
+  }
+}
+
+@Get('vie/verify/:paymentId')
+async verifyPaymentVie(@Param('paymentId') paymentId: string) {
+  try {
+    const result = await this.paymentGatewayService.verifyPaymentVie(paymentId);
+
+    return {
+      success: true,
+      data: {
+        status: result.status,
+        contratNum: result.contratNum,
+        amount: result.amount,
+        ...(result.paymentDate && { paymentDate: result.paymentDate }),
+        ...(result.deleted && { deleted: result.deleted })
+      },
+      message: result.status === 'PAID' 
+        ? 'Payment vie verified successfully' 
+        : 'Payment vie verification failed'
+    };
+  } catch (error) {
+    this.handleError(error);
+  }
+}
+
+@Get('vie/status/:contratNum')
+async getPaymentStatusVie(@Param('contratNum', ParseIntPipe) contratNum: number) {
+  try {
+    const result = await this.paymentGatewayService.getPaymentByContratVie(contratNum);
+
+    if (!result.hasPayment) {
+      return {
+        success: true,
+        data: {
+          hasPayment: false,
+          status: 'NO_PAYMENT',
+          contratNum
+        },
+        message: 'No payment found for this vie contract'
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        hasPayment: true,
+        paymentId: result.paymentId,
+        trackingId: result.trackingId,
+        status: result.status,
+        amount: result.amount,
+        paymentDate: result.paymentDate,
+        contratNum
+      },
+      message: 'Vie payment status retrieved successfully'
+    };
+  } catch (error) {
+    this.handleError(error);
+  }
+}
+
+@Post('vie/cancel/:contratNum')
+async cancelPaymentVie(@Param('contratNum', ParseIntPipe) contratNum: number) {
+  try {
+    const result = await this.paymentGatewayService.cancelPaymentVie(contratNum);
+
+    return {
+      success: true,
+      data: result.data,
+      message: result.message
+    };
+  } catch (error) {
+    this.handleError(error);
+  }
+}
+
+@Post('vie/initiate/:contratNum')
+async initiatePaymentVie(
+  @Param('contratNum', ParseIntPipe) contratNum: number,
+  @Body() body: { successUrl: string; failUrl: string }
+) {
+  try {
+    if (!body.successUrl || !body.failUrl) {
+      throw new BadRequestException('Les URLs de retour sont requises');
+    }
+
+    const paymentLink = await this.paymentGatewayService.generatePaymentLinkVie(
+      contratNum,
+      body.successUrl,
+      body.failUrl
+    );
+
+    return {
+      success: true,
+      data: {
+        paymentLink: paymentLink.paymentLink,
+        paymentId: paymentLink.paymentId,
+        trackingId: paymentLink.trackingId,
+        amount: paymentLink.amount,
+        expiration: paymentLink.expiration,
+        contratNum: contratNum
+      },
+      message: 'Lien de paiement vie généré avec succès'
+    };
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw new HttpException({
+        success: false,
+        message: error.message,
+        error: this.getErrorCode(error)
+      }, error.getStatus());
+    }
+    throw new BadRequestException({
+      success: false,
+      message: 'Erreur technique',
+      error: 'SERVER_ERROR'
+    });
+  }
+}
 }

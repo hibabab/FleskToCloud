@@ -32,7 +32,7 @@ export class Vehicule {
   DPMC: Date;
 
   @Column()
-  cylindree: string;
+  cylindree: number;
 
   @Column({ nullable: true })
   chargeUtil: number;
@@ -51,6 +51,6 @@ export class Vehicule {
 
   @OneToOne(() => CarteGrise, (carteGrise) => carteGrise.vehicule)
   carteGrise: CarteGrise;
-  @OneToMany(() => ContratAuto, (contratAuto) => contratAuto.vehicule)
-  contratAuto: ContratAuto[];
+  @OneToOne(() => ContratAuto, (contratAuto) => contratAuto.vehicule)
+  contratAuto: ContratAuto;
 }

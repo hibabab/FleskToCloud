@@ -375,5 +375,27 @@ export class AuthService {
   
     return user;
   }
+  async getUserByCin(Cin: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { Cin },
+      relations: ['adresse'],
+      select: [
+        'id',
+        'nom',
+        'prenom',
+        'email',
+        'Cin',
+        'telephone',
+        'date_naissance',
+        'role',
+        'isBlocked'
+      ]
+    });
   
+    if (!user) {
+      throw new NotFoundException(`Aucun utilisateur trouvé avec l'CIN ${Cin}`);
+    }
+  
+    return user;
+  }
 }

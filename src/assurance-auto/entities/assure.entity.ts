@@ -18,7 +18,6 @@ export class Assure {
   user: User;
   @Column({ type: 'int' })
   bonusMalus: number;
-
   @OneToMany(() => ContratAuto, (contratAuto) => contratAuto.assure)
   contrats: ContratAuto[];
 }

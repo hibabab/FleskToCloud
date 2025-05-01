@@ -23,7 +23,31 @@ import {
         throw new InternalServerErrorException('Erreur lors de la récupération des utilisateurs');
       }
     }
-  
+    @Get('search/:cinOrEmail')
+    async searchUser(@Param('cinOrEmail') cinOrEmail: string) {
+      try {
+        // Essayez d'abord de convertir en number pour le CIN
+        const cinNumber = Number(cinOrEmail);
+        const isCinSearch = !isNaN(cinNumber);
+        
+        let user: User;
+        
+        if (isCinSearch) {
+          // Recherche par CIN (number)
+          user = await this.userService.getUserByCin(cinNumber);
+        } else {
+          // Recherche par email (string)
+          user = await this.userService.getUserByEmail(cinOrEmail);
+        }
+        
+        return [user]; // Retourne toujours un tableau
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          return []; // Retourne un tableau vide si non trouvé
+        }
+        throw error;
+      }
+    }
     @Get('profile/:id')
     async getUserProfile(@Param('id') id: string): Promise<User> {
       if (!id || isNaN(+id)) {

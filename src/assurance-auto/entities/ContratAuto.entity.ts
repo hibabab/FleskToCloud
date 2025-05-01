@@ -1,5 +1,5 @@
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { Assure } from './assure.entity';
 import { Garanties } from './Garanties.entity';
 import { Vehicule } from './Vehicule.entity';
@@ -18,24 +18,10 @@ export class ContratAuto {
   dateExpiration: Date| string;
   @Column({ type: 'date', nullable: true })
   dateEffet?: Date| string;
-  @Column({ type: 'varchar' })
-  NatureContrat: string; 
-
-  @Column({ type: 'varchar' })
-  typePaiement: string; 
-
-  @Column({ type: 'date' })
-  echeances: Date| string;;
-
   @Column({ type: 'float' })
-  cotisationNette: number; // Cotisation nette
- 
-
+ cotisationNette: number; 
   @Column({ type: 'float' })
-  cotisationTotale: number;
-
-  @Column({ type: 'float' })
-  montantEcheance: number; // Montant de l'échéance
+  cotisationTotale: number; 
   @Column('varchar')
   packChoisi:string;
   @Column({ type: 'varchar', nullable: true, default: 'valide' })
@@ -46,11 +32,11 @@ export class ContratAuto {
   @OneToMany(() => Garanties, (garantie) => garantie.contratAuto)
   garanties: Garanties[];
 
-  @ManyToOne(() => Vehicule, (vehicule) => vehicule.contratAuto)
+  @OneToOne(() => Vehicule, (vehicule) => vehicule.contratAuto)
+  @JoinColumn() 
   vehicule: Vehicule;
   @OneToOne(() => Payment, payment => payment.contrat, {
-    cascade: true, // Permet la création/suppression automatique
-    nullable: true // Autorise l'absence de paiement
+    cascade: true, 
   })
   payment?: Payment;
 }

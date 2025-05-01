@@ -139,7 +139,22 @@ export class NotificationService {
 
     return savedNotif;
   }
+  async createSubscriptionRequestVie(user: User, formData: any): Promise<NotificationEntity> {
+    const notification = new NotificationEntity();
+    notification.message = `Nouvelle demande de souscription de ${user.email}`;
+    notification.user = user;
+    notification.type = 'vie_subscription_request';
+    notification.metadata = formData;
+    notification.status = 'pending';
+    notification.visibleToUser = false; 
 
+    const savedNotif = await this.notificationRepository.save(notification);
+    await this.envoyerNotificationTousAgentsDeService(
+      `Nouvelle demande de souscription à traiter (ID: ${savedNotif.id})`
+    );
+
+    return savedNotif;
+  }
   async getPendingSubscriptionRequests(): Promise<NotificationEntity[]> {
     return this.notificationRepository.find({
       where: { 
@@ -159,6 +174,47 @@ export class NotificationService {
       where: { 
         id: notificationId,
         type: 'subscription_request',
+        status: 'pending'
+      },
+      relations: ['user']
+    });
+
+    if (!notification) {
+      throw new Error('Demande non trouvée ou déjà traitée');
+    }
+
+    // Mettre à jour la notification principale
+    notification.status = decision === 'accept' ? 'accepted' : 'rejected';
+    notification.processedByAgent = agent;
+    await this.notificationRepository.save(notification);
+
+    // Notifier l'utilisateur
+    const userMessage = decision === 'accept'
+      ? 'Votre demande de souscription a été acceptée!'
+      : 'Votre demande de souscription a été refusée.';
+    
+    await this.creerNotification(
+      notification.user.id,
+      userMessage
+    );
+
+    // Notifier les autres agents
+    await this.envoyerNotificationTousAgentsDeServiceSaufUn(
+      `Demande #${notificationId} traitée par ${agent.email}`,
+      agent.id
+    );
+
+    return notification;
+  }
+  async processVieSubscriptionRequest(
+    agent: User,
+    notificationId: number,
+    decision: 'accept' | 'reject'
+  ): Promise<NotificationEntity> {
+    const notification = await this.notificationRepository.findOne({
+      where: { 
+        id: notificationId,
+        type:'vie_subscription_request',
         status: 'pending'
       },
       relations: ['user']

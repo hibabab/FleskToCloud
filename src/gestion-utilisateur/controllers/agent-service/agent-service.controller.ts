@@ -15,7 +15,10 @@ import { AgentServiceService } from 'src/gestion-utilisateur/services/agent-serv
   @Controller('agent-service')
   export class AgentServiceController {
     constructor(private readonly agentServiceService: AgentServiceService) {}
-  
+    @Get('specialite/:specialite')
+    async getAgentsBySpecialite(@Param('specialite') specialite: string) {
+      return this.agentServiceService.getAgentsBySpecialite(specialite);
+    }
     // Récupère tous les agents de service
     @Get()
     async getAllAgentServices() {

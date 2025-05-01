@@ -104,5 +104,13 @@ async getUserById(@Param('id') id: number): Promise<User> {
   }
   return this.authService.getUserById(id);
 }
+@Get('user/:Cin')
+async getUserByCin(@Param('Cin') Cin: number): Promise<User> {
+  
+  if (isNaN(Cin)) {
+    throw new BadRequestException('ID invalide');
+  }
+  return this.authService.getUserByCin(Cin);
+}
 
 }

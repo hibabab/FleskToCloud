@@ -89,4 +89,42 @@ import { UpdateAdminDto } from 'src/gestion-utilisateur/dto/update-admin.dto';
     async hashPassword(plainPassword: string): Promise<string> {
       return bcrypt.hash(plainPassword, this.SALT_ROUNDS);
     }
+    async changePassword(
+      adminId: number,
+      currentPassword: string,
+      newPassword: string
+    ): Promise<void> {
+      try {
+        // 1. Récupérer l'admin
+        const admin = await this.adminRepository.findOne({ where: { id: adminId } });
+        if (!admin) {
+          throw new NotFoundException(`Administrateur avec l'ID ${adminId} non trouvé`);
+        }
+    
+        // 2. Vérifier l'ancien mot de passe
+        const isPasswordValid = await bcrypt.compare(currentPassword, admin.motDePasse);
+        if (!isPasswordValid) {
+          throw new BadRequestException('Le mot de passe actuel est incorrect');
+        }
+    
+        // 3. Vérifier que le nouveau mot de passe est différent de l'ancien
+        if (currentPassword === newPassword) {
+          throw new BadRequestException('Le nouveau mot de passe doit être différent de l\'actuel');
+        }
+    
+        // 4. Hasher et sauvegarder le nouveau mot de passe
+        admin.motDePasse = await bcrypt.hash(newPassword, this.SALT_ROUNDS);
+        await this.adminRepository.save(admin);
+    
+        this.logger.log(`Mot de passe de l'admin ${adminId} mis à jour avec succès`);
+      } catch (error) {
+        this.logger.error('Erreur lors du changement de mot de passe', error.stack);
+        if (error instanceof NotFoundException || error instanceof BadRequestException) {
+          throw error;
+        }
+        throw new InternalServerErrorException(
+          'Erreur interne lors du changement de mot de passe'
+        );
+      }
+    }
   }

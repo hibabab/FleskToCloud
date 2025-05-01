@@ -7,9 +7,11 @@ import {
     NotFoundException,
     BadRequestException,
     InternalServerErrorException,
+    Put,
    
   } from '@nestjs/common';
-import { CreateAdminDto } from 'src/gestion-utilisateur/dto/create-admin.dto';
+
+import { ChangePasswordDto, CreateAdminDto } from 'src/gestion-utilisateur/dto/create-admin.dto';
 
 
 import { UpdateAdminDto } from 'src/gestion-utilisateur/dto/update-admin.dto';
@@ -84,4 +86,16 @@ import { AdminService } from 'src/gestion-utilisateur/services/admin/admin.servi
           }
           throw new InternalServerErrorException('Échec de la vérification des identifiants');
         }
-      }}
+      }
+      @Put(':id/change-password')
+async changeAdminPassword(
+  @Param('id') id: number,
+  @Body() changePasswordDto: ChangePasswordDto
+) {
+  return this.adminService.changePassword(
+    id,
+    changePasswordDto.currentPassword,
+    changePasswordDto.newPassword
+  );
+}
+    }

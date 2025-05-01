@@ -147,13 +147,11 @@ async renouvelerContrat(
         id: result.contrat.num || result.contrat.num,
         dateSouscription: this.formatDate(result.contrat.dateSouscription),
         dateExpiration: this.formatDate(result.contrat.dateExpiration),
-        NatureContrat: result.contrat.NatureContrat || 'Standard',
+       
         packChoisi: result.contrat.packChoisi || 'Non spécifié',
         cotisationNette: result.contrat.cotisationNette || 0,
         cotisationTotale: result.contrat.cotisationTotale || 0,
-        montantEcheance: result.contrat.montantEcheance || 0,
-        echeances: this.formatDate(result.contrat.echeances),
-        typePaiement: result.contrat.typePaiement || 'Non spécifié',
+       
       },
       assure: {
         numSouscription: result.contrat.assure?.NumSouscription || 0,

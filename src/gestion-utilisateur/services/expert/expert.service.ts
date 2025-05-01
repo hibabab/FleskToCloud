@@ -36,6 +36,20 @@ import { constat } from 'src/sinistre/entities/constat.entity';
       }
     }
   
+    async getExpertsBySpecialite(specialite: string): Promise<Expert[]> {
+      try {
+        return await this.expertRepository.find({
+          where: { specialite },
+          relations: ['user', 'user.adresse'],
+        });
+      } catch (error) {
+        console.error(`❌ Erreur lors de la récupération des experts avec la spécialité ${specialite}:`, error);
+        throw new InternalServerErrorException(
+          `Erreur interne lors de la récupération des experts avec la spécialité ${specialite}`,
+        );
+      }
+    }
+
     // ➕ Crée un nouvel expert
     async createExpert(data: {
       userId: number;

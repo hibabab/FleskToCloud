@@ -14,12 +14,10 @@ interface ContratDetails {
   num: string | number;
   dateSouscription: Date | string | null;
   dateExpiration: Date | string | null;
-  echeances: Date | string | null;
-  NatureContrat: string;
-  typePaiement: string;
+  
   cotisationNette: number;
   cotisationTotale: number;
-  montantEcheance: number;
+ 
   packChoisi: string | undefined; 
 }
  enum TypeGaranties {
@@ -73,7 +71,7 @@ interface VehiculeDetails {
   energie: string;
   nbPlace: number;
   DPMC: Date | string | null;
-  cylindree: string;
+  cylindree: number;
   chargeUtil: number;
   valeurNeuf: number;
   numChassis: string;
@@ -129,24 +127,23 @@ export class ContratAutoService {
     }
     console.log('Utilisateur trouvé:', user.id);
   
-   // 2. Vérification assure
-console.log('Recherche de l\'assuré pour user:', user.id);
-let assure = await this.assureRepository.findOne({ where: { user: { id: user.id } } });
-if (!assure) {
-  console.log('Création d\'un nouvel assuré');
-  assure = this.assureRepository.create({
-    user,
-    bonusMalus: dtoA.bonusMalus,
-  });
-  assure = await this.assureRepository.save(assure);
-  console.log('Nouvel assuré créé:', assure.NumSouscription);
-} else {
-  console.log('Assuré existant trouvé:', assure.NumSouscription);
-  // Mise à jour du bonusMalus si l'assuré existe déjà
-  assure.bonusMalus = dtoA.bonusMalus;
-  assure = await this.assureRepository.save(assure);
-  console.log('BonusMalus mis à jour pour l\'assuré existant');
-}
+    // 2. Vérification assure
+    console.log('Recherche de l\'assuré pour user:', user.id);
+    let assure = await this.assureRepository.findOne({ where: { user: { id: user.id } } });
+    if (!assure) {
+      console.log('Création d\'un nouvel assuré');
+      assure = this.assureRepository.create({
+        user,
+        bonusMalus: dtoA.bonusMalus,
+      });
+      assure = await this.assureRepository.save(assure);
+      console.log('Nouvel assuré créé:', assure.NumSouscription);
+    } else {
+      console.log('Assuré existant trouvé:', assure.NumSouscription);
+      assure.bonusMalus = dtoA.bonusMalus;
+      assure = await this.assureRepository.save(assure);
+      console.log('BonusMalus mis à jour pour l\'assuré existant');
+    }
   
     // 3. Vérification véhicule
     console.log('Recherche du véhicule avec Imat:', dtoV.Imat);
@@ -160,22 +157,30 @@ if (!assure) {
       console.log('Véhicule existant trouvé:', vehicule.id);
     }
   
-    // 4. Création contrat
+    // Calcul des dates
+    const today = new Date();
+    const expirationDate = new Date(today);
+    expirationDate.setFullYear(expirationDate.getFullYear() + 1); // Ajoute 1 an
+    
+    // 4. Création contrat avec dates calculées
     console.log('Création du contrat auto');
     const contratAuto = this.contratAutoRepository.create({
       ...dtoC,
+      dateSouscription: today,
+      dateEffet: today,
+      dateExpiration: expirationDate,
       etat: dtoC.etat || 'valide',
       assure,
       vehicule,
     });
+    
     console.log('Contrat auto préparé:', contratAuto);
-  
-    // 5. Sauvegarde contrat
+    console.log('Dates calculées - Effet:', today, 'Expiration:', expirationDate);
+    
     console.log('Sauvegarde du contrat auto');
     const savedContratAuto = await this.contratAutoRepository.save(contratAuto);
     console.log('Contrat auto sauvegardé:', savedContratAuto.num);
-  
-    // 6. Gestion des garanties
+    
     if (dtoC.garanties && dtoC.garanties.length > 0) {
       console.log('Traitement des garanties - nombre:', dtoC.garanties.length);
       const garanties = dtoC.garanties.map((g) => {
@@ -198,18 +203,14 @@ if (!assure) {
       relations: {
         assure: {
           user: {
-            adresse: true, // Garde l'adresse de l'utilisateur
+            adresse: true,
           },
         },
-        vehicule: true, // Charge seulement les infos de base du véhicule
-        garanties: true, // Garde les garanties
+        vehicule: true, 
+        garanties: true, 
       },
     });
-  
   }
-  // async deleteCA(id: number): Promise<void> {
-  //   await this.contratAutoRepository.delete(id);
-  // }
 
   async getAllContratAuto(): Promise<ContratAuto[]> {
     return await this.contratAutoRepository.find({
@@ -227,7 +228,6 @@ if (!assure) {
     });
   }
   async creerNouveauContrat(cinAssure: number, matriculeVehicule: string, packChoice: 'same' | 'Pack1' | 'Pack2' | 'Pack3'): Promise<{ contrat: ContratAuto | null, message?: string }> {
-    // 1. Trouver l'assuré et le véhicule
     const assure = await this.assureRepository.findOne({ 
       where: { user: { Cin: cinAssure } },
       relations: ['user', 'user.adresse']
@@ -245,13 +245,11 @@ if (!assure) {
       throw new Error('Véhicule non trouvé');
     }
   
-    // 2. Récupérer tous les contrats liés à cet assuré et ce véhicule
-    const contrats = await this.contratAutoRepository.find({
+    // Récupérer le contrat lié à ce véhicule (relation OneToOne)
+    const contratExistant = await this.contratAutoRepository.findOne({
       where: {
-        assure: { NumSouscription: assure.NumSouscription },
         vehicule: { id: vehicule.id }
       },
-      order: { dateSouscription: 'DESC' },
       relations: {
         garanties: true,
         assure: {
@@ -263,28 +261,22 @@ if (!assure) {
       }
     });
   
-    if (contrats.length === 0) {
-      throw new Error('Aucun contrat existant trouvé');
+    if (!contratExistant) {
+      throw new Error('Aucun contrat existant trouvé pour ce véhicule');
     }
-  
-    // 3. Prendre le dernier contrat
-    const dernierContrat = contrats[0];
-    
-    // 4. Calculer l'âge du véhicule à partir de DPMC
+    // Calculer l'âge du véhicule à partir de DPMC
     const ageVehicule = this.calculateVehicleAge(vehicule.DPMC);
     
-    // 5. Déterminer le pack à utiliser
-    let packChoisi = dernierContrat.packChoisi;
+    // Déterminer le pack à utiliser
+    let packChoisi = contratExistant.packChoisi;
     let message: string | undefined = undefined;
     
     if (packChoice === 'same') {
       // Vérification de compatibilité avec l'âge du véhicule
-      if (dernierContrat.packChoisi === 'Pack3' && ageVehicule > 3) {
-        // Pack Tierce nécessite un véhicule de 3 ans ou moins
+      if (contratExistant.packChoisi === 'Pack3' && ageVehicule > 3) {
         message = 'Le Pack Tierce (Pack3) nécessite un véhicule de 3 ans ou moins. Veuillez choisir un autre pack.';
         return { contrat: null, message };
-      } else if (dernierContrat.packChoisi === 'Pack2' && ageVehicule >= 15) {
-        // Pack Dommage et Collision nécessite un véhicule de 15 ans ou moins
+      } else if (contratExistant.packChoisi === 'Pack2' && ageVehicule >= 15) {
         message = 'Le Pack Dommage et Collision (Pack2) nécessite un véhicule de 15 ans ou moins. Veuillez choisir un autre pack.';
         return { contrat: null, message };
       }
@@ -302,43 +294,38 @@ if (!assure) {
       }
     }
   
-    // 6. Créer un nouveau contrat basé sur l'ancien
-    const nouveauContrat = this.contratAutoRepository.create({
-      ...dernierContrat,
-      num: undefined, // Laisser TypeORM générer un nouvel ID
-      dateSouscription: new Date(), // Date d'aujourd'hui
-      dateExpiration: this.calculerDateExpiration(), // Date d'aujourd'hui + 1 an
-      echeances: this.calculerProchaineEcheance(dernierContrat.typePaiement),
-      packChoisi: packChoisi, // Utiliser le pack déterminé
-      garanties: [],
-      assure: assure,
-      vehicule: vehicule
-    });
-  
-    // 7. Sauvegarder le nouveau contrat
-    const savedContratAuto = await this.contratAutoRepository.save(nouveauContrat);
-  
-    // 8. Créer les garanties appropriées pour le nouveau pack
-    if (packChoice !== 'same' || (packChoice === 'same' && dernierContrat.garanties.length === 0)) {
-      // Calculer les nouvelles garanties si le pack a changé ou si l'ancien contrat n'en avait pas
-      const garanties = await this.createGarantiesForPack(packChoisi, vehicule, assure.bonusMalus, savedContratAuto);
-      await this.garantiesRepository.save(garanties);
-    } else {
-      // Copier les garanties de l'ancien contrat
-      const nouvellesGaranties = dernierContrat.garanties.map(garantie => 
-        this.garantiesRepository.create({
-          ...garantie,
-          id: undefined, // Nouvel ID
-          contratAuto: savedContratAuto
-        })
-      );
-      
-      await this.garantiesRepository.save(nouvellesGaranties);
+    // Calculer la durée en années depuis la souscription
+    const dateSouscription = new Date(contratExistant.dateSouscription);
+    const aujourdHui = new Date();
+    const duree = aujourdHui.getFullYear() - dateSouscription.getFullYear();
+    
+    // Mettre à jour le bonusMalus si nécessaire
+    if (duree >= 2 && assure.bonusMalus > 1) {
+      assure.bonusMalus = assure.bonusMalus - 1;
+      await this.assureRepository.save(assure);
     }
   
-    // 9. Retourner le contrat avec les relations spécifiées
+    // Mettre à jour le contrat existant
+    contratExistant.dateEffet = new Date(); // Date d'aujourd'hui
+    contratExistant.dateExpiration = this.calculerDateExpiration(); // Date d'aujourd'hui + 1 an
+    contratExistant.packChoisi = packChoisi;
+    contratExistant.etat = 'invalide';
+    // Sauvegarder les modifications du contrat
+    const updatedContrat = await this.contratAutoRepository.save(contratExistant);
+  
+    // Si le pack a changé, mettre à jour les garanties
+    if (packChoice !== 'same') {
+      // Supprimer les anciennes garanties
+      await this.garantiesRepository.delete({ contratAuto: { num: updatedContrat.num } });
+      
+      // Créer les nouvelles garanties pour le pack choisi
+      const nouvGaranties = await this.createGarantiesForPack(packChoisi, vehicule, assure.bonusMalus, updatedContrat);
+      await this.garantiesRepository.save(nouvGaranties);
+    }
+  
+    // Récupérer le contrat mis à jour avec toutes les relations
     const contratFinal = await this.contratAutoRepository.findOne({
-      where: { num: savedContratAuto.num },
+      where: { num: updatedContrat.num },
       relations: {
         assure: {
           user: {
@@ -769,8 +756,7 @@ async updateEcheancesAndGetFullContract(numContrat: number): Promise<any> {
     throw new NotFoundException(`Contrat avec le numéro ${numContrat} non trouvé`);
   }
 
-  // 2. Mettre à jour le champ echeances
-  contrat.echeances = contrat.dateExpiration;
+
 
   // 3. Sauvegarder les modifications en base de données
   const savedContratAuto= await this.contratAutoRepository.save(contrat);
@@ -785,12 +771,10 @@ private formatContractResponse(contrat: ContratAuto): any {
     num: contrat.num,
     dateSouscription: contrat.dateSouscription,
     dateExpiration: contrat.dateExpiration,
-    echeances: contrat.echeances,
-    NatureContrat: contrat.NatureContrat,
-    typePaiement: contrat.typePaiement,
+    
     cotisationNette: contrat.cotisationNette,
     cotisationTotale: contrat.cotisationTotale,
-    montantEcheance: contrat.montantEcheance,
+   
     packChoisi: contrat.packChoisi,
     },
     assure: {
@@ -905,12 +889,8 @@ async getContratDetailsByNum(numContrat: number): Promise<FullContratResponse> {
       num: contrat.num,
       dateSouscription: contrat.dateSouscription,
       dateExpiration: contrat.dateExpiration,
-      echeances: contrat.echeances,
-      NatureContrat: contrat.NatureContrat || 'Standard',
-      typePaiement: contrat.typePaiement || 'Non spécifié',
       cotisationNette: contrat.cotisationNette || 0,
       cotisationTotale: contrat.cotisationTotale || 0,
-      montantEcheance: contrat.montantEcheance || 0,
       packChoisi: contrat.packChoisi || 'Non spécifié'
     },
     assure: {
@@ -944,7 +924,7 @@ async getContratDetailsByNum(numContrat: number): Promise<FullContratResponse> {
       energie: contrat.vehicule?.energie || 'Non spécifié',
       nbPlace: contrat.vehicule?.nbPlace || 0,
       DPMC: contrat.vehicule?.DPMC || null,
-      cylindree: contrat.vehicule?.cylindree || 'Non spécifié',
+      cylindree: contrat.vehicule?.cylindree ||0,
       chargeUtil: contrat.vehicule?.chargeUtil || 0,
       valeurNeuf: contrat.vehicule?.valeurNeuf || 0,
       numChassis: contrat.vehicule?.numChassis || 'Non spécifié',

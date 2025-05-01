@@ -73,7 +73,15 @@ import { NotificationService } from 'src/notification/services/notification/noti
         this.handleError(error, 'Erreur lors de la création de la demande');
       }
     }
-  
+    @Post('subscription-request-vie')
+   
+    async createSubscriptionRequestVie(@Body() data: { user: User; formData: any }): Promise<NotificationEntity> {
+      try {
+        return await this.notificationService.createSubscriptionRequestVie(data.user, data.formData);
+      } catch (error) {
+        this.handleError(error, 'Erreur lors de la création de la demande');
+      }
+    }
     @Get('pending-subscription-requests')
     async getPendingSubscriptionRequests(): Promise<NotificationEntity[]> {
       try {
@@ -89,6 +97,20 @@ import { NotificationService } from 'src/notification/services/notification/noti
     ): Promise<NotificationEntity> {
       try {
         return await this.notificationService.processSubscriptionRequest(
+          data.agent,
+          data.notificationId,
+          data.decision
+        );
+      } catch (error) {
+        this.handleError(error, 'Erreur lors du traitement de la demande');
+      }
+    }
+    @Post('process-subscription-request-vie')
+    async processVieSubscriptionRequest(
+      @Body() data: { agent: User; notificationId: number; decision: 'accept' | 'reject' }
+    ): Promise<NotificationEntity> {
+      try {
+        return await this.notificationService.processVieSubscriptionRequest(
           data.agent,
           data.notificationId,
           data.decision
