@@ -1,0 +1,357 @@
+<div class="flex">
+  <app-dashbort></app-dashbort>
+
+  <div class="flex-1 mt-60 ml-100">
+  <div class="w-full max-w-4xl bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Header commun -->
+    <div class="bg-teal-800 p-6 text-white">
+      <h2 class="text-2xl font-bold">Création de Contrat Vie</h2>
+      <p class="text-teal-200">
+        {{ currentStep === 1 ? 'Étape 1: Vérification du CIN' : 'Étape 2: Informations du contrat' }}
+      </p>
+
+      <!-- Progress steps -->
+      <div class="flex mt-4">
+        <div class="flex-1 border-t-2 border-teal-500 pt-1">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center mx-auto"
+               [ngClass]="currentStep >= 1 ? 'bg-teal-500' : 'bg-gray-300'">
+            <span *ngIf="currentStep > 1" class="text-white">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </span>
+            <span *ngIf="currentStep <= 1" class="text-white">1</span>
+          </div>
+          <p class="text-xs text-center mt-1">CIN</p>
+        </div>
+        <div class="flex-1 border-t-2 border-teal-500 pt-1">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center mx-auto"
+               [ngClass]="currentStep >= 2 ? 'bg-teal-500' : 'bg-gray-300'">
+            <span class="text-white">2</span>
+          </div>
+          <p class="text-xs text-center mt-1">Informations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 1: Vérification CIN -->
+    <div *ngIf="currentStep === 1" class="p-6">
+      <form #cinForm="ngForm">
+        <div class="mb-4">
+          <label for="cin" class="block text-gray-700 text-sm font-bold mb-2">Numéro CIN</label>
+          <input
+            type="text"
+            id="cin"
+            name="cin"
+            [(ngModel)]="cin"
+            required
+            pattern="[0-9]{8}"
+            #cinInput="ngModel"
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            placeholder="Entrez les 8 chiffres du CIN">
+
+          <div *ngIf="cinInput.invalid && (cinInput.dirty || cinInput.touched)" class="text-red-500 text-xs mt-1">
+            <div *ngIf="cinInput.errors?.['required']">Le CIN est obligatoire</div>
+            <div *ngIf="cinInput.errors?.['pattern']">Le CIN doit contenir exactement 8 chiffres</div>
+          </div>
+        </div>
+        <div class="text-center mt-8">
+          <p class="text-gray-600 mb-4">Vous n'avez pas encore de compte ?</p>
+           <a [routerLink]="['/agent/compte']"
+            class="text-teal-800 hover:text-teal-600 font-medium underline"
+
+          >
+            Créer un compte maintenant
+          </a>
+        </div>
+        <div class="flex justify-end">
+          <button
+            type="button"
+            (click)="nextStep()"
+            [disabled]="cinForm.invalid"
+            class="bg-teal-800 hover:bg-teal-900 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed">
+            Suivant
+          </button>
+        </div>
+        <div *ngIf="errorMessage" class="mt-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>{{ errorMessage }}</p>
+        </div>
+      </form>
+
+    </div>
+
+    <!-- Étape 2: Formulaire complet -->
+    <div *ngIf="currentStep === 2" class="p-6">
+      <form (ngSubmit)="submitForm()" #contratForm="ngForm">
+        <div class="mb-4 bg-teal-50 p-3 rounded-lg flex items-center">
+          <svg class="w-5 h-5 text-teal-800 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-teal-800 font-medium">CIN validé: {{ cin }}</span>
+        </div>
+
+        <!-- Informations Assuré -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-teal-800 border-b pb-2 mb-4">Informations de l'Assuré</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Situation Professionnelle -->
+            <div class="mb-4">
+              <label for="situationPro" class="block text-gray-700 text-sm font-bold mb-2">Situation Professionnelle</label>
+              <select
+                id="situationPro"
+                name="situationPro"
+                [(ngModel)]="assureInfo.situationProfessionnelle"
+                required
+                #situationPro="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="" disabled selected>Sélectionnez</option>
+                <option value="Salarié">Salarié</option>
+                <option value="Indépendant">Indépendant</option>
+                <option value="Fonctionnaire">Fonctionnaire</option>
+                <option value="Retraité">Retraité</option>
+                <option value="Sans emploi">Sans emploi</option>
+              </select>
+              <div *ngIf="situationPro.invalid && (situationPro.dirty || situationPro.touched)" class="text-red-500 text-xs mt-1">
+                Ce champ est obligatoire
+              </div>
+            </div>
+
+            <!-- Revenu Mensuel -->
+            <div class="mb-4">
+              <label for="revenu" class="block text-gray-700 text-sm font-bold mb-2">Revenu Mensuel (DT)</label>
+              <input
+                type="number"
+                id="revenu"
+                name="revenu"
+                [(ngModel)]="assureInfo.revenuMensuel"
+                required
+                min="700"
+                max="30000"
+                step="0.01"
+                #revenu="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="700 - 30,000 DT">
+              <div *ngIf="revenu.invalid && (revenu.dirty || revenu.touched)" class="text-red-500 text-xs mt-1">
+                <div *ngIf="revenu.errors?.['required']">Ce champ est obligatoire</div>
+                <div *ngIf="revenu.errors?.['min']">Le revenu minimum est 700 DT</div>
+                <div *ngIf="revenu.errors?.['max']">Le revenu maximum est 30,000 DT</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Informations Emprunt -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-teal-800 border-b pb-2 mb-4">Informations sur l'Emprunt</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Organisme Prêteur -->
+            <div class="mb-4">
+              <label for="organisme" class="block text-gray-700 text-sm font-bold mb-2">Organisme Prêteur</label>
+              <input
+                type="text"
+                id="organisme"
+                name="organisme"
+                [(ngModel)]="empruntInfo.organismePreteur"
+                required
+                minlength="3"
+                #organisme="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Nom de l'organisme (min 3 caractères)">
+              <div *ngIf="organisme.invalid && (organisme.dirty || organisme.touched)" class="text-red-500 text-xs mt-1">
+                <div *ngIf="organisme.errors?.['required']">Ce champ est obligatoire</div>
+                <div *ngIf="organisme.errors?.['minlength']">Minimum 3 caractères requis</div>
+              </div>
+            </div>
+
+            <!-- Montant Prêt -->
+            <div class="mb-4">
+              <label for="montant" class="block text-gray-700 text-sm font-bold mb-2">Montant du Prêt (DT)</label>
+              <input
+                type="number"
+                id="montant"
+                name="montant"
+                [(ngModel)]="empruntInfo.montantPret"
+                required
+                min="1000"
+                step="0.01"
+                #montant="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="0.00">
+              <div *ngIf="montant.invalid && (montant.dirty || montant.touched)" class="text-red-500 text-xs mt-1">
+                <div *ngIf="montant.errors?.['required']">Ce champ est obligatoire</div>
+                <div *ngIf="montant.errors?.['min']">Le montant minimum est 1000 DT</div>
+              </div>
+            </div>
+
+            <!-- Date Effet -->
+            <div class="mb-4">
+              <label for="dateEffet" class="block text-gray-700 text-sm font-bold mb-2">Date d'Effet</label>
+              <input
+                type="date"
+                id="dateEffet"
+                name="dateEffet"
+                [(ngModel)]="empruntInfo.dateEffet"
+                required
+                [min]="minDate"
+                [max]="maxDate"
+                #dateEffet="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <div *ngIf="dateEffet.invalid && (dateEffet.dirty || dateEffet.touched)" class="text-red-500 text-xs mt-1">
+                <div *ngIf="dateEffet.errors?.['required']">Ce champ est obligatoire</div>
+                <div *ngIf="dateEffet.errors?.['min'] || dateEffet.errors?.['max']">L'année doit être l'année courante</div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label for="datePremierR" class="block text-gray-700 text-sm font-bold mb-2">Date Premier Remboursement</label>
+              <input
+                type="date"
+                id="datePremierR"
+                name="datePremierR"
+                [(ngModel)]="empruntInfo.datePremierR"
+                required
+                [min]="empruntInfo.dateEffet"
+                #datePremierR="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <div *ngIf="datePremierR.invalid && (datePremierR.dirty || datePremierR.touched)" class="text-red-500 text-xs mt-1">
+                <div *ngIf="datePremierR.errors?.['required']">Ce champ est obligatoire</div>
+                <div *ngIf="datePremierR.errors?.['min']">La date doit être postérieure à la date d'effet</div>
+              </div>
+            </div>
+
+            <!-- Date Dernier Remboursement -->
+            <div class="mb-4">
+              <label for="dateDernierR" class="block text-gray-700 text-sm font-bold mb-2">Date Dernier Remboursement</label>
+              <input
+                type="date"
+                id="dateDernierR"
+                name="dateDernierR"
+                [(ngModel)]="empruntInfo.dateDernierR"
+                required
+                [min]="empruntInfo.datePremierR || empruntInfo.dateEffet"
+                #dateDernierR="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <div *ngIf="dateDernierR.invalid && (dateDernierR.dirty || dateDernierR.touched)" class="text-red-500 text-xs mt-1">
+                <div *ngIf="dateDernierR.errors?.['required']">Ce champ est obligatoire</div>
+                <div *ngIf="dateDernierR.errors?.['min']">La date doit être postérieure à la date du premier remboursement</div>
+              </div>
+            </div>
+              <!-- Taux Intérêt -->
+              <div class="mb-4">
+                <label for="taux" class="block text-gray-700 text-sm font-bold mb-2">Taux d'Intérêt (%)</label>
+                <input
+                  type="number"
+                  id="taux"
+                  name="taux"
+                  [(ngModel)]="empruntInfo.tauxInteret"
+                  required
+                  min="0.01"
+                  max="0.99"
+                  step="0.01"
+                  #taux="ngModel"
+                  class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="0.01 - 0.99">
+                <div *ngIf="taux.invalid && (taux.dirty || taux.touched)" class="text-red-500 text-xs mt-1">
+                  <div *ngIf="taux.errors?.['required']">Ce champ est obligatoire</div>
+                  <div *ngIf="taux.errors?.['min']">Le taux doit être supérieur à 0</div>
+                  <div *ngIf="taux.errors?.['max']">Le taux doit être inférieur à 1</div>
+                </div>
+              </div>
+
+            <!-- Type Amortissement -->
+            <div class="mb-4">
+              <label for="typeAmort" class="block text-gray-700 text-sm font-bold mb-2">Type d'Amortissement</label>
+              <select
+                id="typeAmort"
+                name="typeAmort"
+                [(ngModel)]="empruntInfo.typeAmortissement"
+                required
+                #typeAmort="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="" disabled selected>Sélectionnez</option>
+                <option value="Constant">Amortissement Constant</option>
+                <option value="Progressif">Amortissement Lineaire </option>
+              </select>
+              <div *ngIf="typeAmort.invalid && (typeAmort.dirty || typeAmort.touched)" class="text-red-500 text-xs mt-1">
+                Ce champ est obligatoire
+              </div>
+            </div>
+
+            <!-- Périodicité -->
+            <div class="mb-4">
+              <label for="periodicite" class="block text-gray-700 text-sm font-bold mb-2">Périodicité</label>
+              <select
+                id="periodicite"
+                name="periodicite"
+                [(ngModel)]="empruntInfo.periodiciteAmortissement"
+                required
+                #periodicite="ngModel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="" disabled selected>Sélectionnez</option>
+                <option value="Mensuelle">Mensuelle</option>
+                <option value="Trimestrielle">Trimestrielle</option>
+                <option value="Semestrielle">Semestrielle</option>
+                <option value="Annuelle">Annuelle</option>
+              </select>
+              <div *ngIf="periodicite.invalid && (periodicite.dirty || periodicite.touched)" class="text-red-500 text-xs mt-1">
+                Ce champ est obligatoire
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Garanties -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-teal-800 border-b pb-2 mb-4">Garanties du Contrat</h3>
+
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="deces"
+                name="deces"
+                [(ngModel)]="garanties.deces"
+                class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+              <label for="deces" class="ml-2 block text-gray-700">Décès</label>
+            </div>
+
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="invalidite"
+                name="invalidite"
+                [(ngModel)]="garanties.invalidite"
+                class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+              <label for="invalidite" class="ml-2 block text-gray-700">Invalidité Absolue et Définitive</label>
+            </div>
+
+
+            </div>
+          </div>
+
+
+        <!-- Navigation -->
+        <div class="flex justify-between border-t pt-4">
+          <button
+          type="submit"
+          [disabled]="contratForm.invalid || isSubmitting"
+          class="bg-teal-800 hover:bg-teal-900 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!isSubmitting">Soumettre le Contrat</span>
+          <span *ngIf="isSubmitting">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Traitement en cours...
+          </span>
+        </button>
+        </div>
+        <div *ngIf="errorMessage" class="mt-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>{{ errorMessage }}</p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

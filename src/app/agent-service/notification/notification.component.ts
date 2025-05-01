@@ -20,7 +20,42 @@ export enum TypeGaranties {
 interface AssureDto {
   bonusMalus: number;
 }
+// Pour les réponses API
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message: string;
+}
 
+// Pour les requêtes de création
+export interface ContratVie  {
+    numero:number;
+    cotisation: number;
+    dateEffet: Date | string;
+
+    garanties: string;
+    assureVie: {
+      situationProfessionnelle: string;
+      revenuMensuel: number;
+    };
+    emprunt: {
+      organismePreteur: string;
+      montantPret: number;
+      dateEffet: Date | string;
+      datePremierR: Date | string;
+      dateDernierR: Date | string;
+      typeAmortissement: string;
+      periodiciteAmortissement: string;
+      tauxInteret: number;
+    };
+}
+
+// Pour les garanties parsées
+export interface Garanties {
+  deces: boolean;
+  invalidite: boolean;
+  // Ajoutez d'autres garanties si nécessaire
+}
 interface CreateVehiculeDto {
   type: string;
   marque: string;
@@ -98,6 +133,7 @@ export class NotificationComponent implements OnInit {
       (data) => {
         this.notifications = this.notificationService.sortNotificationsByDate(data);
         this.loading = false;
+
       },
       (error) => {
         console.error('Erreur chargement notifications :', error);
@@ -334,6 +370,18 @@ export class NotificationComponent implements OnInit {
         error: (error) => handleError(error, `du traitement de la demande d'${decision === 'accept' ? 'acceptation' : 'refus'}`)
     });
 }
+
+
+  getFormDataEntries(): {key: string, value: any}[] {
+    if (!this.formattedMetadata) return [];
+    return Object.entries(this.formattedMetadata).map(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        const flatValues = Object.entries(value as object).map(([k, v]) => `${k}: ${v}`).join(', ');
+        return { key, value: flatValues };
+      }
+      return { key, value };
+    });
+  }
 
   private formatContractData(notification: Notification): any {
     const metadata = notification.metadata || {};
@@ -730,18 +778,6 @@ export class NotificationComponent implements OnInit {
       }
       return this.roundToThreeDecimals(cotisation);
     }
-  getFormDataEntries(): {key: string, value: any}[] {
-    if (!this.formattedMetadata) return [];
-    return Object.entries(this.formattedMetadata).map(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        const flatValues = Object.entries(value as object).map(([k, v]) => `${k}: ${v}`).join(', ');
-        return { key, value: flatValues };
-      }
-      return { key, value };
-    });
-  }
-
-
   isObject(value: any): boolean {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
@@ -781,5 +817,307 @@ processPaymentNotification(): void {
       this.loading = false;
     }
   });
+}
+processVieRequest(decision: 'accept' | 'reject'): void {
+  if (!this.selectedNotification?.id) {
+      return;
+  }
+
+  this.loading = true;
+  const agent = { id: this.userId };
+  const notificationId = this.selectedNotification.id;
+  const userId = this.selectedNotification.user?.id;
+
+  const handleFinalize = () => {
+      this.loading = false;
+      this.closeModal();
+      this.loadNotifications();
+  };
+
+  const handleError = (error: any, context: string) => {
+      console.error(`Erreur lors de ${context}:`, error);
+      this.loading = false;
+  };
+
+  this.notificationService.processVieSubscriptionRequest(
+      agent,
+      notificationId,
+      decision
+  ).subscribe({
+      next: (result) => {
+          if (decision === 'reject') {
+              if (!userId) {
+                  handleFinalize();
+                  return;
+              }
+
+              this.notificationService.sendNotification({
+                  userId: userId,
+                  message: "Votre demande de souscription assurance vie a été refusée. Veuillez vous rendre à notre local pour faire la souscription en personne.",
+                  type: "vie_subscription_rejected"
+              }).subscribe({
+                  next: handleFinalize,
+                  error: (error) => handleError(error, "l'envoi de la notification de refus")
+              });
+          } else if (decision === 'accept') {
+              if (!this.selectedNotification) {
+                  this.loading = false;
+                  return;
+              }
+
+              const contratData = this.formatVieContractData(this.selectedNotification);
+              const cinValue = contratData.Cin || '';
+              console.log(cinValue);
+              const requestData = {
+                  assureVie: contratData.assureVie,
+                  contratVie: {
+                    ...contratData.contratVie,
+                    etat: 'invalide'
+                },
+                  emprunt: contratData.emprunt
+              };
+              console.log(requestData);
+              console.log('Données envoyées:', JSON.stringify(requestData, null, 2));
+
+              this.http.post<ContratVie>(
+                `http://localhost:3000/contratvie/${cinValue}`,
+                requestData
+              ).subscribe({
+                next: (response) => {
+                  console.log('Contrat vie créé:', response);
+
+                  // Si le backend renvoie directement l'objet ContratVie sans structure {success, data, message}
+                  const contratID = response.numero;
+
+                  if (!userId || !contratID) {
+                    handleFinalize();
+                    return;
+                  }
+
+                      if (!userId || !contratID) {
+                          handleFinalize();
+                          return;
+                      }
+
+                      const paymentLink = `/dashboard-assure/contratvie/${contratID}/payment`;
+                      const notificationPayload = {
+                          userId: userId,
+                          message: "Votre demande de souscription d'assurance vie a été acceptée! Vous pouvez maintenant procéder au paiement pour finaliser votre contrat.",
+                          type: "vie_subscription_accepted",
+                          link: paymentLink,
+                          contractId: contratID,
+                          metadata: {
+                              contratId: contratID,
+                              paymentLink: paymentLink,
+                              status: "pending_payment",
+                              contratNumero: response.numero,
+                              contratDetails: {
+                                  dateEffet: response.dateEffet,
+                                  montant: response.cotisation || 0
+                              }
+                          }
+                      };
+
+                      this.notificationService.sendNotification(notificationPayload).subscribe({
+                          next: handleFinalize,
+                          error: (error) => handleError(error, "l'envoi de la notification d'acceptation")
+                      });
+                  },
+                  error: (error) => handleError(error, "la création du contrat vie")
+              });
+          }
+      },
+      error: (error) => handleError(error, `du traitement de la demande d'${decision === 'accept' ? 'acceptation' : 'refus'}`)
+  });
+}
+
+formatVieContractData(notification: Notification): any {
+  if (!notification.metadata) return {};
+
+  const meta = notification.metadata;
+
+  // Garanties sous forme de string
+  let garantiesString = '';
+  if (meta.garanties?.deces) garantiesString += 'Deces;';
+  if (meta.garanties?.invalidite) garantiesString += 'Invalidite;';
+  garantiesString = garantiesString.slice(0, -1);
+
+  return {
+    Cin: meta.assure?.Cin || '',
+    assureVie: {
+      situationProfessionnelle: meta.assureVie?.situationProfessionnelle
+                              || meta.assure?.situationProfessionnelle
+                              || '',
+      revenuMensuel: parseFloat(meta.assureVie?.revenuMensuel
+                              || meta.assure?.revenuMensuel
+                              || '0')
+    },
+    contratVie: {
+      dateEffet: meta.emprunt?.dateEffet || new Date().toISOString(),
+      cotisation: this.calculateVieCotisation(meta),
+      garanties: garantiesString
+    },
+    emprunt: {
+      organismePreteur: meta.emprunt?.organismePreteur
+                      || meta.empruntDetails?.organismePreteur
+                      || '',
+      montantPret: parseFloat(meta.emprunt?.montantPret
+                            || meta.empruntDetails?.montantPret
+                            || '0'),
+      dateEffet: meta.emprunt?.dateEffet
+               || meta.empruntDetails?.dateEffet
+               || new Date().toISOString(),
+      datePremierR: meta.emprunt?.datePremierR
+                  || meta.empruntDetails?.datePremierR
+                  || new Date().toISOString(),
+      dateDernierR: meta.emprunt?.dateDernierR
+                   || meta.empruntDetails?.dateDernierR
+                   || new Date().toISOString(),
+      typeAmortissement: meta.emprunt?.typeAmortissement
+                       || meta.empruntDetails?.typeAmortissement
+                       || 'Constant',
+      periodiciteAmortissement: meta.emprunt?.periodiciteAmortissement
+                              || meta.empruntDetails?.periodiciteAmortissement
+                              || 'Mensuelle',
+      tauxInteret: parseFloat(meta.emprunt?.tauxInteret
+                            || meta.empruntDetails?.tauxInteret
+                            || '0')
+    }
+  };
+}
+
+calculateVieCotisation(metadata: any): number {
+  const montantPret = parseFloat(metadata.montantPret || metadata.emprunt?.montantPret || 0);
+  let cotisation = montantPret < 10000 ? montantPret * 0.005 : montantPret * 0.01;
+  metadata.assure?.dateNaissance?.split('T')[0];
+  // Si nous avons des données d'âge, appliquer les majorations
+  const userAge =  new Date().getFullYear() - new Date(metadata.assure.dateNaissance).getFullYear() -
+  (new Date().getMonth() < new Date(metadata.assure.dateNaissance).getMonth() ||
+   (new Date().getMonth() === new Date(metadata.assure.dateNaissance).getMonth() &&
+    new Date().getDate() < new Date(metadata.assure.dateNaissance).getDate()) ? 1 : 0);
+    console.log(userAge);
+  if (userAge > 50) {
+      cotisation += 50;
+  }
+
+  // Majoration pour les garanties
+  if (metadata.garanties?.deces && metadata.garanties?.invalidite) {
+      cotisation += 30;
+  }
+
+  // Arrondir à 2 décimales
+  return parseFloat(cotisation.toFixed(2));
+}
+
+async processPaymentNotificationVie(): Promise<void> {
+  if (!this.selectedNotification?.id) {
+    return;
+  }
+
+  this.loading = true;
+  const agent = { id: this.userId };
+  const notificationId = this.selectedNotification.id;
+
+  this.notificationService.processPaymentNotification(
+    agent,
+    notificationId
+  ).subscribe({
+    next: (updatedNotification) => {
+      // Mise à jour de la notification sélectionnée
+      this.selectedNotification = updatedNotification;
+
+      // Mise à jour dans la liste
+      const index = this.notifications.findIndex(n => n.id === notificationId);
+      if (index !== -1) {
+        this.notifications[index] = updatedNotification;
+      }
+
+      // Notification aux autres agents
+      const contratNum = updatedNotification.metadata?.contratNum ||
+                        this.extractContratNumber(updatedNotification.message);
+
+      if (contratNum) {
+        this.notificationService.notifyAllUsers(
+          `Le contrat n°${contratNum} est en cours de traitement par l'agent ${this.userId}.`
+        ).subscribe({
+          error: (err) => console.error('Erreur de notification aux agents', err)
+        });
+      }
+
+      this.loadNotifications();
+      this.closeModal();
+    },
+    error: (error) => {
+      console.error('Erreur traitement notification:', error);
+      this.showErrorMessage(
+        error.message || 'Échec du traitement de la notification'
+      );
+
+      // Réinitialisation du statut
+      if (this.selectedNotification) {
+        this.selectedNotification.status = 'pending';
+      }
+    },
+    complete: () => {
+      this.loading = false;
+    }
+  });
+}
+
+// Méthodes utilitaires
+private showErrorMessage(message: string): void {
+  // Implémentation selon votre framework (Toast, Snackbar, etc.)
+  console.error(message);
+}
+
+
+
+
+private extractContratNumber(message: string): string {
+  if (!message) return '';
+  const match = message.match(/Contrat Vie #(\d+)/);
+  return match && match[1] ? match[1] : '';
+}
+
+// Méthode helper pour notifier les autres agents
+private notifyOtherAgents(contratNum: string, agentEmail: string): void {
+  this.notificationService.notifyAllUsers(
+    `Le contrat vie n°${contratNum} est en cours de livraison par l'agent ${agentEmail}.`,
+    'delivery_in_progress'
+  ).subscribe({
+    next: () => console.log('Notification de livraison envoyée avec succès'),
+    error: (err) => console.error('Erreur lors de l\'envoi de la notification:', err)
+  });
+}
+getContractDetails(): Array<{label: string, value: string}> {
+  if (!this.selectedNotification?.metadata?.contratData) {
+    return [];
+  }
+
+  const contratData = this.selectedNotification.metadata.contratData;
+  const user = contratData.user || {};
+
+  return [
+    {
+      label: 'Numéro de contrat',
+      value: this.selectedNotification.metadata.contratNum || 'N/A'
+    },
+    {
+      label: 'Assuré',
+      value: `${user.prenom || 'N/A'} ${user.nom || 'N/A'}`
+    },
+    {
+      label: 'Type de contrat',
+      value: contratData.typeContrat || 'Contrat Vie'
+    },
+    {
+      label: 'Prime',
+      value: `${this.selectedNotification.metadata.amount || contratData.prime || 'N/A'} DT`
+    },
+    {
+      label: 'Date d\'effet',
+      value: contratData.dateDebut ? new Date(contratData.dateDebut).toLocaleDateString() : 'N/A'
+    }
+  ];
 }
 }

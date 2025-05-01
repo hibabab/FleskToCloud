@@ -2,6 +2,7 @@
   <app-dashboard/>
 
   <div class="flex-1 mt-20 ml-60">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
     <h1 class="text-3xl font-bold text-center text-teal-800 mb-6">Souscrire à un contrat Assurance Auto</h1>
 
     <!-- Message de chargement -->
@@ -158,7 +159,7 @@
       <option value="4">4 places</option>
       <option value="5">5 places (standard)</option>
       <option value="7">7 places (SUV)</option>
-      <option value="9">9 places (Minibus)</option>
+
     </select>
     <mat-icon class="text-gray-500 ml-2">arrow_drop_down</mat-icon>
   </div>
@@ -420,40 +421,8 @@
                 <option value="Pack2">Pack Dommage et Collision</option>
                 <option value="Pack3">Pack Tous Risques</option>
               </select>
-            </div>
-          </div>
+            </div></div></div></div>
 
-          <!-- Nature de paiement -->
-          <div class="flex flex-col">
-            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Nature de paiement</label>
-            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
-              <mat-icon class="text-blue-500 mr-3">payment</mat-icon>
-              <select formControlName="typePaiement" class="w-full bg-transparent focus:outline-none">
-                <option value="" disabled selected>Sélectionnez un mode</option>
-                <option value="Annuel">Annuel</option>
-                <option value="Semestriel">Semestriel</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Nature de contrat - Correction: placé dans le bon sous-groupe -->
-          <div class="flex flex-col">
-            <label class="text-gray-700 mb-2 font-medium"><span class="text-red-500">*</span> Nature de contrat</label>
-            <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 shadow-sm">
-              <mat-icon class="text-blue-500 mr-3">description</mat-icon>
-              <select formControlName="NatureContrat" class="w-full bg-transparent focus:outline-none">
-                <option value="" disabled selected>Sélectionnez une nature</option>
-                <option value="Renouvelable">Renouvelable</option>
-                <option value="Fermé">Fermé</option>
-              </select>
-            </div>
-            <span class="text-red-500 text-sm"
-                  *ngIf="insuranceForm.get('contrat.NatureContrat')?.invalid && insuranceForm.get('contrat.NatureContrat')?.touched">
-              Ce champ est obligatoire
-            </span>
-          </div>
-        </div>
-      </div>
 
       <!-- Bouton de soumission -->
       <div class="flex justify-center mt-8">
@@ -466,5 +435,6 @@
         </button>
       </div>
     </form>
+  </div>
   </div>
 </div>

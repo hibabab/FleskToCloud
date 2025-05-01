@@ -1,0 +1,100 @@
+<div class="flex">
+  <app-dashbort></app-dashbort>
+
+  <div class="flex-1 mt-20 ml-0 mr-70">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-teal-800 mb-2">Liste des Assurés Vie</h1>
+      <p class="text-gray-600">Gestion complète des souscriptions d'assurance vie</p>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="mb-6">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+          </svg>
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="search()"
+          class="block w-full p-3 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-teal-800 focus:border-teal-800"
+          placeholder="Rechercher par CIN">
+      </div>
+    </div>
+
+    <!-- Loading & Error States -->
+    <div *ngIf="loading" class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-800"></div>
+    </div>
+
+    <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!loading && !error" class="bg-white shadow-md rounded-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-teal-800 text-white">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                N° Souscription
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Nom Complet
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                CIN
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Contact
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Profession/Revenu
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                Adresse
+              </th>
+
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let item of assuresVie" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ item.assureVie.numSouscription || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">{{ item.user.nom }} {{ item.user.prenom }}</div>
+
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ item.user.Cin || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ item.user.email || 'N/A' }}</div>
+                <div class="text-sm text-gray-500">{{ item.user.telephone || 'N/A' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ item.assureVie.situationProfessionnelle || 'N/A' }}</div>
+                <div class="text-sm text-gray-500">{{ item.assureVie.revenuMensuel | number:'1.2-2' }} DT</div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                {{ formatAdresse(item.adresse) }}
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="assuresVie.length === 0 && !loading" class="p-8 text-center text-gray-500">
+        Aucun assuré vie trouvé
+      </div>
+    </div>
+  </div>
+</div>

@@ -25,7 +25,7 @@ export interface SubscriptionRequest {
   providedIn: 'root',
 })
 export class NotificationService {
-  private apiUrl = 'http://localhost:3000/notificationgatway'; // API Gateway
+  private apiUrl = 'http://localhost:3000/notificationgatway';
 
   constructor(private http: HttpClient) {}
 
@@ -62,7 +62,12 @@ export class NotificationService {
       formData
     });
   }
-
+  createSubscriptionRequestVie(user: any, formData: any): Observable<Notification> {
+    return this.http.post<Notification>(`${this.apiUrl}/subscription-request-vie`, {
+      user,
+      formData
+    });
+  }
   getPendingSubscriptionRequests(): Observable<Notification[]> {
     return this.http.get<Notification[]>(`${this.apiUrl}/pending-subscription-requests`);
   }
@@ -73,6 +78,17 @@ export class NotificationService {
     decision: 'accept' | 'reject'
   ): Observable<Notification> {
     return this.http.post<Notification>(`${this.apiUrl}/process-subscription-request`, {
+      agent,
+      notificationId,
+      decision
+    });
+  }
+  processVieSubscriptionRequest(
+    agent: any,
+    notificationId: number,
+    decision: 'accept' | 'reject'
+  ): Observable<Notification> {
+    return this.http.post<Notification>(`${this.apiUrl}/process-subscription-request-vie`, {
       agent,
       notificationId,
       decision

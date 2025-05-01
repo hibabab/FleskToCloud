@@ -27,6 +27,10 @@ import { ConstatComponent } from './constat/constat.component';
 import { NotificationComponent } from './notification/notification.component';
 import { MesReCuComponent } from './mes-re-cu/mes-re-cu.component';
 import { DevisAvieComponent } from './devis-avie/devis-avie.component';
+import { PaymentInitiateVieComponent } from './payment-initiate-vie/payment-initiate-vie.component';
+import { PaymentSuccessVieComponent } from './payment-success-vie/payment-success-vie.component';
+import { DemandeSouscriptionVieComponent } from './demande-souscription-vie/demande-souscription-vie.component';
+import { HistoriqueContratVieComponent } from './historique-contrat-vie/historique-contrat-vie.component';
 
 
 
@@ -52,7 +56,11 @@ import { DevisAvieComponent } from './devis-avie/devis-avie.component';
     ConstatComponent,
     NotificationComponent,
     MesReCuComponent,
-    DevisAvieComponent
+    DevisAvieComponent,
+    PaymentInitiateVieComponent,
+    PaymentSuccessVieComponent,
+    DemandeSouscriptionVieComponent,
+    HistoriqueContratVieComponent
 
   ],
   imports: [

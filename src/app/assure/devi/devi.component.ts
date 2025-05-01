@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 export enum TypeGaranties {
@@ -44,7 +44,7 @@ export class DeviComponent {
         Validators.required,
         Validators.pattern(/^(19[7-9][1-9]|19[8-9]\d|20\d{2})$/)
       ]],
-      Imat: ['', [Validators.required, Validators.pattern(/^\d{4}TU\d{2,3}$/)]]
+      Imat: ['', [Validators.required,this.validateImmatriculation]]
     });
     this.formulaireEtape2 = this.fb.group({
       bonusMalus: ['', Validators.required],
@@ -59,6 +59,14 @@ export class DeviComponent {
       CIN:['', Validators.required]
     });
   }
+   validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
+        const pattern = /^\d{1,4}TU\d{1,3}$/i;
+
+        if (control.value && !pattern.test(control.value)) {
+          return { 'invalidImmatriculation': true };
+        }
+        return null;
+    }
   calculateResponsabiliteCivile(type: string, bonusMalus: number, puissance: number): number {
     let cotisation = 0;
     if (type === 'Tourisme') {

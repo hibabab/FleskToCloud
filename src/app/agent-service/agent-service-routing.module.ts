@@ -16,6 +16,9 @@ import { ListeAutoComponent } from './liste-auto/liste-auto.component';
 import { ConstatListComponent } from './constat-list/constat-list.component';
 import { NotificationComponent } from './notification/notification.component';
 import { DevisCVieComponent } from './devis-cvie/devis-cvie.component';
+import { CreationCVieComponent } from './creation-c-vie/creation-c-vie.component';
+import { ListeAssureVieComponent } from './liste-assure-vie/liste-assure-vie.component';
+import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/historique-contrat-vie-a.component';
 
 
 
@@ -24,8 +27,11 @@ import { DevisCVieComponent } from './devis-cvie/devis-cvie.component';
 const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent },
   { path: 'creationCA', component: CreationContratComponent },
   { path: 'devisCVie', component: DevisCVieComponent },
+  { path: 'Cvie', component: CreationCVieComponent },
   { path: '', redirectTo: 'interface', pathMatch: 'full' },
   { path: 'CA', component: ContratAutoComponent },
+  { path: 'historique', component: HistoriqueContratVieAComponent },
+  { path: 'listAvie', component: ListeAssureVieComponent },
   { path: 'compte', component: CreationCompteComponent},
   { path: 'renouvellementCA', component: RenouvellementCAComponent},
   { path: 'semstrielCA', component: ContratAutoSemestrielComponent},

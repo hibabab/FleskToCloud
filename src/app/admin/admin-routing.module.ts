@@ -8,12 +8,14 @@ import { ExpertFormComponent } from './expert-form/expert-form.component';
 import { AgentServiceFormComponent } from './agent-service-form/agent-service-form.component';
 import { ListExpertComponent } from './expert-list/expert-list.component';
 import { ListAgentServiceComponent } from './list-agent-service/list-agent-service.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 
 const routes: Routes = [ { path: '', component: DehasbortComponent } ,
   { path: 'interface', component: InterfaceAdminComponent },
   { path: 'listUser', component: UserListComponent },
   { path: 'Expert', component: ExpertFormComponent },
+  { path: 'mdp', component: ChangePasswordComponent },
   {
     path: 'agent-service',
     component: AgentServiceFormComponent

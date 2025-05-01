@@ -33,15 +33,19 @@ export class NotificationComponent {
       this.markAsRead(notification);
     }
 
-    // Vérifier si c'est une notification de souscription acceptée
-    if (notification.type === 'subscription_accepted') {
+    // Vérifier si c'est une notification de souscription acceptée (standard ou vie)
+    if (notification.type === 'subscription_accepted' || notification.type === 'vie_subscription_accepted') {
       // Rechercher l'ID du contrat dans l'ordre de priorité
       const contractId = notification.contractId ||
                        (notification.metadata && notification.metadata.contratId);
 
       if (contractId) {
-        // Naviguer vers la page de paiement avec l'ID du contrat
-        this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
+        // Naviguer vers la page de paiement appropriée en fonction du type
+        if (notification.type === 'vie_subscription_accepted') {
+          this.router.navigate([`/dashboard-assure/contratvie/${contractId}/payment`]);
+        } else {
+          this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
+        }
       } else if (notification.link) {
         // Si pas d'ID mais un lien est disponible
         this.router.navigateByUrl(notification.link);
@@ -67,7 +71,12 @@ export class NotificationComponent {
     const contractId = notification.contractId || notification.metadata?.contratId;
 
     if (contractId) {
-      this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
+      // Redirection en fonction du type de notification
+      if (notification.type === 'vie_subscription_accepted') {
+        this.router.navigate([`/dashboard-assure/contratvie/${contractId}/payment`]);
+      } else {
+        this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
+      }
     } else if (notification.link) {
       this.router.navigateByUrl(notification.link);
     } else {
@@ -82,7 +91,12 @@ export class NotificationComponent {
                         this.selectedNotification.metadata?.contratId;
 
       if (contractId) {
-        this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
+        // Redirection en fonction du type de notification
+        if (this.selectedNotification.type === 'vie_subscription_accepted') {
+          this.router.navigate([`/dashboard-assure/contratvie/${contractId}/payment`]);
+        } else {
+          this.router.navigate([`/dashboard-assure/contrat/${contractId}/payment`]);
+        }
         this.closeModal();
       } else if (this.selectedNotification.link) {
         this.router.navigateByUrl(this.selectedNotification.link);
@@ -168,7 +182,7 @@ export class NotificationComponent {
   }
 
   isSubscriptionAccepted(notification: Notification): boolean {
-    return notification.type === 'subscription_accepted';
+    return notification.type === 'subscription_accepted' || notification.type === 'vie_subscription_accepted';
   }
 
   private getCookie(name: string): string | null {

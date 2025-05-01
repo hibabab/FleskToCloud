@@ -23,21 +23,7 @@ interface AssureDto {
   bonusMalus: number;
 }
 
-interface CreateVehiculeDto {
-  type: string;
-  marque: string;
-  model: string;
-  Imat: string;
-  energie: string;
-  nbPlace: number;
-  DPMC: string;
-  cylindree: string;
-  chargeUtil?: string;
-  valeurNeuf: number;
-  numChassis: string;
-  poidsVide: number;
-  puissance: number;
-}
+
 interface CreateGarantiesDto {
   type: TypeGaranties;
   capital?: number;
@@ -45,16 +31,11 @@ interface CreateGarantiesDto {
   franchise?: number;
 }
 interface ContratAutoDto {
-  dateSouscription: string;
-  dateExpiration: string;
-  dateEffet: string;
-  NatureContrat: string;
-  typePaiement: string;
-  echeances: string;
+
   cotisationNette: number;
   packChoisi?: string;
   cotisationTotale: number;
-  montantEcheance: number;
+
   garanties?: CreateGarantiesDto[];
 }
 @Component({
@@ -95,8 +76,7 @@ export class ContratAutoComponent  {
       }),
       contrat: this.fb.group({
         packChoisi: ['', Validators.required],
-        typePaiement: ['', Validators.required],
-        NatureContrat: ['', Validators.required]
+
       })
     });
   }
@@ -126,27 +106,49 @@ export class ContratAutoComponent  {
   }
 
   validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
-    const pattern = /^\d{4}TU\d{3}$/;
+    const pattern = /^\d{1,4}TU\d{1,3}$/i;
+
     if (control.value && !pattern.test(control.value)) {
       return { 'invalidImmatriculation': true };
     }
     return null;
+}
+
+verifyCin(): void {
+  // Vérifier si le CIN est vide
+  if (!this.Cin) {
+    this.cinError = 'Le numéro CIN est requis';
+    return;
   }
 
-  verifyCin(): void {
-    if (!this.Cin) {
-      this.cinError = 'Le numéro CIN est requis';
-      return;
-    }
-
-    if (this.Cin.length < 8) {
-      this.cinError = 'Le numéro CIN doit contenir au moins 8 caractères';
-      return;
-    }
-
-    this.currentStep = 2;
-    this.cinError = '';
+  // Vérifier la longueur du CIN
+  if (this.Cin.length < 8) {
+    this.cinError = 'Le numéro CIN doit contenir au moins 8 caractères';
+    return;
   }
+
+  // Vérifier si le CIN existe déjà dans la base de données
+  this.http.get<any[]>(`http://localhost:3000/user-gateway/search/${this.Cin}`)
+    .subscribe(
+      (response) => {
+        if (response && response.length > 0) {
+          // Le CIN existe déjà
+          this.currentStep = 2;
+          this.cinError = '';
+
+        } else {
+          this.cinError = 'utlisateur non trouvé ';
+
+        }
+      },
+      (error) => {
+        console.error('Erreur lors de la vérification du CIN:', error);
+        // En cas d'erreur, on permet à l'utilisateur de continuer
+        // mais on peut aussi afficher un message d'erreur
+        this.cinError = 'Erreur lors de la vérification du CIN';
+      }
+    );
+}
 
   previousStep(): void {
     this.currentStep = 1;
@@ -519,24 +521,7 @@ export class ContratAutoComponent  {
       bonusMalus
     );
 
-    const today = new Date();
-    const dateSouscription = today.toISOString().split('T')[0];
-    const dateEffet = dateSouscription;
-    const dateExpiration = new Date(today.setFullYear(today.getFullYear() + 1)).toISOString().split('T')[0];
 
-    const date = new Date();
-    switch(contratData.typePaiement.toLowerCase()) {
-      case 'semestriel':
-        date.setMonth(date.getMonth() + 6);
-        break;
-      case 'annuel':
-        date.setFullYear(date.getFullYear() + 1);
-        break;
-      default:
-        date.setMonth(date.getMonth() + 1);
-    }
-
-    const echeances = date.toISOString().split('T')[0];
 
     const cotisationNette = this.roundToThreeDecimals(
       garanties.reduce((sum, garantie) => sum + (garantie.cotisationNette || 0), 0)
@@ -546,9 +531,7 @@ export class ContratAutoComponent  {
       cotisationNette + 50.000 + 3.800 + 0.800 + 10.000 + 3.000 + 1.000
     );
 
-    const montantEcheance = contratData.typePaiement === 'Semestriel'
-      ? this.roundToThreeDecimals(cotisationTotale / 2)
-      : cotisationTotale;
+
 
     // Préparation des données pour le backend
     const assure: AssureDto = { bonusMalus };
@@ -556,16 +539,10 @@ export class ContratAutoComponent  {
 
     // Utiliser directement l'objet véhicule avec les conversions
     const dtoC: ContratAutoDto = {
-      dateSouscription,
-      dateExpiration,
-      dateEffet,
-      NatureContrat: contratData.NatureContrat,
-      typePaiement: contratData.typePaiement,
-      echeances,
       cotisationNette,
       packChoisi: contratData.packChoisi,
       cotisationTotale,
-      montantEcheance,
+
       garanties
     };
 
@@ -739,16 +716,26 @@ validateVehicleAge(control: AbstractControl): ValidationErrors | null {
   const dpmc = control.value;
   const pack = this.insuranceForm?.get('contrat.packChoisi')?.value;
 
-  if (!dpmc || !pack) return null;
+  if (!dpmc) return null; // Si pas de date fournie, on ne valide pas
 
   const age = this.calculateVehicleAge(dpmc);
+
+  // Premier check: rejet si age > 40 ans
+  if (age > 40) {
+    return { vehicleTooOld: true };
+  }
+
+  // Ensuite les validations spécifiques aux packs
+  if (!pack) return null;
 
   if (age > 15 && pack === 'Pack dommage et Collision') {
     return { invalidAgeForPack: true };
   }
+
   if (age > 3 && pack === 'Tous les risques') {
     return { invalidAgeForTousRisques: true };
   }
+
   return null;
 }
 private getErrorMessage(error: HttpErrorResponse): string {
@@ -906,6 +893,7 @@ async generatePaymentReceipt(paymentData: any): Promise<void> {
 
 
 async generateContratPDF(contratData: any): Promise<void> {
+
   try {
     const doc = new jsPDF('p', 'mm', 'a4') as any;
     doc.setFont('helvetica');
@@ -938,16 +926,15 @@ async generateContratPDF(contratData: any): Promise<void> {
     autoTable(doc, {
       startY: yOffset,
       body: [
-        ['N° Contrat', 'Code agence', 'N° Sociétaire', 'Date Souscription', 'Date Effet', 'Date Expiration', 'Nature', 'Échéances'],
+        ['N° Contrat', 'Code agence', 'N° Sociétaire', 'Date Souscription', 'Date Effet', 'Date Expiration'],
         [
           contratData.num || 'N/A', // Changé de contratData.contrat.num
           133,
           contratData.assure?.NumSouscription || 'N/A', // Changé de assure.numSouscription
           contratData.dateSouscription || 'N/A', // Changé de contratData.contrat.dateSouscription
           contratData.dateEffet || 'N/A', // Changé de contratData.contrat.dateSouscription
-          contratData.dateExpiration || 'N/A', // Changé de contratData.contrat.dateExpiration
-          contratData.NatureContrat || 'N/A', // Changé de contratData.contrat.NatureContrat
-          contratData.echeances || 'N/A' // Changé de contratData.contrat.echeances
+          contratData.dateExpiration || 'N/A',
+
         ]
       ],
       styles: { fontSize: 8 },
@@ -971,7 +958,6 @@ async generateContratPDF(contratData: any): Promise<void> {
 
     const assure = contratData.assure || {};
     const user = assure.user || {}; // Les données personnelles sont dans assure.user
-
     autoTable(doc, {
       startY: yOffset,
       body: [
@@ -983,14 +969,18 @@ async generateContratPDF(contratData: any): Promise<void> {
           user.telephone || 'N/A', // Changé de assure.telephone
           assure.bonusMalus || 'N/A' // Reste inchangé
         ],
-        ['Adresse', 'Ville', 'Code Postal', 'Pays', ''],
         [
-          user.adresse?.rue || 'N/A', // Adapté selon la structure réelle
-          user.adresse?.ville || 'N/A',
-          user.adresse?.codePostal || 'N/A',
-          user.adresse?.pays || 'N/A',
-          ''
-        ]
+          'Rue', 'Numéro', 'Ville', 'Gouvernat', 'Code Postal', 'Pays', '',],
+          [
+            user.adresse?.rue || 'N/A',
+            user.adresse?.numMaison?.toString() || 'N/A',
+            user.adresse?.ville || 'N/A',
+            user.adresse?.gouvernat || 'N/A',
+            user.adresse?.codePostal?.toString() || 'N/A',
+            user.adresse?.pays || 'N/A',
+            ''
+          ]
+
       ],
       styles: { fontSize: 8 },
       columnStyles: {
@@ -1075,11 +1065,11 @@ async generateContratPDF(contratData: any): Promise<void> {
     autoTable(doc, {
       startY: yOffset,
       body: [
-        ['Cotisation Nette', 'Cotisation Totale', 'Montant Échéance'],
+        ['Cotisation Nette', 'Cotisation Totale'],
         [
           contratData.cotisationNette ? `${contratData.cotisationNette.toFixed(3)} DT` : '0.000 DT', // Changé de contratData.contrat.cotisationNette
           contratData.cotisationTotale ? `${contratData.cotisationTotale.toFixed(3)} DT` : '0.000 DT', // Changé de contratData.contrat.cotisationTotale
-          contratData.montantEcheance ? `${contratData.montantEcheance.toFixed(3)} DT` : '0.000 DT' // Changé de contratData.contrat.montantEcheance
+
         ]
       ],
       styles: {

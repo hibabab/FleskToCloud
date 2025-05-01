@@ -1,0 +1,14 @@
+/* transition smooth pour les menus */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* style pour le menu déroulant */
+.hidden {
+  display: none;
+}
+.relative:hover .hidden {
+  display: block;
+}

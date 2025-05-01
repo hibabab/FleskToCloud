@@ -4,7 +4,8 @@ import { finalize } from 'rxjs/operators';
 import { PaymentService } from '../../services/payment.service';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../agent-service/Services/notification.service';
-import { jwtDecode } from 'jwt-decode';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -85,12 +86,13 @@ export class PaymentSuccessComponent implements OnInit {
         next: async (response) => {
           if (response.success) {
             this.verificationResult = response.data;
-
+                  console.log(response.data);
             // Mettre à jour le statut et notifier après vérification réussie
             if (this.verificationResult?.contratNum) {
               // Charger d'abord les données du contrat
               await this.loadContratData(this.verificationResult.contratNum);
               await this.updateContratStatusAndNotify(this.verificationResult.contratNum);
+              await this.generatePaymentReceipt(response.data);
             }
 
             this.startRedirectCountdown();
@@ -161,7 +163,7 @@ const adresseComplete = this.formatAdresse(adresse);
 📅 Date: ${new Date().toLocaleDateString()}`;
 const notificationResult = await this.notificationService.notifyAllUsers(
   message,
-  'pending' 
+  'pending'
 ).toPromise();
 
         if (notificationResult) {
@@ -204,6 +206,120 @@ const notificationResult = await this.notificationService.notifyAllUsers(
       adresse.Gouvernorat,
       adresse.pays
     ].filter(Boolean).join(', ');
+  }
+  async generatePaymentReceipt(paymentData: any): Promise<void> {
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4') as any;
+      doc.setFont('helvetica');
+
+      // Variables de position
+      let yOffset = 20;
+      const margin = 15;
+      const lineHeight = 7;
+      const sectionSpacing = 5;
+
+      // 1. En-tête avec logo
+      try {
+        const logoBase64 = await this.loadImageAsBase64('assets/images/logoFC.png');
+        doc.addImage(logoBase64, 'PNG', margin, yOffset, 30, 30);
+      } catch (error) {
+        console.warn('Logo non chargé');
+      }
+
+      // Titre principal
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text('REÇU DE PAIEMENT', 105, yOffset + 15, { align: 'center' });
+      yOffset += 30;
+
+      // 2. Informations du paiement
+      doc.setFontSize(10);
+      doc.text('INFORMATIONS DE PAIEMENT', margin, yOffset);
+      yOffset += lineHeight;
+
+      autoTable(doc, {
+        startY: yOffset,
+        body: [
+          ['Statut', 'Date Paiement', 'Montant'],
+          [
+
+            paymentData.status || 'N/A',
+            paymentData.paymentDate ? new Date(paymentData.paymentDate).toLocaleDateString() : 'N/A',
+            paymentData.amount ? `${paymentData.amount.toFixed(3)} DT` : '0.000 DT'
+          ]
+        ],
+        styles: {
+          fontSize: 8,
+        },
+        columnStyles: {
+          0: { fontStyle: 'bold' },
+          1: { fontStyle: 'bold' },
+          2: { fontStyle: 'bold' },
+          3: { fontStyle: 'bold' }
+        }
+      });
+      yOffset = (doc as any).lastAutoTable.finalY + sectionSpacing;
+
+      // 3. Informations du contrat associé
+      doc.setFontSize(10);
+      doc.text('INFORMATIONS DU CONTRAT', margin, yOffset);
+      yOffset += lineHeight;
+
+      autoTable(doc, {
+        startY: yOffset,
+        body: [
+          ['N° Contrat', 'Date', 'Type de paiement'],
+          [
+            paymentData.contratNum || 'N/A',
+            new Date().toLocaleDateString(),
+            'Paiement en ligne'
+          ]
+        ],
+        styles: {
+          fontSize: 8,
+        },
+        columnStyles: {
+          0: { fontStyle: 'bold' },
+          1: { fontStyle: 'bold' },
+          2: { fontStyle: 'bold' }
+        }
+      });
+      yOffset = (doc as any).lastAutoTable.finalY + sectionSpacing;
+
+      // Pied de page
+      doc.setFontSize(6);
+      doc.setTextColor(100);
+      doc.text('Flesk Cover - Tél: 24051646 - Email: contact@fleskcover.com', 105, 285, { align: 'center' });
+
+      // Génération du fichier
+      const fileName = `Reçu_Paiement_${paymentData.paymentId || new Date().getTime()}.pdf`;
+      doc.save(fileName);
+
+    } catch (error) {
+      console.error('Erreur génération reçu PDF:', error);
+      throw error;
+    }
+  }
+  loadImageAsBase64(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'blob';
+      xhr.onload = function() {
+        if (this.status === 200) {
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            resolve(reader.result as string);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(xhr.response);
+        } else {
+          reject(new Error('Failed to load image'));
+        }
+      };
+      xhr.onerror = reject;
+      xhr.send();
+    });
   }
 
 

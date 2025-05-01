@@ -1,0 +1,76 @@
+<div class="flex">
+  <app-dashboard/>
+
+  <div class="flex-1 mt-20 ml-60">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-12">
+
+    <p class="text-gray-600 font-medium mt-4">Vérification du paiement vie en cours...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="text-center p-6">
+    <div class="mx-auto flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+      <mat-icon class="text-red-500 text-4xl">error</mat-icon>
+    </div>
+    <p class="text-red-500 mb-6">{{error}}</p>
+    <button
+      mat-raised-button
+      color="primary"
+      [routerLink]="['/dashboard-assure']"
+      class="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors"
+    >
+      Retour au tableau de bord
+    </button>
+  </div>
+
+  <!-- Success State -->
+  <div *ngIf="verificationResult && !loading" class="text-center">
+    <div class="mx-auto flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+      <mat-icon class="text-green-500 text-5xl">check_circle</mat-icon>
+    </div>
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Paiement vie réussi!</h2>
+
+    <!-- Message spécifique assurance vie -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+      <p class="text-green-700 font-medium">
+        "Votre contrat d'assurance vie a été activé avec succès. Vous recevrez le contrat signé à votre adresse."
+      </p>
+      <p *ngIf="contratData?.emprunt" class="text-green-700 mt-2">
+        Votre emprunt associé a également été validé.
+      </p>
+    </div>
+
+    <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+      <div class="detail-row flex justify-between py-2 border-b border-gray-100 last:border-0">
+        <span class="text-gray-600 font-medium">Contrat vie:</span>
+        <span class="text-gray-800 font-semibold">N°{{verificationResult.contratNum}}</span>
+      </div>
+      <div class="detail-row flex justify-between py-2 border-b border-gray-100 last:border-0">
+        <span class="text-gray-600 font-medium">Montant:</span>
+        <span class="text-gray-800 font-semibold">{{verificationResult.amount}} DT</span>
+      </div>
+      <div class="detail-row flex justify-between py-2 border-b border-gray-100 last:border-0">
+        <span class="text-gray-600 font-medium">Date:</span>
+        <span class="text-gray-800 font-semibold">{{verificationResult.paymentDate | date:'medium'}}</span>
+      </div>
+      <div *ngIf="contratData?.emprunt" class="detail-row flex justify-between py-2 border-b border-gray-100 last:border-0">
+        <span class="text-gray-600 font-medium">Montant emprunt:</span>
+        <span class="text-gray-800 font-semibold">{{contratData?.emprunt?.montantPret}} DT</span>
+      </div>
+      <div class="detail-row flex justify-between py-2">
+        <span class="text-gray-600 font-medium">Statut:</span>
+        <span class="text-green-600 font-semibold">Actif</span>
+      </div>
+    </div>
+    <div class="back-link mt-8 border-t border-gray-200 pt-4">
+      <a [routerLink]="['/dashboard-assure', 'interface']" class="text-teal-800 hover:text-teal-900 flex items-center">
+        <mat-icon>arrow_back</mat-icon>
+        <span class="ml-1">Retour </span>
+      </a>
+    </div>
+    <div class="mt-4">
+    </div>
+  </div>
+</div>

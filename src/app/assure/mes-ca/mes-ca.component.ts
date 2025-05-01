@@ -187,7 +187,7 @@ async generateContratPDF(contratData: any): Promise<void> {
      autoTable(doc, {
        startY: yOffset,
        body: [
-         ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration', 'Nature', 'Échéances'],
+         ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration'],
          [
            contratData.contrat.num || 'N/A',
            133,
@@ -195,8 +195,7 @@ async generateContratPDF(contratData: any): Promise<void> {
            contratData.contrat.dateSouscription || 'N/A',
            contratData.contrat.dateSouscription || 'N/A',
            contratData.contrat.dateExpiration || 'N/A',
-           contratData.contrat.NatureContrat || 'N/A',
-           contratData.contrat.echeances || 'N/A'
+
          ]
        ],
        styles: {
@@ -235,14 +234,15 @@ async generateContratPDF(contratData: any): Promise<void> {
           user.telephone || 'N/A',
           assure.bonusMalus || 'N/A'
          ],
-         ['Adresse', 'Ville', 'Code Postal', 'Pays', ''],
-         [
-           adresse.rue || 'N/A',
-           adresse.ville || 'N/A',
-           adresse.codePostal || 'N/A',
-           adresse.pays || 'N/A',
-           ''
-         ]
+         ['Rue', 'Numéro de maison','Ville', 'Gouvernat','Code Postal', ''],
+          [
+            adresse.rue || 'N/A',
+            adresse.numMaison || 'N/A',
+            adresse.ville || 'N/A',
+            adresse.Gouvernat || 'N/A',
+            adresse.codePostal || 'N/A',
+            ''
+          ]
        ],
        styles: {
          fontSize: 8,
@@ -333,11 +333,10 @@ async generateContratPDF(contratData: any): Promise<void> {
      autoTable(doc, {
        startY: yOffset,
        body: [
-         ['Cotisation Nette', 'Cotisation Totale', 'Montant Échéance'],
+         ['Cotisation Nette', 'Cotisation Totale'],
          [
            contratData.contrat.cotisationNette ? `${contratData.contrat.cotisationNette.toFixed(3)} DT` : '0.000 DT',
            contratData.contrat.cotisationTotale ? `${contratData.contrat.cotisationTotale.toFixed(3)} DT` : '0.000 DT',
-           contratData.contrat.montantEcheance ? `${contratData.contrat.montantEcheance.toFixed(3)} DT` : '0.000 DT'
          ]
        ],
        styles: {

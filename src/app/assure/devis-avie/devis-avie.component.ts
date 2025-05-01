@@ -13,7 +13,7 @@ export class DevisAvieComponent {
   devisForm: FormGroup;
   showPdfPreview = false;
   pdfContent = '';
-
+  isDisabled = true;
   constructor(private fb: FormBuilder) {
     this.devisForm = this.fb.group({
       // Informations personnelles
@@ -33,7 +33,8 @@ export class DevisAvieComponent {
       dureeRemboursement: ['', [Validators.required, Validators.min(1), Validators.max(30)]],
 
       // Garanties
-      garantieDeces: [false],
+      garantieDeces: [{ value: true, disabled: this.isDisabled }],
+
       garantieInvalidite: [false]
     });
   }

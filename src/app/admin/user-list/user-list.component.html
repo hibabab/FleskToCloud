@@ -1,80 +1,111 @@
 <div class="flex">
   <app-dehasbort/>
 
-  <div class="flex-1 mt-20 ml-60">
-  <!-- Titre de la page -->
-  <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des utilisateurs</h1>
+  <div class="flex-1 mt-20 ml-6">
+    <!-- Titre de la page -->
+    <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des utilisateurs</h1>
 
-  <!-- Tableau des utilisateurs actifs -->
-  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-    <h2 class="text-xl font-semibold text-teal-800 p-4 bg-teal-50">Utilisateurs Actifs</h2>
-    <table class="min-w-full">
-      <thead class="bg-teal-700">
-        <tr>
-          <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Statut</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of activeUsers" class="hover:bg-gray-50 transition duration-200">
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.nom }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.prenom }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.Cin }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.email }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">
-            <span class="text-green-600 font-medium">Actif</span>
-          </td>
-          <td class="py-3 px-4 border-b border-gray-100">
-            <button
-              (click)="toggleBlockUser(user)"
-              class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
-            >
-              Bloquer
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Barre de recherche -->
+    <div class="mb-6">
+      <div class="relative">
+        <input type="text"
+               [(ngModel)]="searchTerm"
+               (keyup.enter)="searchUser()"
+               placeholder="Rechercher par CIN ou email..."
+               class="w-full px-4 py-2 border border-teal-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+        <button (click)="searchUser()"
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-teal-600 text-white px-4 py-1 rounded hover:bg-teal-700">
+          Rechercher
+        </button>
+      </div>
+    </div>
 
-  <!-- Tableau des utilisateurs bloqués -->
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <h2 class="text-xl font-semibold text-teal-800 p-4 bg-teal-50">Utilisateurs Bloqués</h2>
-    <table class="min-w-full">
-      <thead class="bg-teal-700">
-        <tr>
-          <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Statut</th>
-          <th class="py-3 px-4 text-left text-white font-semibold">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of blockedUsers" class="hover:bg-gray-50 transition duration-200">
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.nom }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.prenom }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.Cin }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">{{ user.email }}</td>
-          <td class="py-3 px-4 border-b border-gray-100">
-            <span class="text-red-600 font-medium">Bloqué</span>
-          </td>
-          <td class="py-3 px-4 border-b border-gray-100">
-            <button
-              (click)="toggleBlockUser(user)"
-              class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200"
-            >
-              Débloquer
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Message lorsqu'aucun utilisateur n'est trouvé -->
+    <div *ngIf="searchMode && filteredUsers.length === 0" class="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+      Aucun utilisateur trouvé avec le CIN ou l'email "{{ searchTerm }}"
+    </div>
+
+    <!-- Bouton pour réinitialiser la recherche -->
+    <div *ngIf="searchMode" class="mb-6">
+      <button (click)="resetSearch()"
+              class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200">
+        Afficher tous les utilisateurs
+      </button>
+    </div>
+
+    <!-- Tableau des utilisateurs actifs -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8" *ngIf="!searchMode || filteredUsers.length > 0">
+      <h2 class="text-xl font-semibold text-teal-800 p-4 bg-teal-50">Utilisateurs {{ searchMode ? 'Trouvés' : 'Actifs' }}</h2>
+      <table class="min-w-full">
+        <thead class="bg-teal-700">
+          <tr>
+            <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Statut</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of (searchMode ? filteredUsers : activeUsers)" class="hover:bg-gray-50 transition duration-200">
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.nom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.prenom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.Cin }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.email }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">
+              <span [ngClass]="{'text-green-600': !user.isBlocked, 'text-red-600': user.isBlocked}" class="font-medium">
+                {{ user.isBlocked ? 'Bloqué' : 'Actif' }}
+              </span>
+            </td>
+            <td class="py-3 px-4 border-b border-gray-100">
+              <button
+                (click)="toggleBlockUser(user)"
+                [ngClass]="{'bg-red-500 hover:bg-red-600': !user.isBlocked, 'bg-green-500 hover:bg-green-600': user.isBlocked}"
+                class="text-white px-4 py-2 rounded transition duration-200"
+              >
+                {{ user.isBlocked ? 'Débloquer' : 'Bloquer' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tableau des utilisateurs bloqués (uniquement en mode non-recherche) -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden" *ngIf="!searchMode && blockedUsers.length > 0">
+      <h2 class="text-xl font-semibold text-teal-800 p-4 bg-teal-50">Utilisateurs Bloqués</h2>
+      <table class="min-w-full">
+        <thead class="bg-teal-700">
+          <tr>
+            <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Statut</th>
+            <th class="py-3 px-4 text-left text-white font-semibold">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of blockedUsers" class="hover:bg-gray-50 transition duration-200">
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.nom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.prenom }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.Cin }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">{{ user.email }}</td>
+            <td class="py-3 px-4 border-b border-gray-100">
+              <span class="text-red-600 font-medium">Bloqué</span>
+            </td>
+            <td class="py-3 px-4 border-b border-gray-100">
+              <button
+                (click)="toggleBlockUser(user)"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200"
+              >
+                Débloquer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 </div>

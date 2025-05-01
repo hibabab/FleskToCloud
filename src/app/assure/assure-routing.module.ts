@@ -18,17 +18,25 @@ import { PaymentInitiateComponent } from './payment/payment-initiate/payment-ini
 import { NotificationComponent } from './notification/notification.component';
 import { MesReCuComponent } from './mes-re-cu/mes-re-cu.component';
 import { DevisAvieComponent } from './devis-avie/devis-avie.component';
+import { PaymentSuccessVieComponent } from './payment-success-vie/payment-success-vie.component';
+import { PaymentInitiateVieComponent } from './payment-initiate-vie/payment-initiate-vie.component';
+import { DemandeSouscriptionVieComponent } from './demande-souscription-vie/demande-souscription-vie.component';
+import { HistoriqueContratVieComponent } from './historique-contrat-vie/historique-contrat-vie.component';
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
   { path: 'change-password', component: ChangePasswordComponent },
   { path: 'aceuil', component: AceuilComponent },
+  { path: 'historiqueCV', component:HistoriqueContratVieComponent },
   { path: 'contrat/:id/payment', component: PaymentInitiateComponent },
+  { path: 'contratvie/:id/payment', component: PaymentInitiateVieComponent },
   { path: 'payment/success', component: PaymentSuccessComponent },
+  { path: 'payment/success/vie', component: PaymentSuccessVieComponent },
   { path: 'payment/failure', component: PaymentFailureComponent },
   { path: 'contrat/:id/payment-status', component: PaymentStatusComponent },
   { path: 'MesCA', component:MesCAComponent },
   { path: 'souscription-auto', component:CreationContratComponent },
+  { path: 'souscription-vie', component:DemandeSouscriptionVieComponent },
   { path: 'mesRecu', component:MesReCuComponent },
   { path: 'interface', component:InterfaceComponent },
   { path: 'devisVie', component:DevisAvieComponent },

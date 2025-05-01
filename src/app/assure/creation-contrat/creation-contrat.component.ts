@@ -37,7 +37,7 @@ export class CreationContratComponent implements OnInit {
         type: ['', Validators.required],
         marque: ['', Validators.required],
         model: ['', Validators.required],
-        Imat: ['', [Validators.required, Validators.pattern(/^\d{4}TU\d{2,3}$/)]],
+        Imat: ['', [Validators.required,  this.validateImmatriculation]],
         energie: ['', Validators.required],
         nbPlace: [null, [Validators.required, Validators.min(2), Validators.max(9)]],
         DPMC: ['', [Validators.required, this.validateDate.bind(this)]],
@@ -68,12 +68,18 @@ export class CreationContratComponent implements OnInit {
       }),
       contrat: this.fb.group({
         packChoisi: ['', Validators.required],
-        typePaiement: ['', Validators.required],
-        NatureContrat: ['', Validators.required]
+
       })
     });
   }
+  validateImmatriculation(control: AbstractControl ): {[key: string]: any} | null {
+    const pattern = /^\d{1,4}TU\d{1,3}$/i;
 
+    if (control.value && !pattern.test(control.value)) {
+      return { 'invalidImmatriculation': true };
+    }
+    return null;
+}
   ngOnInit(): void {
     this.loadUserDataFromToken();
   }

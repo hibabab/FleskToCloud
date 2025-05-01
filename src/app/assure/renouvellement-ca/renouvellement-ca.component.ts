@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
@@ -33,12 +33,17 @@ export class RenouvellementCAComponent implements OnInit {
   successMessage: string = '';
   user: UserDto | null = null;
   userCin: string = '';
+  error: string | null = null;
+  contractData: any = null;
+  contratNum: number | null = null;
+  showRenewalForm = false;
+  isExpired = false;
+  expirationMessage = '';
 
   // Variables pour la partie paiement
   paymentData: any = null;
   paymentLoading: boolean = false;
   paymentError: string = '';
-  contratNum: number | null = null;
   showDebugInfo: boolean = false;
 
   // URLs pour le retour après paiement
@@ -52,10 +57,7 @@ export class RenouvellementCAComponent implements OnInit {
     private paymentService: PaymentService
   ) {
     this.renewalForm = this.fb.group({
-      Imat: ['', [
-        Validators.required,
-        Validators.pattern(/^\d{4}TU\d{3}$/)
-      ]],
+      Imat: ['', [Validators.required,this.validateImmatriculation]],
       packOption: ['same', Validators.required],
       packValue: ['same']  // Default value aligned with backend
     }); this.renewalForm.get('packOption')?.valueChanges.subscribe(option => {
@@ -72,7 +74,65 @@ export class RenouvellementCAComponent implements OnInit {
       packValueControl?.updateValueAndValidity();
     });
   }
+  searchContract() {this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.contractData = null;
+    this.isExpired = false;
+    this.expirationMessage = '';
+    const Cin = this.renewalForm.get('Cin')?.value;
+    const Imat = this.renewalForm.get('Imat')?.value;
+    // Appel à l'API pour récupérer les détails du contrat
+    this.http.get<any>(
+      `http://localhost:3000/contrat-auto-geteway/search?Cin=${Cin}&Imat=${Imat}`
+    ).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response && response.status === 200 && response.data && response.data.length > 0) {
+          this.contractData = response.data[0];
+          this.contratNum = this.contractData.id;
+          this.checkExpirationDate();
 
+
+        } else {
+          this.errorMessage = 'Aucun contrat trouvé pour les informations fournies';
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isLoading = false;
+        console.error('Erreur:', err);
+        let errorMessage = 'Erreur lors de la recherche du contrat';
+        if (err.error?.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        this.errorMessage = errorMessage;
+      }
+    });}
+    checkExpirationDate() {
+      if (!this.contractData || !this.contractData.dateExpiration) {
+        this.errorMessage = 'Impossible de vérifier la date d\'expiration: informations manquantes';
+        return;
+      }
+
+      const today = new Date();
+      const expirationDate = new Date(this.contractData.dateExpiration);
+
+      // Vérifier si le contrat est déjà expiré
+      const isExpired = today > expirationDate;
+
+      if (isExpired) {
+        this.isExpired = true;
+        this.expirationMessage = 'Votre contrat est expiré. Veuillez le renouveler.';
+        this.showRenewalForm = true;
+      } else {
+        this.isExpired = false;
+        const remainingDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+        this.expirationMessage = `Votre contrat est valide jusqu'au ${expirationDate.toLocaleDateString()}. Il reste ${remainingDays} jours avant l'échéance.`;
+        this.showRenewalForm = false;
+      }
+    }
   ngOnInit(): void {
     this.loadUserDataFromToken();
   }
@@ -83,7 +143,14 @@ export class RenouvellementCAComponent implements OnInit {
     if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
     return null;
   }
+ validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
+        const pattern = /^\d{1,4}TU\d{1,3}$/i;
 
+        if (control.value && !pattern.test(control.value)) {
+          return { 'invalidImmatriculation': true };
+        }
+        return null;
+    }
   loadUserDataFromToken(): void {
     const token = this.getCookie('access_token');
 
@@ -128,8 +195,13 @@ export class RenouvellementCAComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.renewalForm.invalid) {
-      this.errorMessage = 'Veuillez remplir tous les champs requis';
+    if (!this.renewalForm.valid || !this.isExpired) {
+      if (!this.isExpired) {
+        this.errorMessage = 'Le renouvellement n\'est possible que pour les contrats expirés.';
+      } else {
+        this.markFormGroupTouched(this.renewalForm);
+        window.alert('Veuillez remplir tous les champs requis');
+      }
       return;
     }
 
@@ -176,7 +248,26 @@ export class RenouvellementCAComponent implements OnInit {
           this.successMessage = 'Contrat renouvelé avec succès!';
           await this.generateContratPDF(response.data);
           this.contratNum = response.data.contrat.id;
-         this.continuePayment()
+
+          this.paymentService.cancel(contratNum)
+            .pipe(finalize(() => {
+              console.log('Finalisation de la demande d\'annulation');
+            }))
+            .subscribe({
+              next: (response) => {
+                console.log('Paiement précédent annulé avec succès:', response);
+                setTimeout(() => {
+                  this.continuePayment();
+                }, 1000);
+              },
+              error: (err) => {
+                console.error('Erreur lors de la suppression du paiement:', err);
+                if (err.status === 404) {
+                  console.log('Aucun paiement à annuler, tentative de création directe');
+                  this.continuePayment();
+                }
+              }
+            });
         } else {
           this.errorMessage = response.message || 'Erreur lors du renouvellement';
         }
@@ -193,7 +284,6 @@ export class RenouvellementCAComponent implements OnInit {
       }
     });
   }
-
 
   continuePayment(): void {
    if (this.contratNum) {
@@ -367,7 +457,7 @@ export class RenouvellementCAComponent implements OnInit {
       autoTable(doc, {
         startY: yOffset,
         body: [
-          ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration', 'Nature', 'Échéances'],
+          ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration'],
           [
             contratData.contrat.id || 'N/A',
             133,
@@ -375,8 +465,7 @@ export class RenouvellementCAComponent implements OnInit {
             contratData.contrat.dateSouscription || 'N/A',
             contratData.contrat.dateSouscription || 'N/A',
             contratData.contrat.dateExpiration || 'N/A',
-            contratData.contrat.NatureContrat || 'N/A',
-            contratData.contrat.echeances || 'N/A'
+
           ]
         ],
         styles: {
@@ -414,12 +503,13 @@ export class RenouvellementCAComponent implements OnInit {
             assure.telephone || 'N/A',
             assure.bonusMalus || 'N/A'
           ],
-          ['Adresse', 'Ville', 'Code Postal', 'Pays', ''],
+          ['Rue', 'Numéro de maison','Ville', 'Gouvernat','Code Postal', ''],
           [
             adresse.rue || 'N/A',
+            adresse.numMaison || 'N/A',
             adresse.ville || 'N/A',
+            adresse.Gouvernat || 'N/A',
             adresse.codePostal || 'N/A',
-            adresse.pays || 'N/A',
             ''
           ]
         ],
@@ -512,11 +602,11 @@ export class RenouvellementCAComponent implements OnInit {
       autoTable(doc, {
         startY: yOffset,
         body: [
-          ['Cotisation Nette', 'Cotisation Totale', 'Montant Échéance'],
+          ['Cotisation Nette', 'Cotisation Totale'],
           [
             contratData.contrat.cotisationNette ? `${contratData.contrat.cotisationNette.toFixed(3)} DT` : '0.000 DT',
             contratData.contrat.cotisationTotale ? `${contratData.contrat.cotisationTotale.toFixed(3)} DT` : '0.000 DT',
-            contratData.contrat.montantEcheance ? `${contratData.contrat.montantEcheance.toFixed(3)} DT` : '0.000 DT'
+
           ]
         ],
         styles: {

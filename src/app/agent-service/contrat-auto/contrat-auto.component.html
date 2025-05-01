@@ -1,60 +1,63 @@
-<div class="flex">
+<div class="flex bg-white min-h-screen">
   <app-dashbort></app-dashbort>
 
-  <div class="flex-1 mt-20 ml-60">
+  <div class="flex-1 mt-20 ml-0 mr-70">
     <!-- Contenu principal centré -->
     <main class="flex-1 ml-60"> <!-- ml-60 pour compenser la largeur de la sidebar -->
       <div class="max-w-6xl mx-auto p-8"><!-- Conteneur principal centré -->
-        <div class="bg-gray-100 rounded-2xl shadow-lg overflow-hidden p-10">
-          <div class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold text-teal-700">Souscription à un contrat automobile</h1>
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden p-10 border border-gray-100">
+          <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-teal-800 tracking-tight">Souscription à un contrat automobile</h1>
+            <div class="h-1 w-24 bg-teal-600 mx-auto mt-4 rounded-full"></div>
           </div>
           <!-- Messages d'état -->
-<div *ngIf="errorMessage" class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
-  <div class="flex items-center">
-    <mat-icon class="mr-2">error</mat-icon>
-    <span>{{ errorMessage }}</span>
-  </div>
-</div>
+          <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg shadow-sm">
+            <div class="flex items-center">
+              <mat-icon class="mr-3 text-red-600">error</mat-icon>
+              <span class="font-medium">{{ errorMessage }}</span>
+            </div>
+          </div>
 
-<div *ngIf="successMessage" class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
-  <div class="flex items-center">
-    <mat-icon class="mr-2">check_circle</mat-icon>
-    <span>{{ successMessage }}</span>
-  </div>
-</div>
-          <div *ngIf="validationErrors.length > 0" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+          <div *ngIf="successMessage" class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-lg shadow-sm">
+            <div class="flex items-center">
+              <mat-icon class="mr-3 text-green-600">check_circle</mat-icon>
+              <span class="font-medium">{{ successMessage }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="validationErrors.length > 0" class="mb-6 p-5 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm">
             <div class="flex">
               <div class="flex-shrink-0">
-                <mat-icon class="text-red-500">error</mat-icon>
+                <mat-icon class="text-red-600">error</mat-icon>
               </div>
-              <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">Des erreurs ont été détectées</h3>
+              <div class="ml-4">
+                <h3 class="text-md font-semibold text-red-800">Des erreurs ont été détectées</h3>
                 <div class="mt-2 text-sm text-red-700">
-                  <ul class="list-disc pl-5 space-y-1">
+                  <ul class="list-disc pl-5 space-y-2">
                     <li *ngFor="let error of validationErrors">{{ error }}</li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
+
           <!-- Étape 1: Vérification CIN -->
           <div *ngIf="currentStep === 1" class="space-y-6">
-            <h2 class="text-2xl font-semibold text-gray-800 border-b pb-2">Identification de l'assuré</h2>
-            <div class="flex flex-col">
+            <h2 class="text-2xl font-semibold text-teal-800 border-b border-gray-200 pb-3">Identification de l'assuré</h2>
+            <div class="flex flex-col max-w-md mx-auto mt-8">
               <label class="text-gray-700 font-medium mb-2">Numéro CIN <span class="text-red-500">*</span></label>
-              <div class="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-50 focus-within:ring-2 focus-within:ring-teal-500">
+              <div class="flex items-center border border-gray-300 p-4 rounded-lg bg-gray-50 focus-within:ring-2 focus-within:ring-teal-500 shadow-sm transition-all duration-300">
                 <mat-icon class="text-teal-700 mr-3">badge</mat-icon>
                 <input type="number" [(ngModel)]="Cin" class="w-full bg-transparent focus:outline-none text-lg" placeholder="Entrez votre numéro CIN" required>
               </div>
-              <span class="text-red-500 text-sm mt-1" *ngIf="cinError">{{ cinError }}</span>
+              <span class="text-red-500 text-sm mt-2" *ngIf="cinError">{{ cinError }}</span>
             </div>
-            <div class="text-center mt-6">
-              <p class="text-gray-600">Vous n'avez pas encore de compte ?</p>
-              <a [routerLink]="['/agent/compte']" class="text-teal-700 hover:text-teal-500 font-medium underline">Créer un compte maintenant</a>
+            <div class="text-center mt-8">
+              <p class="text-gray-600 mb-2">Vous n'avez pas encore de compte ?</p>
+              <a [routerLink]="['/agent/compte']" class="text-teal-700 hover:text-teal-600 font-semibold underline">Créer un compte maintenant</a>
             </div>
-            <div class="flex justify-center mt-6">
-              <button (click)="verifyCin()" class="bg-teal-700 text-white px-6 py-3 rounded-lg shadow-md hover:bg-teal-600 transition flex items-center text-lg font-semibold">
+            <div class="flex justify-center mt-8">
+              <button (click)="verifyCin()" class="bg-teal-700 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-teal-600 hover:shadow-xl transition-all duration-300 flex items-center text-lg font-semibold">
                 Suivant <mat-icon class="ml-2">arrow_forward</mat-icon>
               </button>
             </div>
@@ -65,35 +68,39 @@
             <form [formGroup]="insuranceForm" (ngSubmit)="onSubmit()" class="space-y-6">
               <!-- Bonus Malus -->
               <div class="flex flex-col">
-                <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Classe Bonus Malus</label>
-                <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                  <mat-icon class="text-teal-800 mr-2">grade</mat-icon>
-                  <select formControlName="bonusMalus" class="w-full bg-transparent focus:outline-none">
+                <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Classe Bonus Malus</label>
+                <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                  <mat-icon class="text-teal-800 mr-3">grade</mat-icon>
+                  <select formControlName="bonusMalus" class="w-full bg-transparent focus:outline-none text-gray-800">
                     <option value="" disabled selected>Sélectionnez une classe</option>
                     <option *ngFor="let classe of [1,2,3,4,5,6,7,8,9,10,11]" [value]="classe">{{ classe }}</option>
                   </select>
                 </div>
-                <span class="text-red-500 text-sm"
+                <span class="text-red-500 text-sm mt-1"
                       *ngIf="insuranceForm.get('bonusMalus')?.invalid && insuranceForm.get('bonusMalus')?.touched">
                   Ce champ est obligatoire
                 </span>
               </div>
 
               <!-- Partie Véhicule -->
-              <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Votre Véhicule</h2>
-              <div formGroupName="vehicule" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="mt-10 mb-6">
+                <h2 class="text-2xl font-semibold text-teal-800 border-b border-gray-200 pb-3 mb-6">Votre Véhicule</h2>
+                <div class="h-1 w-16 bg-teal-600 -mt-6 mb-6 rounded-full"></div>
+              </div>
+
+              <div formGroupName="vehicule" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Type de véhicule -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Type</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">category</mat-icon>
-                    <select formControlName="type" class="w-full bg-transparent focus:outline-none" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Type</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">category</mat-icon>
+                    <select formControlName="type" class="w-full bg-transparent focus:outline-none text-gray-800" required>
                       <option value="" disabled selected>Sélectionnez un type</option>
                       <option value="Tourisme">Tourisme</option>
                       <option value="Utilitaire">Utilitaire</option>
                     </select>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.type')?.invalid && insuranceForm.get('vehicule.type')?.touched">
                     Ce champ est obligatoire
                   </span>
@@ -101,12 +108,12 @@
 
                 <!-- Marque -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Marque</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">directions_car</mat-icon>
-                    <input type="text" formControlName="marque" class="w-full bg-transparent focus:outline-none" placeholder="Ex: Renault" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Marque</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">directions_car</mat-icon>
+                    <input type="text" formControlName="marque" class="w-full bg-transparent focus:outline-none text-gray-800" placeholder="Ex: Renault" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.marque')?.invalid && insuranceForm.get('vehicule.marque')?.touched">
                     Ce champ est obligatoire
                   </span>
@@ -114,12 +121,12 @@
 
                 <!-- Modèle -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Modèle</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">build</mat-icon>
-                    <input type="text" formControlName="model" class="w-full bg-transparent focus:outline-none" placeholder="Ex: Clio" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Modèle</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">build</mat-icon>
+                    <input type="text" formControlName="model" class="w-full bg-transparent focus:outline-none text-gray-800" placeholder="Ex: Clio" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.model')?.invalid && insuranceForm.get('vehicule.model')?.touched">
                     Ce champ est obligatoire
                   </span>
@@ -127,14 +134,14 @@
 
                 <!-- Immatriculation -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1">
+                  <label class="text-gray-700 font-medium mb-2">
                     <span class="text-red-500">*</span> Immatriculation
                   </label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">confirmation_number</mat-icon>
-                    <input type="text" formControlName="Imat" class="w-full bg-transparent focus:outline-none" placeholder="Ex: 1234TU567" required>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">confirmation_number</mat-icon>
+                    <input type="text" formControlName="Imat" class="w-full bg-transparent focus:outline-none text-gray-800" placeholder="Ex: 1234TU567" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.Imat')?.invalid && insuranceForm.get('vehicule.Imat')?.touched">
                     Le format doit être 4 chiffres + "TU" + 3 chiffres (ex: 1234TU567).
                   </span>
@@ -142,10 +149,10 @@
 
                 <!-- Énergie -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Énergie</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">local_gas_station</mat-icon>
-                    <select formControlName="energie" class="w-full bg-transparent focus:outline-none" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Énergie</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">local_gas_station</mat-icon>
+                    <select formControlName="energie" class="w-full bg-transparent focus:outline-none text-gray-800" required>
                       <option value="" disabled selected>Sélectionnez le type d'énergie</option>
                       <option value="Essence">Essence</option>
                       <option value="Diesel">Diesel</option>
@@ -153,7 +160,7 @@
                       <option value="Electrique">Électrique</option>
                     </select>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.energie')?.invalid && insuranceForm.get('vehicule.energie')?.touched">
                     Ce champ est obligatoire
                   </span>
@@ -161,10 +168,10 @@
 
                 <!-- Nombre de places -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Nombre de places</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">event_seat</mat-icon>
-                    <select formControlName="nbPlace" class="w-full bg-transparent focus:outline-none" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Nombre de places</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">event_seat</mat-icon>
+                    <select formControlName="nbPlace" class="w-full bg-transparent focus:outline-none text-gray-800" required>
                       <option value="" disabled selected>Sélectionnez le nombre de places</option>
                       <option value="2">2 places</option>
                       <option value="3">3 places</option>
@@ -173,7 +180,7 @@
                       <option value="7">7 places</option>
                     </select>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.nbPlace')?.invalid && insuranceForm.get('vehicule.nbPlace')?.touched">
                     Ce champ est obligatoire
                   </span>
@@ -181,25 +188,36 @@
 
                 <!-- Date de mise en circulation -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Date de mise en circulation</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">calendar_today</mat-icon>
-                    <input type="date" formControlName="DPMC" class="w-full bg-transparent focus:outline-none" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Date de mise en circulation</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">calendar_today</mat-icon>
+                    <input type="date" formControlName="DPMC" class="w-full bg-transparent focus:outline-none text-gray-800" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.DPMC')?.invalid && insuranceForm.get('vehicule.DPMC')?.touched">
                     Ce champ est obligatoire
                   </span>
+                  <div *ngIf="insuranceForm.get('DPMC')?.hasError('vehicleTooOld')" class="error-message">
+                    Nous n'acceptons pas les véhicules de plus de 40 ans.
+                  </div>
+
+                  <div *ngIf="insuranceForm.get('DPMC')?.hasError('invalidAgeForPack')" class="error-message">
+                    Le Pack dommage et Collision n'est pas disponible pour les véhicules de plus de 15 ans.
+                  </div>
+
+                  <div *ngIf="insuranceForm.get('DPMC')?.hasError('invalidAgeForTousRisques')" class="error-message">
+                    Le pack Tous risques n'est pas disponible pour les véhicules de plus de 3 ans.
+                  </div>
                 </div>
 
                 <!-- Cylindrée -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Cylindrée (cm³)</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">speed</mat-icon>
-                    <input type="number" formControlName="cylindree" min="800" max="3500" class="w-full bg-transparent focus:outline-none" placeholder="Entre 800 et 3500 cm³" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Cylindrée (cm³)</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">speed</mat-icon>
+                    <input type="number" formControlName="cylindree" min="800" max="3500" class="w-full bg-transparent focus:outline-none text-gray-800" placeholder="Entre 800 et 3500 cm³" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.cylindree')?.invalid && insuranceForm.get('vehicule.cylindree')?.touched">
                     La cylindrée doit être entre 800 et 3500 cm³
                   </span>
@@ -207,12 +225,12 @@
 
                 <!-- Charge utile -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"> Charge utile (kg)</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">weight</mat-icon>
-                    <input type="number" formControlName="chargeUtil" min="350" max="26000" class="w-full bg-transparent focus:outline-none" placeholder="Entre 350 et 26000 kg">
+                  <label class="text-gray-700 font-medium mb-2"> Charge utile (kg)</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">weight</mat-icon>
+                    <input type="number" formControlName="chargeUtil" min="350" max="26000" class="w-full bg-transparent focus:outline-none text-gray-800" placeholder="Entre 350 et 26000 kg">
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.chargeUtil')?.invalid && insuranceForm.get('vehicule.chargeUtil')?.touched">
                     La charge utile doit être entre 350 et 26000 kg
                   </span>
@@ -220,12 +238,12 @@
 
                 <!-- Valeur à neuf -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Valeur à neuf (DT)</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">money</mat-icon>
-                    <input type="number" formControlName="valeurNeuf" min="8000" max="999999" class="w-full bg-transparent focus:outline-none" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Valeur à neuf (DT)</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">money</mat-icon>
+                    <input type="number" formControlName="valeurNeuf" min="8000" max="999999" class="w-full bg-transparent focus:outline-none text-gray-800" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.valeurNeuf')?.invalid && insuranceForm.get('vehicule.valeurNeuf')?.touched">
                     La valeur doit être entre 8000 et 999999 DT
                   </span>
@@ -233,12 +251,12 @@
 
                 <!-- Numéro de châssis -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Numéro de châssis</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">confirmation_number</mat-icon>
-                    <input type="text" formControlName="numChassis" maxlength="17" class="w-full bg-transparent focus:outline-none uppercase" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Numéro de châssis</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">confirmation_number</mat-icon>
+                    <input type="text" formControlName="numChassis" maxlength="17" class="w-full bg-transparent focus:outline-none uppercase text-gray-800" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.numChassis')?.invalid && insuranceForm.get('vehicule.numChassis')?.touched">
                     Le numéro de châssis doit contenir 17 caractères
                   </span>
@@ -246,12 +264,12 @@
 
                 <!-- Poids à vide -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Poids à vide (kg)</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">fitness_center</mat-icon>
-                    <input type="number" formControlName="poidsVide" min="900" max="3000" class="w-full bg-transparent focus:outline-none" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Poids à vide (kg)</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">fitness_center</mat-icon>
+                    <input type="number" formControlName="poidsVide" min="900" max="3000" class="w-full bg-transparent focus:outline-none text-gray-800" required>
                   </div>
-                  <span class="text-red-500 text-sm"
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('vehicule.poidsVide')?.invalid && insuranceForm.get('vehicule.poidsVide')?.touched">
                     Le poids doit être entre 900 et 3000 kg
                   </span>
@@ -259,63 +277,75 @@
 
                 <!-- Puissance -->
                 <div class="flex flex-col">
-                  <label class="text-gray-700 mb-1"><span class="text-red-500">*</span> Puissance (CV)</label>
-                  <div class="flex items-center border p-3 rounded-lg shadow-sm bg-gray-50">
-                    <mat-icon class="text-teal-800 mr-2">fitness_center</mat-icon>
-                    <select formControlName="puissance" class="w-full bg-transparent focus:outline-none" required>
+                  <label class="text-gray-700 font-medium mb-2"><span class="text-red-500">*</span> Puissance (CV)</label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">fitness_center</mat-icon>
+                    <select formControlName="puissance" class="w-full bg-transparent focus:outline-none text-gray-800" required>
                       <option value="" disabled selected>Sélectionnez la puissance</option>
                       <option *ngFor="let cv of [4,5,6,7,8,9,10,11,12]" [value]="cv">{{cv}} CV</option>
                     </select>
                   </div>
-                  <div *ngIf="insuranceForm.get('vehicule.puissance')?.hasError('min') || insuranceForm.get('vehicule.puissance')?.hasError('max')">
+                  <div *ngIf="insuranceForm.get('vehicule.puissance')?.hasError('min') || insuranceForm.get('vehicule.puissance')?.hasError('max')" class="text-red-500 text-sm mt-1">
                     La puissance doit être entre 4 et 12 pour un véhicule de tourisme, ou entre 5 et 12 pour un utilitaire
                   </div>
-
                 </div>
               </div>
 
               <!-- Partie Contrat -->
-              <h2 class="text-2xl font-semibold text-gray-700 mt-8 mb-4 border-b pb-2">Renseignement</h2>
-              <div formGroupName="contrat" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="mt-10 mb-6">
+                <h2 class="text-2xl font-semibold text-teal-800 border-b border-gray-200 pb-3 mb-6">Renseignement</h2>
+                <div class="h-1 w-16 bg-teal-600 -mt-6 mb-6 rounded-full"></div>
+              </div>
+
+              <div formGroupName="contrat" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Champ Pack choisi -->
                 <div class="space-y-2">
-                  <label class="block text-lg font-semibold text-gray-700">Pack choisi <span class="text-red-500">*</span></label>
-                  <select formControlName="packChoisi" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-teal-800" required>
-                    <option value="" disabled selected>Sélectionnez un pack</option>
-                    <option value="Pack1">Pack Essentille</option>
-                    <option value="Pack2">Pack Dommage et Collision</option>
-                    <option value="Pack3">Pack tous risques</option>
-                  </select>
-                  <span class="text-red-500 text-sm"
+                  <label class="block text-lg font-medium text-gray-700">Pack choisi <span class="text-red-500">*</span></label>
+                  <div class="flex items-center border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50 focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all duration-200">
+                    <mat-icon class="text-teal-800 mr-3">inventory_2</mat-icon>
+                    <select formControlName="packChoisi" class="w-full bg-transparent focus:outline-none text-gray-800" required>
+                      <option value="" disabled selected>Sélectionnez un pack</option>
+                      <option value="Pack1">Pack Essentille</option>
+                      <option value="Pack2">Pack Dommage et Collision</option>
+                      <option value="Pack3">Pack tous risques</option>
+                    </select>
+                  </div>
+                  <span class="text-red-500 text-sm mt-1"
                         *ngIf="insuranceForm.get('contrat.packChoisi')?.invalid && insuranceForm.get('contrat.packChoisi')?.touched">
                     Ce champ est obligatoire
                   </span>
                 </div>
+              </div>
 
-                <!-- Nature paiement -->
-                <div class="space-y-2">
-                  <label class="block text-lg font-semibold text-gray-700">Nature de paiement <span class="text-red-500">*</span></label>
-                  <select formControlName="typePaiement" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-teal-800" required>
-                    <option value="" disabled selected>Sélectionnez un mode de paiement</option>
-                    <option value="Annuel">Annuel</option>
-                    <option value="Semestriel">Semestriel</option>
-                  </select>
-                  <span class="text-red-500 text-sm"
-                        *ngIf="insuranceForm.get('contrat.typePaiement')?.invalid && insuranceForm.get('contrat.typePaiement')?.touched">
-                    Ce champ est obligatoire
-                  </span>
+              <!-- Messages d'avertissement avec style amélioré -->
+              <div *ngIf="insuranceForm.get('vehicule.type')?.value === 'Tourisme' &&
+                        (insuranceForm.get('vehicule.puissance')?.value < 4 || insuranceForm.get('vehicule.puissance')?.value > 7)"
+                  class="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-lg shadow-sm mt-8">
+                <div class="flex items-center">
+                  <mat-icon class="text-amber-500 mr-3">warning</mat-icon>
+                  <span class="text-amber-800 font-medium">Pour un véhicule de tourisme, la puissance doit être entre 4 et 7 CV</span>
                 </div>
-                <!-- Nature de contrat -->
-                <div class="space-y-2">
-                  <label class="block text-lg font-semibold text-gray-700">Nature de contrat <span class="text-red-500">*</span></label>
-                  <select formControlName="NatureContrat" class="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-teal-800" required>
-                    <option value="" disabled selected>Sélectionnez une nature de contrat</option>
-                    <option value="Renouvelable">Renouvelable</option>
-                    <option value="Fermé">Fermé</option>
-                  </select>
-                  <span class="text-red-500 text-sm"
-                        *ngIf="insuranceForm.get('contrat.NatureContrat')?.invalid && insuranceForm.get('contrat.NatureContrat')?.touched">
-                    Ce champ est obligatoire
+              </div>
+
+              <div *ngIf="insuranceForm.get('vehicule.type')?.value === 'Utilitaire' &&
+                        (insuranceForm.get('vehicule.puissance')?.value < 5 || insuranceForm.get('vehicule.puissance')?.value > 12)"
+                  class="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-lg shadow-sm mt-8">
+                <div class="flex items-center">
+                  <mat-icon class="text-amber-500 mr-3">warning</mat-icon>
+                  <span class="text-amber-800 font-medium">Pour un véhicule utilitaire, la puissance doit être entre 5 et 12 CV</span>
+                </div>
+              </div>
+
+              <div *ngIf="(calculateVehicleAge(insuranceForm.get('vehicule.DPMC')?.value) > 15 &&
+                         insuranceForm.get('contrat.packChoisi')?.value === 'Pack dommage et Collision') ||
+                         (calculateVehicleAge(insuranceForm.get('vehicule.DPMC')?.value) > 3 &&
+                         insuranceForm.get('contrat.packChoisi')?.value === 'Tous les risques')"
+                  class="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-lg shadow-sm mt-8">
+                <div class="flex items-center">
+                  <mat-icon class="text-amber-500 mr-3">warning</mat-icon>
+                  <span class="text-amber-800 font-medium">
+                    Un véhicule de {{ calculateVehicleAge(insuranceForm.get('vehicule.DPMC')?.value) }} ans
+                    ne peut pas choisir le pack {{ insuranceForm.get('contrat.packChoisi')?.value }}
                   </span>
                 </div>
               </div>
@@ -324,7 +354,7 @@
                 <button
                   type="button"
                   (click)="previousStep()"
-                  class="bg-gray-300 text-gray-800 px-6 py-3 rounded-lg shadow-md hover:bg-gray-400 transition duration-300 flex items-center"
+                  class="bg-gray-200 text-gray-800 px-8 py-3 rounded-lg shadow-md hover:bg-gray-300 transition-all duration-300 flex items-center font-medium"
                 >
                   <mat-icon class="mr-2">arrow_back</mat-icon>
                   Retour
@@ -333,44 +363,14 @@
                 <button
                   type="submit"
                   [disabled]="insuranceForm.invalid"
-                  class="bg-teal-800 text-white px-6 py-3 rounded-lg shadow-md hover:bg-teal-700 transition duration-300 flex items-center"
+                  [ngClass]="{'opacity-60 cursor-not-allowed': insuranceForm.invalid, 'hover:bg-teal-700 hover:shadow-xl': !insuranceForm.invalid}"
+                  class="bg-teal-800 text-white px-8 py-3 rounded-lg shadow-lg transition-all duration-300 flex items-center font-medium"
                 >
                   SOUSCRIRE
                   <mat-icon class="ml-2">check_circle</mat-icon>
                 </button>
               </div>
             </form>
-            <div *ngIf="insuranceForm.get('vehicule.type')?.value === 'Tourisme' &&
-            (insuranceForm.get('vehicule.puissance')?.value < 4 || insuranceForm.get('vehicule.puissance')?.value > 7)"
-      class="p-3 bg-amber-50 border-l-4 border-amber-400 rounded-lg">
-   <div class="flex">
-     <mat-icon class="text-amber-500 mr-2">warning</mat-icon>
-     <span class="text-amber-800">Pour un véhicule de tourisme, la puissance doit être entre 4 et 7 CV</span>
-   </div>
- </div>
-
- <div *ngIf="insuranceForm.get('vehicule.type')?.value === 'Utilitaire' &&
-            (insuranceForm.get('vehicule.puissance')?.value < 5 || insuranceForm.get('vehicule.puissance')?.value > 12)"
-      class="p-3 bg-amber-50 border-l-4 border-amber-400 rounded-lg">
-   <div class="flex">
-     <mat-icon class="text-amber-500 mr-2">warning</mat-icon>
-     <span class="text-amber-800">Pour un véhicule utilitaire, la puissance doit être entre 5 et 12 CV</span>
-   </div>
- </div>
-
- <div *ngIf="(calculateVehicleAge(insuranceForm.get('vehicule.DPMC')?.value) > 15 &&
-             insuranceForm.get('contrat.packChoisi')?.value === 'Pack dommage et Collision') ||
-             (calculateVehicleAge(insuranceForm.get('vehicule.DPMC')?.value) > 3 &&
-             insuranceForm.get('contrat.packChoisi')?.value === 'Tous les risques')"
-      class="p-3 bg-amber-50 border-l-4 border-amber-400 rounded-lg">
-   <div class="flex">
-     <mat-icon class="text-amber-500 mr-2">warning</mat-icon>
-     <span class="text-amber-800">
-       Un véhicule de {{ calculateVehicleAge(insuranceForm.get('vehicule.DPMC')?.value) }} ans
-       ne peut pas choisir le pack {{ insuranceForm.get('contrat.packChoisi')?.value }}
-     </span>
-   </div>
- </div>
           </div>
         </div>
       </div>

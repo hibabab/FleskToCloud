@@ -2,63 +2,77 @@
   <!-- Composant de barre latérale -->
   <app-dashbort></app-dashbort>
 
-  <!-- Contenu principal -->
-  <div class="flex-1 mt-16 ml-56">
-    <section class="min-h-screen p-4 space-y-6">
-      <div class="flex-1 p-6 sm:ml-4 flex flex-col items-center">
-        <!-- Titre -->
-        <div class="w-full max-w-6xl">
-          <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des experts</h1>
-    
-          <!-- Tableau -->
-          <div class="bg-white rounded-xl shadow-lg overflow-x-auto w-full">
-            <table class="min-w-full text-base">
-              <!-- En-tête -->
-              <thead class="bg-teal-700 text-white text-lg">
-                <tr>
-                  <th class="py-4 px-5 text-left font-semibold">Nom</th>
-                  <th class="py-4 px-5 text-left font-semibold">Prénom</th>
-                  <th class="py-4 px-5 text-left font-semibold">Adresse</th>
-                  <th class="py-4 px-5 text-left font-semibold">Email</th>
-                  <th class="py-4 px-5 text-left font-semibold">Téléphone</th>
-                  <th class="py-4 px-5 text-left font-semibold">Disponibilité</th>
-                  <th class="py-4 px-5 text-left font-semibold">Spécialité</th>
-                  <th class="py-4 px-5 text-left font-semibold">Expérience</th>
-                </tr>
-              </thead>
-    
-              <!-- Corps -->
-              <tbody>
-                <tr *ngFor="let expert of experts" class="hover:bg-gray-100 transition duration-200">
-                  <td class="py-4 px-5 border-b border-gray-200">{{ expert.user.nom }}</td>
-                  <td class="py-4 px-5 border-b border-gray-200">{{ expert.user.prenom }}</td>
-                  <td class="py-4 px-5 border-b border-gray-200">
-                    {{ expert.user.adresse.rue }}, 
-                    {{ expert.user.adresse.ville }},
-                    {{ expert.user.adresse.codePostal }},
-                    {{ expert.user.adresse.pays }}
-                  </td>
-                  <td class="py-4 px-5 border-b border-gray-200">{{ expert.user.email }}</td>
-                  <td class="py-4 px-5 border-b border-gray-200">{{ expert.user.telephone }}</td>
-                  <td class="py-4 px-5 border-b border-gray-200">
-                    <span [ngClass]="{
-                      'text-green-600': expert.disponibilite, 
-                      'text-red-600': !expert.disponibilite
-                    }" class="font-semibold">
-                      {{ expert.disponibilite ? 'Disponible' : 'Non disponible' }}
-                    </span>
-                  </td>
-                  <td class="py-4 px-5 border-b border-gray-200 text-blue-800 font-medium">
-                    {{ expert.specialite }}
-                  </td>
-                  <td class="py-4 px-5 border-b border-gray-200">{{ expert.nbAnneeExperience }} ans</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+  <div class="flex-1 mt-20 ml-60">
+    <div class="flex-1 p-6 sm:ml-64 mt-16">
+      <!-- Titre de la page -->
+      <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des experts</h1>
+
+      <!-- Barre de recherche par spécialité -->
+      <div class="mb-6 flex items-center">
+        <label for="specialite" class="mr-2 text-teal-800 font-medium">Filtrer par spécialité :</label>
+        <select id="specialite"
+                [(ngModel)]="selectedSpecialite"
+                (change)="filterExpertsBySpecialite()"
+                class="px-4 py-2 border border-teal-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+          <option value="">Toutes les spécialités</option>
+          <option value="vehicule_lourd_et_leger">Véhicule lourd et léger</option>
+          <option value="mecanique_generale">Mécanique générale</option>
+          <option value="incendie">Incendie</option>
+          <option value="batiment">Bâtiment</option>
+          <option value="genie_civil">Génie civil</option>
+          <option value="informatique_et_machine_electronique">Informatique et machine électronique</option>
+          <option value="commissaire_davarie">Commissaire d'avarie</option>
+          <option value="medical">Médical</option>
+          <option value="evaluation_degats_corpels">Évaluation de dégâts corporels d'accident de circulation</option>
+          <option value="perte_exploitation_incendie">Perte d'exploitation après incendie</option>
+          <option value="electricite">Électricité</option>
+          <option value="alimentation_et_industrie_alimentaire">Alimentation et industrie alimentaire</option>
+          <option value="finances">Finances</option>
+          <option value="electrique_navires">Électrique de navires</option>
+          <option value="corps_navire_maritime">Corps de navire maritime</option>
+          <option value="autre">Autre</option>
+        </select>
       </div>
-    </section>
-    
+
+      <!-- Message lorsqu'aucun expert n'est trouvé -->
+      <div *ngIf="filteredExperts.length === 0 && selectedSpecialite" class="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+        Aucun expert trouvé avec la spécialité "{{ getSpecialiteLabel(selectedSpecialite) }}" actuellement.
+      </div>
+
+      <!-- Tableau des experts -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full" *ngIf="filteredExperts.length > 0">
+          <thead class="bg-teal-700">
+            <tr>
+              <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Téléphone</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Disponibilité</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Spécialité</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Années d'expérience</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let expert of filteredExperts" class="hover:bg-gray-50 transition duration-200">
+              <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.nom }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.prenom }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.Cin }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.email }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ expert.user.telephone }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">
+                <span [ngClass]="{'text-green-600': expert.disponibilite, 'text-red-600': !expert.disponibilite}" class="font-medium">
+                  {{ expert.disponibilite ? 'Disponible' : 'Non disponible' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ expert.specialite }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ expert.nbAnneeExperience }} ans</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
+

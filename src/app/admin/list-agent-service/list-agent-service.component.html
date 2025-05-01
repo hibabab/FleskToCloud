@@ -1,34 +1,57 @@
 <div class="flex">
   <app-dehasbort/>
 
-  <div class="flex-1 mt-20 ml-60">
-    <!-- Titre de la page -->
-    <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des agents de service</h1>
+  <div class="flex-1 mt-20 ml-6">
+    <div class="p-6">
+      <!-- Titre de la page -->
+      <h1 class="text-3xl font-bold text-teal-800 mb-6">Liste des agents de service</h1>
 
-    <!-- Tableau des agents de service -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <table class="min-w-full">
-        <thead class="bg-teal-700">
-          <tr>
-            <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
-            <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
-            <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
-            <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
-            <th class="py-3 px-4 text-left text-white font-semibold">Téléphone</th>
-            <th class="py-3 px-4 text-left text-white font-semibold">Spécialité</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let agent of agentServices" class="hover:bg-gray-50 transition duration-200">
-            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.nom }}</td>
-            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.prenom }}</td>
-            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.Cin }}</td>
-            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.email }}</td>
-            <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.telephone }}</td>
-            <td class="py-3 px-4 border-b border-gray-100">{{ agent.specialite }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Barre de recherche par spécialité -->
+      <div class="mb-6 flex items-center">
+        <label for="specialite" class="mr-2 text-teal-800 font-medium">Filtrer par spécialité :</label>
+        <select id="specialite"
+                [(ngModel)]="selectedSpecialite"
+                (change)="filterAgentsBySpecialite()"
+                class="px-4 py-2 border border-teal-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+          <option value="">Toutes les spécialités</option>
+          <option value="service_client">Service Client / Accueil</option>
+          <option value="gestion_contrats">Service Gestion des Contrats</option>
+          <option value="service_sinistres">Service Sinistres</option>
+          <option value="comptabilite_facturation">Service Comptabilité / Facturation</option>
+          <option value="contentieux_recouvrement">Service Contentieux / Recouvrement</option>
+        </select>
+      </div>
+
+      <!-- Message lorsqu'aucun agent n'est trouvé -->
+      <div *ngIf="filteredAgents.length === 0 && selectedSpecialite" class="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+        Aucun agent trouvé avec la spécialité "{{ getSpecialiteLabel(selectedSpecialite) }}" actuellement.
+      </div>
+
+      <!-- Tableau des agents de service -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full" *ngIf="filteredAgents.length > 0">
+          <thead class="bg-teal-700">
+            <tr>
+              <th class="py-3 px-4 text-left text-white font-semibold">Nom</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Prénom</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">CIN</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Email</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Téléphone</th>
+              <th class="py-3 px-4 text-left text-white font-semibold">Spécialité</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let agent of filteredAgents" class="hover:bg-gray-50 transition duration-200">
+              <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.nom }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.prenom }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.Cin }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.email }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ agent.user.telephone }}</td>
+              <td class="py-3 px-4 border-b border-gray-100">{{ getSpecialiteLabel(agent.specialite) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

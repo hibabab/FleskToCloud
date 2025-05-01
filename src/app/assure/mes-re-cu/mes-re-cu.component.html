@@ -1,142 +1,253 @@
-<div class="flex">
+<div class="flex min-h-screen bg-gray-50">
   <app-dashboard/>
 
   <div class="flex-1 mt-20 ml-60">
-  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <main class="px-4 py-6 sm:px-0">
-      <div class="max-w-md mx-auto">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Consultation des reçus de paiement</h2>
-
-        <div *ngIf="successMessage" class="mb-4 p-4 bg-green-100 text-green-700 rounded">
-          {{ successMessage }}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900">Reçus de Paiement</h1>
+          <p class="mt-2 text-sm text-gray-600">Consultez et téléchargez vos reçus de paiement</p>
         </div>
 
-        <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          {{ errorMessage }}
+        <!-- Messages d'état -->
+        <div *ngIf="successMessage" class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-green-700">{{ successMessage }}</p>
+            </div>
+          </div>
         </div>
 
-        <div class="bg-white py-8 px-6 shadow rounded-lg">
-          <form class="space-y-6" (ngSubmit)="onSubmit()">
-            <div>
-              <label for="num" class="block text-sm font-medium text-gray-700">
-                Numéro de contrat
-              </label>
-              <div class="mt-1 flex">
-                <input
-                  id="num"
-                  name="num"
-                  type="number"
-                  required
-                  [(ngModel)]="num"
-                  (blur)="verifyContrat()"
-                  class="flex-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-800 focus:border-teal-800 sm:text-sm"
-                  [disabled]="isLoading"
-                />
-                <button
-                  type="button"
-                  (click)="toggleContratsList()"
-                  class="ml-2 inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-800"
-                >
-                  Voir mes contrats
-                </button>
-              </div>
+        <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
             </div>
-
-            <div *ngIf="showContratsList" class="border rounded-md p-4 max-h-60 overflow-y-auto">
-              <h3 class="text-sm font-medium text-gray-700 mb-2">Mes contrats</h3>
-              <ul class="divide-y divide-gray-200">
-                <li *ngFor="let contrat of contrats" class="py-2">
-                  <button
-                    type="button"
-                    (click)="selectContrat(contrat)"
-                    class="text-left w-full hover:bg-gray-50 p-2 rounded"
-                  >
-                    <div class="font-medium">Contrat n° {{contrat.contrat.num}}</div>
-                    <div class="text-sm text-gray-500">
-                      Véhicule: {{contrat.vehicule.marque}} {{contrat.vehicule.model}} ({{contrat.vehicule.Imat}})
-                    </div>
-                    <div class="text-sm text-gray-500">
-                      Période: {{contrat.contrat.dateSouscription | date}} - {{contrat.contrat.dateExpiration | date}}
-                    </div>
-                  </button>
-                </li>
-              </ul>
+            <div class="ml-3">
+              <p class="text-sm text-red-700">{{ errorMessage }}</p>
             </div>
+          </div>
+        </div>
 
-            <div *ngIf="selectedContrat" class="p-4 bg-gray-50 rounded-md">
-              <h3 class="font-medium">Détails du contrat sélectionné</h3>
-              <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
-                <div>Véhicule:</div>
-                <div>{{selectedContrat.vehicule.marque}} {{selectedContrat.vehicule.model}}</div>
-
-                <div>Immatriculation:</div>
-                <div>{{selectedContrat.vehicule.Imat}}</div>
-
-                <div>Période:</div>
-                <div>{{selectedContrat.contrat.dateSouscription | date}} - {{selectedContrat.contrat.dateExpiration | date}}</div>
-              </div>
-            </div>
-
-            <div>
+        <!-- Card Container -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <!-- Type de contrat selector -->
+          <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-medium text-gray-900">Type de contrat</h3>
+            <div class="mt-4 flex space-x-4">
               <button
-                type="submit"
-                [disabled]="isLoading || !num"
-                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-800 hover:bg-teal-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-800 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span *ngIf="!isLoading">Voir les paiements</span>
-                <span *ngIf="isLoading">
-                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                [class]="typeContrat === 'auto' ? 'px-6 py-3 bg-teal-800 text-white rounded-lg font-medium shadow-sm' : 'px-6 py-3 bg-white text-gray-700 rounded-lg font-medium border border-gray-300 shadow-sm hover:bg-gray-50'"
+                (click)="changeTypeContrat('auto')">
+                <div class="flex items-center">
+                  <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  Chargement...
-                </span>
+                  Contrat Auto
+                </div>
+              </button>
+              <button
+                [class]="typeContrat === 'vie' ? 'px-6 py-3 bg-teal-800 text-white rounded-lg font-medium shadow-sm' : 'px-6 py-3 bg-white text-gray-700 rounded-lg font-medium border border-gray-300 shadow-sm hover:bg-gray-50'"
+                (click)="changeTypeContrat('vie')">
+                <div class="flex items-center">
+                  <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Contrat Vie
+                </div>
               </button>
             </div>
-          </form>
+          </div>
 
-         <!-- Modifier la section des paiements pour gérer un seul paiement -->
-<div *ngIf="payments.length > 0" class="mt-8">
-  <h3 class="text-lg font-medium text-gray-900 mb-4">Dernier paiement</h3>
-  <div class="border rounded-md p-4">
-    <div class="flex justify-between items-start">
-      <div>
-        <h4 class="font-medium">Paiement #{{payments[0].paymentId}}</h4>
-        <p *ngIf="payments[0].paymentDate" class="text-sm text-gray-500">
-          Date: {{payments[0].paymentDate | date:'medium'}}
-        </p>
-      </div>
-      <span [class]="getStatusClass(payments[0].status)" class="px-2 py-1 text-xs font-medium rounded-full">
-        {{payments[0].status}}
-      </span>
-    </div>
-    <div class="mt-2 grid grid-cols-2 gap-2 text-sm">
-      <div>Montant:</div>
-      <div class="font-medium">{{payments[0].amount | currency:'MAD':'symbol':'1.2-2'}}</div>
+          <!-- Formulaire de recherche -->
+          <div class="px-6 py-6">
+            <form class="space-y-6" (ngSubmit)="onSubmit()">
+              <div>
+                <label for="num" class="block text-sm font-medium text-gray-700 mb-1">
+                  Numéro de contrat {{ typeContrat === 'auto' ? 'auto' : 'vie' }}
+                </label>
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input
+                    id="num"
+                    name="num"
+                    type="number"
+                    required
+                    [(ngModel)]="num"
+                    (blur)="verifyContrat()"
+                    class="flex-1 min-w-0 block w-full px-4 py-3 rounded-md border-gray-300 focus:ring-teal-800 focus:border-teal-800 sm:text-sm"
+                    [disabled]="isLoading"
+                    placeholder="Saisissez le numéro de contrat"
+                  />
+                  <button
+                    type="button"
+                    (click)="toggleContratsList()"
+                    class="ml-3 inline-flex items-center px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-800"
+                  >
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                    Mes contrats
+                  </button>
+                </div>
+              </div>
 
-      <div>Référence:</div>
-      <div>{{payments[0].trackingId}}</div>
+              <!-- Liste des contrats Auto -->
+              <div *ngIf="showContratsList && typeContrat === 'auto'" class="border border-gray-200 rounded-lg p-4 max-h-60 overflow-y-auto bg-gray-50">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">Mes contrats auto</h3>
+                <ul class="divide-y divide-gray-200">
+                  <li *ngFor="let contrat of contrats" class="py-3">
+                    <button
+                      type="button"
+                      (click)="selectContrat(contrat)"
+                      class="text-left w-full hover:bg-gray-100 p-3 rounded-lg transition duration-150"
+                    >
+                      <div class="flex justify-between">
+                        <span class="font-medium text-teal-800">Contrat n° {{contrat.contrat.num}}</span>
+                        <span class="text-xs bg-teal-100 text-teal-800 px-2 py-1 rounded-full">Auto</span>
+                      </div>
+                      <div class="mt-1 text-sm text-gray-600">
+                        <p>Véhicule: {{contrat.vehicule.marque}} {{contrat.vehicule.model}} ({{contrat.vehicule.Imat}})</p>
+                        <p class="mt-1">Période: {{contrat.contrat.dateSouscription | date:'dd/MM/yyyy'}} - {{contrat.contrat.dateExpiration | date:'dd/MM/yyyy'}}</p>
+                      </div>
+                    </button>
+                  </li>
+                </ul>
+              </div>
 
-      <div>Contrat:</div>
-      <div>N° {{payments[0].contrat.num}}</div>
-    </div>
-    <button
-      (click)="downloadReceipt(payments[0])"
-      class="mt-3 inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-800"
-    >
-      <svg class="-ml-0.5 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-      </svg>
-      Télécharger le reçu
-    </button>
-  </div>
-</div>
+              <!-- Liste des contrats Vie -->
+              <div *ngIf="showContratsVieList && typeContrat === 'vie'" class="border border-gray-200 rounded-lg p-4 max-h-60 overflow-y-auto bg-gray-50">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">Mes contrats vie</h3>
+                <ul class="divide-y divide-gray-200">
+                  <li *ngFor="let contrat of contratsVie" class="py-3">
+                    <button
+                      type="button"
+                      (click)="selectContrat(contrat)"
+                      class="text-left w-full hover:bg-gray-100 p-3 rounded-lg transition duration-150"
+                    >
+                      <div class="flex justify-between">
+                        <span class="font-medium text-teal-800">Contrat n° {{contrat.contratVie.numero}}</span>
+                        <span class="text-xs bg-teal-100 text-teal-800 px-2 py-1 rounded-full">Vie</span>
+                      </div>
+                      <div class="mt-1 text-sm text-gray-600">
+                        <p>Assuré: {{contrat.user?.prenom}} {{contrat.user?.nom}}</p>
+                        <p class="mt-1">Période: {{contrat.contratVie.dateSouscription | date:'dd/MM/yyyy'}} - {{contrat.contratVie.dateExpiration | date:'dd/MM/yyyy'}}</p>
+                      </div>
+                    </button>
+                  </li>
+                </ul>
+              </div>
 
-          <div *ngIf="payments.length === 0 && hasSearched" class="mt-8 p-4 bg-gray-50 rounded-md text-center">
-            <p class="text-gray-500">Aucun paiement trouvé pour ce contrat</p>
+              <div class="pt-2">
+                <button
+                  type="submit"
+                  [disabled]="isLoading || !num"
+                  class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-800 hover:bg-teal-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-800 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150"
+                >
+                  <span *ngIf="!isLoading" class="flex items-center">
+                    <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                    Rechercher
+                  </span>
+                  <span *ngIf="isLoading" class="flex items-center">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Recherche en cours...
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Résultats de recherche -->
+        <div *ngIf="hasSearched && payments.length > 0" class="mt-8 bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-medium text-gray-900 flex items-center">
+              <svg class="mr-2 h-6 w-6 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Historique des paiements
+            </h3>
+          </div>
+          <ul class="divide-y divide-gray-200">
+            <li *ngFor="let payment of payments" class="px-6 py-4 hover:bg-gray-50 transition duration-150">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <div class="h-10 w-10 rounded-full bg-teal-100 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <p class="text-sm font-medium text-teal-800 truncate">
+                        Paiement #{{ payment.paymentId }}
+                      </p>
+                      <p class="text-sm text-gray-500">
+                        {{ payment.paymentDate | date:'dd/MM/yyyy à HH:mm' }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4 sm:mt-0 sm:ml-4 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                  <span class="px-3 py-1 text-xs font-medium rounded-full" [ngClass]="getStatusClass(payment.status)">
+                    {{ payment.status }}
+                  </span>
+                  <span class="text-base font-semibold text-gray-900">
+                    {{ payment.amount }} DT
+                  </span>
+                  <button
+                    (click)="downloadReceipt(payment)"
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-800 transition duration-150"
+                  >
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Télécharger
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Aucun résultat -->
+        <div *ngIf="hasSearched && payments.length === 0 && !isLoading" class="mt-8 bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-6 py-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">Aucun paiement trouvé</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Aucun reçu de paiement n'a été trouvé pour ce contrat.
+            </p>
+            <div class="mt-6">
+              <button
+                type="button"
+              
+                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-800 hover:bg-teal-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-800 transition duration-150"
+              >
+                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Nouvelle recherche
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   </div>
 </div>

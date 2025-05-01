@@ -35,74 +35,101 @@ export interface RoleEntity {
   styleUrls: ['./user-list.component.css'],
 })
 export class UserListComponent implements OnInit {
-  users: User[] = []; // Tableau pour stocker tous les utilisateurs
-  activeUsers: User[] = []; // Tableau pour stocker les utilisateurs actifs
-  blockedUsers: User[] = []; // Tableau pour stocker les utilisateurs bloqués
-  errorMessage: string = ''; // Propriété pour stocker le message d'erreur
+  users: User[] = [];
+  activeUsers: User[] = [];
+  blockedUsers: User[] = [];
+  filteredUsers: User[] = [];
+  searchTerm: string = '';
+  searchMode: boolean = false;
+  errorMessage: string = '';
 
-  constructor(private http: HttpClient) {} // Injectez HttpClient
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.loadUsers(); // Chargez les utilisateurs au démarrage du composant
+    this.loadUsers();
   }
 
-  // Méthode pour charger les utilisateurs
   loadUsers(): void {
-    const apiUrl = 'http://localhost:3000/auth/users'; // URL du backend
-
-    this.http.get<User[]>(apiUrl).subscribe(
+    this.http.get<User[]>('http://localhost:3000/auth/users').subscribe(
       (data: User[]) => {
-        this.users = data; // Affectez les données reçues au tableau users
-
-        // Séparer les utilisateurs actifs et bloqués
+        this.users = data;
         this.activeUsers = this.users.filter(user => !user.isBlocked);
         this.blockedUsers = this.users.filter(user => user.isBlocked);
       },
       (error) => {
-        this.errorMessage = 'Erreur lors de la récupération des utilisateurs.'; // Message d'erreur
+        this.errorMessage = 'Erreur lors de la récupération des utilisateurs.';
         console.error('Erreur:', error);
       }
     );
   }
 
-  toggleBlockUser(user: User): void {
-    if (!user || !user.id) {
-      console.error("L'utilisateur ou son ID est invalide.");
+  searchUser(): void {
+    if (!this.searchTerm.trim()) {
+      this.resetSearch();
       return;
     }
 
-    const apiUrl = `http://localhost:3000/user-gateway/${user.id}/block`; // URL de la passerelle
-    const isBlocked = typeof user.isBlocked === 'boolean' ? !user.isBlocked : false; // Inverser le statut
+    // Encoder le terme de recherche
+    const encodedTerm = encodeURIComponent(this.searchTerm);
+
+    this.http.get<User[]>(`http://localhost:3000/user-gateway/search/${encodedTerm}`).subscribe({
+      next: (data: User[]) => {
+        this.filteredUsers = data;
+        this.searchMode = true;
+        if (data.length === 0) {
+          this.errorMessage = `Aucun utilisateur trouvé avec "${this.searchTerm}"`;
+        } else {
+          this.errorMessage = '';
+        }
+      },
+      error: (error) => {
+        this.filteredUsers = [];
+        this.searchMode = true;
+        if (error.status === 404) {
+          this.errorMessage = `Aucun utilisateur trouvé avec "${this.searchTerm}"`;
+        } else {
+          this.errorMessage = 'Erreur lors de la recherche. Veuillez réessayer.';
+          console.error('Erreur détaillée:', error);
+        }
+      }
+    });
+  }
+
+  resetSearch(): void {
+    this.searchTerm = '';
+    this.searchMode = false;
+    this.filteredUsers = [];
+  }
+
+  toggleBlockUser(user: User): void {
+    const apiUrl = `http://localhost:3000/user-gateway/${user.id}/block`;
+    const isBlocked = !user.isBlocked;
 
     this.http.put<User>(apiUrl, { isBlocked }).subscribe({
       next: (updatedUser) => {
         if (updatedUser) {
-          user.isBlocked = updatedUser.isBlocked; // Mettre à jour le statut local
+          user.isBlocked = updatedUser.isBlocked;
 
-          // Mettre à jour les tableaux activeUsers et blockedUsers
-          if (updatedUser.isBlocked) {
-            this.activeUsers = this.activeUsers.filter(u => u.id !== updatedUser.id);
-            this.blockedUsers.push(updatedUser);
+          if (this.searchMode) {
+            // Mettre à jour dans filteredUsers
+            const index = this.filteredUsers.findIndex(u => u.id === updatedUser.id);
+            if (index !== -1) {
+              this.filteredUsers[index] = updatedUser;
+            }
           } else {
-            this.blockedUsers = this.blockedUsers.filter(u => u.id !== updatedUser.id);
-            this.activeUsers.push(updatedUser);
+            // Mettre à jour dans activeUsers/blockedUsers
+            if (updatedUser.isBlocked) {
+              this.activeUsers = this.activeUsers.filter(u => u.id !== updatedUser.id);
+              this.blockedUsers.push(updatedUser);
+            } else {
+              this.blockedUsers = this.blockedUsers.filter(u => u.id !== updatedUser.id);
+              this.activeUsers.push(updatedUser);
+            }
           }
-
-          console.log(
-            `Utilisateur ${updatedUser.nom} ${updatedUser.prenom} a été ${updatedUser.isBlocked ? 'bloqué' : 'débloqué'}.`
-          );
         }
       },
       error: (error) => {
-        console.error("Erreur lors de la mise à jour du statut de l'utilisateur :", error);
-
-        if (error.status === 404) {
-          console.error(`L'utilisateur avec l'ID ${user.id} est introuvable.`);
-        } else if (error.status === 400) {
-          console.error("Requête invalide. Vérifiez les données envoyées.");
-        } else {
-          console.error("Une erreur inattendue est survenue.");
-        }
+        console.error("Erreur lors de la mise à jour du statut:", error);
       }
     });
   }

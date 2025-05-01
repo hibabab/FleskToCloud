@@ -1,14 +1,14 @@
 <div class="flex">
   <app-dashbort></app-dashbort>
 
-  <div class="flex-1 mt-20 ml-60">
+  <div class="flex-1 mt-20 ml-0 mr-70">
     <section class="min-h-screen p-4">
       <div class="flex justify-between items-center mb-6">
         <div>
           <h2 class="text-2xl font-semibold text-gray-800">liste des  sinistres</h2>
-        
+
         </div>
-      
+
       </div>
 
       <div class="bg-white p-6 rounded-xl shadow-lg">
@@ -19,7 +19,7 @@
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">N° police</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Date survenance</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Adresse</th>
-               
+
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">PDF</th>
                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Action</th>
@@ -33,9 +33,9 @@
                 <td class="px-4 py-3 text-sm text-gray-700">
                   {{ constat.lieu?.rue }}, {{ constat.lieu?.ville }},{{ constat.lieu?.codePostal }}
                 </td>
-             
+
                 <td class="px-4 py-3 text-sm text-gray-700">{{ constat.statut || 'En attente' }}</td>
-             
+
                 <td class="px-4 py-4">
                   <!-- Lien vers le rapport PDF -->
                   <a *ngIf="constat.pathurl" [href]="'http://localhost:3000' + constat.pathurl" target="_blank" class="px-3 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700 flex items-center">
@@ -43,15 +43,15 @@
                   </a>
                   <span *ngIf="!constat.pathurl" class="text-gray-500">PDF non disponible</span>
                   <td class="px-4 py-3 text-sm">
-                   
-                    
+
+
                     <!-- Bouton si non affecté -->
                     <button *ngIf="!affectedConstats.get(constat.idConstat)"
                             class="text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded"
                             (click)="openPopup(constat)">
                       Affecter expert
                     </button>
-                    
+
                     <!-- Affichage si affecté -->
                     <div *ngIf="affectedConstats.get(constat.idConstat)" class="flex items-center">
                       <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -72,7 +72,7 @@
 <div *ngIf="showPopup" class="fixed inset-0 z-50 flex justify-center items-center bg-gray-500/50">
   <div class="relative p-4 w-full max-w-2xl max-h-full flex justify-center items-center">
     <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700 w-full p-6">
-      
+
       <!-- Titre et description -->
       <h2 class="font-semibold text-xl mb-4 text-teal-800">Affecter un expert</h2>
       <p class="text-gray-500 text-sm mb-6">Veuillez sélectionner un expert et compléter les détails de l’intervention.</p>
@@ -90,7 +90,7 @@
           </select>
         </div>
 
-        
+
 
         <!-- ✅ Commentaire -->
         <div>

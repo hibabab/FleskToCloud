@@ -1,0 +1,129 @@
+<div class="flex">
+  <app-dashboard/>
+
+  <div class="flex-1 mt-20 ml-60">
+  <h1 class="text-3xl font-bold text-teal-800 mb-2 text-center">Paiement sécurisé de votre assurance vie</h1>
+
+  <div class="border-b border-gray-200 mb-6">
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">Contrat Vie N°{{contratNum}}</h3>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="loading" class="loading-spinner flex items-center justify-center p-8">
+    <mat-icon class="animate-spin mr-2 text-teal-800">refresh</mat-icon>
+    <p class="text-gray-600">Initialisation du paiement vie...</p>
+  </div>
+
+  <!-- Affichage des erreurs -->
+  <div *ngIf="error" class="error-message bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+    <div class="flex items-start">
+      <mat-icon class="text-red-500 mr-2">error</mat-icon>
+      <div>
+        <p class="text-red-700 font-semibold">{{error}}</p>
+
+        <!-- Affichage conditionnel pour l'erreur de montant -->
+        <p *ngIf="error.includes('trop élevé')" class="text-sm text-gray-700 mt-2">
+          Pour les montants importants, veuillez effectuer un paiement local en agence.
+          Contactez notre service client au
+          <a href="tel:+21624051646" class="text-teal-800 font-medium">+216 24051646</a>
+          ou utilisez le bouton ci-dessous.
+          <button (click)="createLocalPayment()" class="mt-2 bg-teal-800 text-white px-4 py-2 rounded">
+            Paiement local
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Détails du paiement -->
+  <div *ngIf="paymentData && !loading" class="payment-details bg-gray-50 p-6 rounded-lg mb-6">
+    <h3 class="text-xl font-semibold text-teal-800 mb-4">Détails du paiement vie</h3>
+
+    <div class="grid grid-cols-1 gap-2">
+      <div class="detail-row flex justify-between py-2 border-b border-gray-200">
+        <span class="text-gray-600">Montant:</span>
+        <span class="font-medium">{{paymentData.amount}} DT</span>
+      </div>
+
+      <div *ngIf="paymentData.paymentType" class="detail-row flex justify-between py-2 border-b border-gray-200">
+        <span class="text-gray-600">Type:</span>
+        <span class="font-medium">
+          {{paymentData.paymentType === 'LOCAL' ? 'Paiement local' : 'Paiement en ligne'}}
+        </span>
+      </div>
+
+      <div *ngIf="paymentData.status" class="detail-row flex justify-between py-2 border-b border-gray-200">
+        <span class="text-gray-600">Statut:</span>
+        <span [ngClass]="{
+          'text-amber-600': paymentData.status === 'PENDING',
+          'text-teal-800 font-bold': paymentData.status === 'PAID',
+          'text-red-600': paymentData.status === 'FAILED'
+        }">
+          {{paymentData.status === 'PENDING' ? 'En attente' :
+             paymentData.status === 'PAID' ? 'Payé' : 'Échoué'}}
+        </span>
+      </div>
+
+      <div *ngIf="paymentData.expiration" class="detail-row flex justify-between py-2">
+        <span class="text-gray-600">Expiration:</span>
+        <span class="text-gray-800">{{paymentData.expiration | date:'medium'}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions de paiement -->
+  <div *ngIf="!loading && paymentData && paymentData.status !== 'PAID' && paymentData.paymentType !== 'LOCAL'" class="payment-actions text-center py-6">
+    <div class="mb-4">
+      <button (click)="toggleDebugInfo()" class="text-xs text-gray-500 hover:text-gray-700">
+        {{showDebugInfo ? 'Masquer' : 'Afficher'}} les informations techniques
+      </button>
+
+      <div *ngIf="showDebugInfo" class="debug-info mt-2 p-3 bg-gray-100 rounded text-left text-xs">
+        <div class="grid grid-cols-1 gap-1">
+          <div><strong>ID:</strong> {{paymentData.paymentId}}</div>
+          <div><strong>Tracking ID:</strong> {{paymentData.trackingId}}</div>
+          <div><strong>Lien:</strong> {{paymentData.paymentLink}}</div>
+          <div><strong>Montant:</strong> {{paymentData.amount | currency:'TND':'symbol':'1.2-2'}}</div>
+          <div *ngIf="paymentData.expiration"><strong>Expire:</strong> {{paymentData.expiration | date:'medium'}}</div>
+        </div>
+      </div>
+    </div>
+
+    <button mat-raised-button
+            (click)="continuePayment()"
+            class="bg-teal-800 hover:bg-teal-900 text-white py-3 px-6 rounded shadow-md flex items-center justify-center mx-auto">
+      <mat-icon class="mr-2">payment</mat-icon>
+      Payer maintenant
+    </button>
+
+    <p class="text-sm text-gray-500 mt-4">
+      Vous serez redirigé vers notre plateforme de paiement sécurisé
+    </p>
+
+    <div class="mt-6 text-center">
+      <button (click)="cancelAndCreateNewPayment()"
+              class="text-teal-800 hover:text-teal-900 underline text-sm">
+        Générer un nouveau lien de paiement
+      </button>
+    </div>
+  </div>
+
+  <!-- Message de paiement déjà effectué -->
+  <div *ngIf="paymentData && paymentData.status === 'PAID'" class="text-center py-6">
+    <div class="bg-green-50 text-green-800 p-4 rounded-lg flex flex-col items-center">
+      <mat-icon class="text-green-600 text-3xl mb-2">check_circle</mat-icon>
+      <p class="font-semibold">Ce contrat vie a déjà été payé avec succès!</p>
+      <p *ngIf="paymentData.paymentDate" class="text-sm mt-2">
+        Payé le: {{paymentData.paymentDate | date:'medium'}}
+      </p>
+    </div>
+  </div>
+
+  <!-- Lien de retour -->
+  <div class="back-link mt-8 border-t border-gray-200 pt-4">
+    <a [routerLink]="['/dashboard-assure', 'interface']" class="text-teal-800 hover:text-teal-900 flex items-center">
+      <mat-icon>arrow_back</mat-icon>
+      <span class="ml-1">Retour à l'interface</span>
+    </a>
+  </div>
+</div>

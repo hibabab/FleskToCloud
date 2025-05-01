@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { PaymentService } from '../../assure/services/payment.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-renouvellement-ca',
@@ -11,18 +13,23 @@ import autoTable from 'jspdf-autotable';
   styleUrl: './renouvellement-ca.component.css'
 })
 export class RenouvellementCAComponent {
+
   renewalForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  loading = false;
+  error: string | null = null;
+  contractData: any = null;
+  contratNum: number | null = null;
+  showRenewalForm = false;
+  isExpired = false;
+  expirationMessage = '';
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private paymentService: PaymentService) {
     this.renewalForm = this.fb.group({
       Cin: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-      Imat: ['', [
-        Validators.required,
-        Validators.pattern(/^\d{4}TU\d{3}$/)
-      ]],
+      Imat: ['', [Validators.required,this.validateImmatriculation]],
       packOption: ['same', Validators.required],
       packValue: ['same']  // Default value aligned with backend
     });
@@ -42,11 +49,73 @@ export class RenouvellementCAComponent {
       packValueControl?.updateValueAndValidity();
     });
   }
+  searchContract() {this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.contractData = null;
+    this.isExpired = false;
+    this.expirationMessage = '';
+    const Cin = this.renewalForm.get('Cin')?.value;
+    const Imat = this.renewalForm.get('Imat')?.value;
+    // Appel à l'API pour récupérer les détails du contrat
+    this.http.get<any>(
+      `http://localhost:3000/contrat-auto-geteway/search?Cin=${Cin}&Imat=${Imat}`
+    ).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response && response.status === 200 && response.data && response.data.length > 0) {
+          this.contractData = response.data[0];
+          this.contratNum = this.contractData.id;
+          this.checkExpirationDate();
 
+
+        } else {
+          this.errorMessage = 'Aucun contrat trouvé pour les informations fournies';
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isLoading = false;
+        console.error('Erreur:', err);
+        let errorMessage = 'Erreur lors de la recherche du contrat';
+        if (err.error?.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        this.errorMessage = errorMessage;
+      }
+    });}
+    checkExpirationDate() {
+      if (!this.contractData || !this.contractData.dateExpiration) {
+        this.errorMessage = 'Impossible de vérifier la date d\'expiration: informations manquantes';
+        return;
+      }
+
+      const today = new Date();
+      const expirationDate = new Date(this.contractData.dateExpiration);
+
+      // Vérifier si le contrat est déjà expiré
+      const isExpired = today > expirationDate;
+
+      if (isExpired) {
+        this.isExpired = true;
+        this.expirationMessage = 'Votre contrat est expiré. Veuillez le renouveler.';
+        this.showRenewalForm = true;
+      } else {
+        this.isExpired = false;
+        const remainingDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+        this.expirationMessage = `Votre contrat est valide jusqu'au ${expirationDate.toLocaleDateString()}. Il reste ${remainingDays} jours avant l'échéance.`;
+        this.showRenewalForm = false;
+      }
+    }
   onSubmit() {
-    if (!this.renewalForm.valid) {
-      this.markFormGroupTouched(this.renewalForm);
-      window.alert('Veuillez remplir tous les champs requis');
+    if (!this.renewalForm.valid || !this.isExpired) {
+      if (!this.isExpired) {
+        this.errorMessage = 'Le renouvellement n\'est possible que pour les contrats expirés.';
+      } else {
+        this.markFormGroupTouched(this.renewalForm);
+        window.alert('Veuillez remplir tous les champs requis');
+      }
       return;
     }
 
@@ -90,10 +159,10 @@ export class RenouvellementCAComponent {
         if (response.success) {
           console.log('Contrat renouvelé:', response.data);
           // Get contract number from response
-          const contratNum = response.data.contrat.id ;
+          const contratNum = response.data.contrat.id;
 
-          // Process payment after successful contract renewal
-          this.processPayment(contratNum, response.data);
+          // Supprimer l'ancien paiement et créer un nouveau
+          this.cancelAndCreateNewPayment(contratNum, response.data);
         } else {
           this.isLoading = false;
           console.error('Réponse inattendue:', response);
@@ -116,6 +185,49 @@ export class RenouvellementCAComponent {
     });
   }
 
+  // Méthode pour annuler l'ancien paiement et en créer un nouveau
+  cancelAndCreateNewPayment(contratNum: number, contractData: any): void {
+    this.loading = true;
+    this.error = null;
+
+    // Stocker les données du contrat pour utilisation ultérieure
+    this.contractData = contractData;
+    this.contratNum = contratNum;
+console.log(contratNum);
+    this.paymentService.cancel(contratNum)
+      .pipe(finalize(() => {
+        console.log('Finalisation de la demande d\'annulation');
+      }))
+      .subscribe({
+        next: (response) => {
+          console.log('Paiement précédent annulé avec succès:', response);
+          setTimeout(() => {
+            this.processPayment(contratNum, contractData);
+            const updateUrl = `http://localhost:3000/contrat-auto-geteway/contrat/${contratNum}/status`;
+
+            // Mettre à jour le statut du contrat via HTTP
+            const updateResponse: any = this.http.patch(updateUrl, {
+              status: 'valide'
+            }).toPromise();
+
+            if (updateResponse && updateResponse.success) {
+              console.log('Statut du contrat mis à jour avec succès');}
+          }, 1000);
+        },
+        error: (err) => {
+          console.error('Erreur lors de la suppression du paiement:', err);
+          if (err.status === 404) {
+            console.log('Aucun paiement à annuler, tentative de création directe');
+            this.processPayment(contratNum, contractData);
+          } else {
+            this.error = err.error?.message || 'Impossible de supprimer le paiement existant';
+            this.loading = false;
+            this.isLoading = false;
+          }
+        }
+      });
+  }
+
   private processPayment(contratNum: number, contractData: any) {
     // Appel à l'API pour créer un paiement local
     this.http.post<{success: boolean, data: any, message: string}>(
@@ -125,6 +237,7 @@ export class RenouvellementCAComponent {
     ).subscribe({
       next: (paymentResponse) => {
         this.isLoading = false;
+        this.loading = false;
 
         if (paymentResponse.success) {
           console.log('Paiement local enregistré:', paymentResponse.data);
@@ -150,6 +263,7 @@ export class RenouvellementCAComponent {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading = false;
+        this.loading = false;
         console.error('Erreur de paiement:', err);
 
         let errorMessage = 'Erreur lors de l\'enregistrement du paiement';
@@ -166,6 +280,14 @@ export class RenouvellementCAComponent {
       }
     });
   }
+    validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
+        const pattern = /^\d{1,4}TU\d{1,3}$/i;
+
+        if (control.value && !pattern.test(control.value)) {
+          return { 'invalidImmatriculation': true };
+        }
+        return null;
+    }
   async generatePaymentReceipt(paymentData: any): Promise<void> {
     try {
       const doc = new jsPDF('p', 'mm', 'a4') as any;
@@ -302,7 +424,7 @@ export class RenouvellementCAComponent {
       autoTable(doc, {
         startY: yOffset,
         body: [
-          ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration', 'Nature', 'Échéances'],
+          ['N° Contrat','Code agence',  'N° Sociétaire','Date Souscription','Date Effet', 'Date Expiration'],
           [
             contratData.contrat.id || 'N/A',
             133,
@@ -310,8 +432,7 @@ export class RenouvellementCAComponent {
             contratData.contrat.dateSouscription || 'N/A',
             contratData.contrat.dateSouscription || 'N/A',
             contratData.contrat.dateExpiration || 'N/A',
-            contratData.contrat.NatureContrat || 'N/A',
-            contratData.contrat.echeances || 'N/A'
+
           ]
         ],
         styles: {
@@ -348,12 +469,13 @@ export class RenouvellementCAComponent {
             assure.telephone || 'N/A',
             assure.bonusMalus || 'N/A'
           ],
-          ['Adresse', 'Ville', 'Code Postal', 'Pays', ''],
+          ['Rue', 'Numéro de maison','Ville', 'Gouvernat','Code Postal', ''],
           [
             adresse.rue || 'N/A',
+            adresse.numMaison || 'N/A',
             adresse.ville || 'N/A',
+            adresse.Gouvernat || 'N/A',
             adresse.codePostal || 'N/A',
-            adresse.pays || 'N/A',
             ''
           ]
         ],
@@ -446,11 +568,11 @@ export class RenouvellementCAComponent {
       autoTable(doc, {
         startY: yOffset,
         body: [
-          ['Cotisation Nette', 'Cotisation Totale', 'Montant Échéance'],
+          ['Cotisation Nette', 'Cotisation Totale', ],
           [
             contratData.contrat.cotisationNette ? `${contratData.contrat.cotisationNette.toFixed(3)} DT` : '0.000 DT',
             contratData.contrat.cotisationTotale ? `${contratData.contrat.cotisationTotale.toFixed(3)} DT` : '0.000 DT',
-            contratData.contrat.montantEcheance ? `${contratData.contrat.montantEcheance.toFixed(3)} DT` : '0.000 DT'
+
           ]
         ],
         styles: {
