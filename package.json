@@ -26,6 +26,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/schedule": "^6.0.0",
     "@nestjs/typeorm": "^11.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/nanoid": "^3.0.0",
@@ -37,6 +38,7 @@
     "pg": "^8.14.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "twilio": "^5.5.2",
     "typeorm": "^0.3.22"
   },
   "devDependencies": {
@@ -52,6 +54,7 @@
     "@types/node": "^22.10.7",
     "@types/nodemailer": "^6.4.17",
     "@types/supertest": "^6.0.2",
+    "@types/twilio": "^3.19.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

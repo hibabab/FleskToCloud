@@ -147,7 +147,7 @@ async renouvelerContrat(
         id: result.contrat.num || result.contrat.num,
         dateSouscription: this.formatDate(result.contrat.dateSouscription),
         dateExpiration: this.formatDate(result.contrat.dateExpiration),
-       
+        dateEffet: this.formatDate(result.contrat.dateEffet),
         packChoisi: result.contrat.packChoisi || 'Non spécifié',
         cotisationNette: result.contrat.cotisationNette || 0,
         cotisationTotale: result.contrat.cotisationTotale || 0,
@@ -163,6 +163,7 @@ async renouvelerContrat(
         email: result.contrat.assure?.user?.email || 'Non spécifié',
         dateNaissance: this.formatDate(result.contrat.assure?.user?.date_naissance),
         adresse: result.contrat.assure?.user?.adresse ? {
+          gouvernat:result.contrat.assure.user.adresse.gouvernat || 'Non spécifié',
           rue: result.contrat.assure.user.adresse.rue || 'Non spécifié',
           numMaison: result.contrat.assure.user.adresse.numMaison || 'Non spécifié',
           ville: result.contrat.assure.user.adresse.ville || 'Non spécifié',
@@ -256,6 +257,7 @@ async updateEcheances(
           dateNaissance: result.assure.user?.date_naissance,
           adresse: result.assure.user?.adresse ? {
             rue: result.assure.user.adresse.rue || 'Non spécifié',
+            gouvernat:result.contrat.assure.user.adresse.gouvernat || 'Non spécifié',
             numMaison: result.assure.user.adresse.numMaison || 'Non spécifié',
             ville: result.assure.user.adresse.ville || 'Non spécifié',
             codePostal: result.assure.user.adresse.codePostal || 'Non spécifié',

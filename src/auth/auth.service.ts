@@ -398,4 +398,24 @@ export class AuthService {
   
     return user;
   }
+  async isEmailExists(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    return !!user;
+  }
+  async isCinExists(cin: number): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { Cin: cin } });
+    return !!user;
+  }
+  async isUserBlocked(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ 
+      where: { email },
+      select: ['isBlocked']
+    });
+    
+    if (!user) {
+      throw new NotFoundException('Utilisateur non trouvé');
+    }
+    
+    return user.isBlocked;
+  }
 }

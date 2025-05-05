@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ContratAuto } from 'src/assurance-auto/entities/ContratAuto.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { NotificationEntity } from 'src/notification/entities/notification.entity';
-import { Not, Repository } from 'typeorm';
+import { LessThanOrEqual, Like, MoreThan, Not, Repository } from 'typeorm';
+import { SmsService } from '../sms/sms.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class NotificationService {
@@ -12,8 +15,11 @@ export class NotificationService {
     private readonly notificationRepository: Repository<NotificationEntity>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(ContratAuto)
+    private readonly contratAutoRepository: Repository<ContratAuto>,
+    private readonly smsService: SmsService,
   ) {}
-
+  private readonly logger = new Logger(NotificationService.name);
   // Méthode pour créer une notification
   async creerNotification(
     userId: number,
@@ -370,4 +376,115 @@ export class NotificationService {
     // Sauvegarder les modifications
     return await this.notificationRepository.save(notification);
   }
+   EVERY_DAY_AT_MIDNIGHT  = '40 9 * * *';
+
+  
+  @Cron('43 15 * * *')
+  async verifierContratsExpiration(envoyerNotifications: boolean = true): Promise<number> {
+    this.logger.log('Vérification des contrats qui expirent bientôt...');
+    
+    // Date actuelle
+    const aujourdhui = new Date();
+    
+    // Date dans 14 jours
+    const dansDeuxSemaines = new Date();
+    dansDeuxSemaines.setDate(dansDeuxSemaines.getDate() + 14);
+    
+    // Trouver les contrats qui expirent exactement dans 14 jours
+    // Pour éviter d'envoyer plusieurs notifications pour le même contrat
+    const dateDebut = new Date(aujourdhui);
+    dateDebut.setHours(0, 0, 0, 0);
+    
+    const dateFin = new Date(aujourdhui);
+    dateFin.setHours(23, 59, 59, 999);
+    dateFin.setDate(dateFin.getDate() + 14);
+    
+    const contratsExpirants = await this.contratAutoRepository.find({
+      where: {
+        dateExpiration: MoreThan(dateDebut) && LessThanOrEqual(dateFin),
+        etat: 'valide',
+      },
+      relations: ['assure', 'assure.user'],
+    });
+    
+    this.logger.log(`Nombre de contrats expirant dans deux semaines: ${contratsExpirants.length}`);
+
+    // Vérifier si nous devons envoyer des notifications
+    if (envoyerNotifications) {
+      // Créer et envoyer des notifications pour chaque contrat
+      for (const contrat of contratsExpirants) {
+        await this.creerNotificationExpiration(contrat);
+      }
+      this.logger.log(`Notifications envoyées pour ${contratsExpirants.length} contrats`);
+    } else {
+      this.logger.log(`Pas d'envoi de notifications (mode vérification uniquement)`);
+    }
+    
+    return contratsExpirants.length;
+  }
+
+  // Le reste du code reste inchangé
+  
+  // Créer et envoyer une notification pour l'expiration d'un contrat
+  async creerNotificationExpiration(contrat: ContratAuto) {
+    try {
+      const user = contrat.assure.user;
+      const dateExpirationFormatee = new Date(contrat.dateExpiration).toLocaleDateString('fr-FR');
+      
+      // Vérifier si une notification a déjà été envoyée aujourd'hui pour ce contrat
+      const aujourdhui = new Date();
+      aujourdhui.setHours(0, 0, 0, 0);
+      
+      const notificationExistante = await this.notificationRepository.findOne({
+        where: {
+          type: 'EXPIRATION_CONTRAT',
+          user: { id: user.id },
+          createdAt: MoreThan(aujourdhui),
+          message: Like(`%contrat d'assurance automobile n°${contrat.num}%`),
+        },
+      });
+      
+      if (notificationExistante) {
+        this.logger.log(`Une notification a déjà été envoyée aujourd'hui pour le contrat ${contrat.num}`);
+        return;
+      }
+      
+      // Créer la notification
+      const notification = this.notificationRepository.create({
+        message: `Votre contrat d'assurance automobile n°${contrat.num} expire le ${dateExpirationFormatee}. Veuillez procéder au renouvellement.`,
+        type: 'EXPIRATION_CONTRAT',
+        user: user,
+      });
+      
+      // Enregistrer la notification dans la base de données
+      await this.notificationRepository.save(notification);
+      
+      // Envoyer le SMS
+      await this.envoyerSmsNotification(user, notification);
+      
+      this.logger.log(`Notification créée pour le contrat ${contrat.num}`);
+    } catch (error) {
+      this.logger.error(`Erreur lors de la création de la notification pour le contrat ${contrat.num}`, error.stack);
+    }
+  }
+
+  // Envoyer un SMS via TunisieSMS
+  async envoyerSmsNotification(user: User, notification: NotificationEntity) {
+    try {
+      const messageEnvoye = await this.smsService.envoyerSms(
+        user.telephone,
+        notification.message
+      );
+
+      if (messageEnvoye) {
+        
+        await this.notificationRepository.save(notification);
+        this.logger.log(`SMS envoyé avec succès à ${user.telephone}`);
+      }
+    } catch (error) {
+      this.logger.error(`Erreur lors de l'envoi du SMS: ${error.message}`, error.stack);
+    }
+  }
+
+ 
 }

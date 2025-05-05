@@ -10,6 +10,7 @@ import {
     BadRequestException,
     NotFoundException,
     InternalServerErrorException,
+    UseGuards,
   } from '@nestjs/common';
 import { User } from 'src/auth/entities/user.entity';
 import { NotificationEntity } from 'src/notification/entities/notification.entity';
@@ -202,5 +203,11 @@ async processPaymentNotification(
   } catch (error) {
     this.handleError(error, 'Erreur lors du traitement de la notification de paiement');
   }
+}
+
+@Post('check-expirations')
+async checkExpirations() {
+  await this.notificationService.verifierContratsExpiration();
+  return { message: 'Vérification des contrats expirés lancée avec succès' };
 }
   }

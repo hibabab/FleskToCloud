@@ -14,7 +14,7 @@ interface ContratDetails {
   num: string | number;
   dateSouscription: Date | string | null;
   dateExpiration: Date | string | null;
-  
+ dateEffet: string | Date | null | undefined;
   cotisationNette: number;
   cotisationTotale: number;
  
@@ -264,6 +264,7 @@ export class ContratAutoService {
     if (!contratExistant) {
       throw new Error('Aucun contrat existant trouvé pour ce véhicule');
     }
+    const ancienneDateExpiration = new Date(contratExistant.dateExpiration);
     // Calculer l'âge du véhicule à partir de DPMC
     const ageVehicule = this.calculateVehicleAge(vehicule.DPMC);
     
@@ -306,8 +307,8 @@ export class ContratAutoService {
     }
   
     // Mettre à jour le contrat existant
-    contratExistant.dateEffet = new Date(); // Date d'aujourd'hui
-    contratExistant.dateExpiration = this.calculerDateExpiration(); // Date d'aujourd'hui + 1 an
+    contratExistant.dateEffet = ancienneDateExpiration;
+    contratExistant.dateExpiration = this.calculerDateExpiration(ancienneDateExpiration);
     contratExistant.packChoisi = packChoisi;
     contratExistant.etat = 'invalide';
     // Sauvegarder les modifications du contrat
@@ -711,34 +712,13 @@ export class ContratAutoService {
     return Math.round(value * 1000) / 1000;
   }
 
-private calculerDateExpiration(): Date {
-    const date = new Date();
-    date.setFullYear(date.getFullYear() + 1);
-    return date;
+  private calculerDateExpiration(dateDepart: Date = new Date()): Date {
+    const dateExpiration = new Date(dateDepart);
+    dateExpiration.setFullYear(dateExpiration.getFullYear() + 1);
+    return dateExpiration;
 }
 
-private calculerProchaineEcheance(typePaiement: string): Date {
-    const date = new Date();
-    
-    switch(typePaiement.toLowerCase()) {
-      case 'mensuel':
-        date.setMonth(date.getMonth() + 1);
-        break;
-      case 'trimestriel':
-        date.setMonth(date.getMonth() + 3);
-        break;
-      case 'semestriel':
-        date.setMonth(date.getMonth() + 6);
-        break;
-      case 'annuel':
-        date.setFullYear(date.getFullYear() + 1);
-        break;
-      default:
-        date.setMonth(date.getMonth() + 1);
-    }
-    
-    return date;
-}
+
 async updateEcheancesAndGetFullContract(numContrat: number): Promise<any> {
   // 1. Récupérer le contrat avec toutes les relations
   const contrat = await this.contratAutoRepository.findOne({
@@ -889,6 +869,7 @@ async getContratDetailsByNum(numContrat: number): Promise<FullContratResponse> {
       num: contrat.num,
       dateSouscription: contrat.dateSouscription,
       dateExpiration: contrat.dateExpiration,
+      dateEffet:contrat.dateEffet,
       cotisationNette: contrat.cotisationNette || 0,
       cotisationTotale: contrat.cotisationTotale || 0,
       packChoisi: contrat.packChoisi || 'Non spécifié'

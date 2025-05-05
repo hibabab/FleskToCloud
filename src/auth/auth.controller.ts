@@ -8,6 +8,7 @@ import {
   Param,
   InternalServerErrorException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/SignupDto';
@@ -112,5 +113,40 @@ async getUserByCin(@Param('Cin') Cin: number): Promise<User> {
   }
   return this.authService.getUserByCin(Cin);
 }
-
+@Get('check-email/:email')
+async checkEmailExists(@Param('email') email: string): Promise<{ exists: boolean }> {
+  try {
+    const exists = await this.authService.isEmailExists(email);
+    return { exists };
+  } catch (error) {
+    throw new InternalServerErrorException('Erreur lors de la vérification de l\'email');
+  }
 }
+
+@Get('check-cin/:cin')
+async checkCinExists(@Param('cin') cin: number): Promise<{ exists: boolean }> {
+  if (isNaN(cin)) {
+    throw new BadRequestException('CIN invalide');
+  }
+  try {
+    const exists = await this.authService.isCinExists(cin);
+    return { exists };
+  } catch (error) {
+    throw new InternalServerErrorException('Erreur lors de la vérification du CIN');
+  }
+}
+
+@Get('check-blocked/:email')
+async checkUserBlocked(@Param('email') email: string): Promise<{ isBlocked: boolean }> {
+  try {
+    const isBlocked = await this.authService.isUserBlocked(email);
+    return { isBlocked };
+  } catch (error) {
+    if (error instanceof NotFoundException) {
+      throw error;
+    }
+    throw new InternalServerErrorException('Erreur lors de la vérification du statut de blocage');
+  }
+}
+}
+
