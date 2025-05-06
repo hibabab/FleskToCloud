@@ -158,4 +158,7 @@ processPaymentNotification(
     notificationId
   });
 }
+checkExpirations(): Observable<any> {
+  return this.http.post(`${this.apiUrl}/check-expirations`, {});
+}
 }

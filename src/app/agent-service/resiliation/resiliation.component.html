@@ -1,0 +1,62 @@
+<div class="flex">
+  <app-dashbort></app-dashbort>
+
+  <div class="flex-1 mt-20 ml-0 mr-70">
+    <main class="flex-1 ml-60 w-full">
+      <div class="max-w-6xl mx-auto p-8">
+        <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-md w-full p-8">
+          <div class="flex flex-col items-center mb-8 text-2xl font-semibold text-teal-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 class="font-semibold text-xl text-gray-700 mt-2">Résiliation contrat auto</h2>
+          </div>
+
+          <form [formGroup]="cancellationForm" (ngSubmit)="onSubmit()" class="w-full space-y-4">
+            <div>
+              <label class="block mb-1 text-sm font-medium text-gray-700">CIN</label>
+              <input type="text" formControlName="cin"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2"
+                    placeholder="CIN d'assuré">
+              <div *ngIf="cancellationForm.get('cin')?.invalid && cancellationForm.get('cin')?.touched" class="text-red-500 text-sm mt-1">
+                Le CIN doit contenir 8 chiffres
+              </div>
+            </div>
+
+            <div>
+              <label class="block mb-1 text-sm font-medium text-gray-700">Matricule</label>
+              <input type="text" formControlName="imat"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2"
+                    placeholder="Matricule du véhicule">
+              <div *ngIf="cancellationForm.get('imat')?.invalid && cancellationForm.get('imat')?.touched" class="text-red-500 text-sm mt-1">
+                Format invalide (ex: 1234TU567)
+              </div>
+            </div>
+
+            <div class="pt-4">
+              <button type="submit" [disabled]="cancellationForm.invalid || isLoading"
+                      class="w-full text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg px-5 py-2.5 text-center disabled:opacity-50 disabled:cursor-not-allowed">
+                <span *ngIf="!isLoading">Confirmer la résiliation</span>
+                <span *ngIf="isLoading" class="flex items-center justify-center">
+                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Traitement...
+                </span>
+              </button>
+            </div>
+          </form>
+
+          <div *ngIf="successMessage" class="mt-4 p-4 bg-teal-100 border border-teal-400 text-teal-700 rounded">
+            {{ successMessage }}
+          </div>
+
+          <div *ngIf="errorMessage" class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {{ errorMessage }}
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

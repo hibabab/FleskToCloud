@@ -19,6 +19,7 @@ import { DevisCVieComponent } from './devis-cvie/devis-cvie.component';
 import { CreationCVieComponent } from './creation-c-vie/creation-c-vie.component';
 import { ListeAssureVieComponent } from './liste-assure-vie/liste-assure-vie.component';
 import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/historique-contrat-vie-a.component';
+import { ResiliationComponent } from './resiliation/resiliation.component';
 
 
 
@@ -41,6 +42,7 @@ const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent 
   { path: 'liste-expert', component: ListeExpertComponent },
   { path: 'liste-auto', component: ListeAutoComponent },
   { path: 'liste-constat', component: ConstatListComponent},
+  { path: 'annuler', component: ResiliationComponent},
    {path:'notification',component:NotificationComponent}
 
 

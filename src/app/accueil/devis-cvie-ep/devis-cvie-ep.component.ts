@@ -13,7 +13,7 @@ export class DevisCVieEpComponent {
   devisForm: FormGroup;
   showPdfPreview = false;
   pdfContent = '';
-
+  isDisabled = true;
   constructor(private fb: FormBuilder) {
     this.devisForm = this.fb.group({
       // Informations personnelles
@@ -25,15 +25,15 @@ export class DevisCVieEpComponent {
       ]],
       nom: ['', [Validators.required, Validators.minLength(2)]],
       prenom: ['', [Validators.required, Validators.minLength(2)]],
-      age: ['', [Validators.required, Validators.min(18), Validators.max(70)]],
+      age: ['', [Validators.required, Validators.min(18), Validators.max(65)]],
 
       // Informations sur l'emprunt
       organismePreteur: ['', Validators.required],
       montantPret: ['', [Validators.required, Validators.min(1000)]],
       dureeRemboursement: ['', [Validators.required, Validators.min(1), Validators.max(30)]],
 
-      // Garanties
-      garantieDeces: [false],
+      garantieDeces: [{ value: true, disabled: this.isDisabled }],
+
       garantieInvalidite: [false]
     });
   }

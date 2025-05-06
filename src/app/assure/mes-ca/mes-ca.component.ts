@@ -110,6 +110,7 @@ export class MesCAComponent implements OnInit {
             ? response.data.map((item: any) => ({
                 contrat: {
                   num: item.num,
+                  etat: item.etat,
                   dateSouscription: item.dateSouscription,
                   dateExpiration: item.dateExpiration
                 },
@@ -193,7 +194,7 @@ async generateContratPDF(contratData: any): Promise<void> {
            133,
            contratData.assure?.NumSouscription || 'N/A',
            contratData.contrat.dateSouscription || 'N/A',
-           contratData.contrat.dateSouscription || 'N/A',
+           contratData.contrat.dateEffet || 'N/A',
            contratData.contrat.dateExpiration || 'N/A',
 
          ]
@@ -239,7 +240,7 @@ async generateContratPDF(contratData: any): Promise<void> {
             adresse.rue || 'N/A',
             adresse.numMaison || 'N/A',
             adresse.ville || 'N/A',
-            adresse.Gouvernat || 'N/A',
+            adresse.gouvernat || 'N/A',
             adresse.codePostal || 'N/A',
             ''
           ]

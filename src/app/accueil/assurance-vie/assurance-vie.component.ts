@@ -7,5 +7,13 @@ import { Component } from '@angular/core';
   styleUrl: './assurance-vie.component.css'
 })
 export class AssuranceVieComponent {
+  activeQuestion: number | null = null;
 
+  toggleQuestion(questionNumber: number) {
+    if (this.activeQuestion === questionNumber) {
+      this.activeQuestion = null;
+    } else {
+      this.activeQuestion = questionNumber;
+    }
+  }
 }

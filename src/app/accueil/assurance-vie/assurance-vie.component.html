@@ -1,69 +1,324 @@
-<div class="bg-gray-100 py-12">
-  <!-- Section Hero avec image et introduction -->
-  <div class="relative h-[600px] overflow-hidden rounded-lg shadow-lg mb-12">
-    <!-- Image de fond -->
-    <img
-      src="assets/images/img6.jpg"
-      alt="Assurance Vie"
-      class="w-full h-full object-cover transform transition-transform duration-1000 hover:scale-105"
-    />
+<!-- assurance-vie.component.html -->
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body >
+ <!-- Logo -->
 
-    <!-- Overlay gradient pour améliorer la lisibilité du texte -->
-    <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-600/50"></div>
 
-    <!-- Contenu texte centré -->
-    <div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
-      <h1 class="text-5xl font-bold mb-6 animate-fade-in-down">
-        Assurance Vie
-      </h1>
-      <p class="text-2xl max-w-3xl leading-relaxed mb-8 animate-fade-in-up">
-        L'assurance vie protège vos proches et sécurise votre avenir financier.
-      </p>
+ <div class="  w-full flex flex-col">
+  <!-- Première barre de navigation -->
+  <nav class="w-full bg-gradient-to-r from-teal-900 to-teal-700 text-white p-3 flex items-center justify-between">
+    <!-- Onglets -->
+    <div class="flex space-x-1 ml-20 items-center">
+      <!-- Icône d'étoile blanche -->
+      <i class="fas fa-star text-white w-6 h-4"></i>
+      <p class=" text-white text-lg font-semibold">Roulez sereinement, vivez pleinement</p>
+      <i class="fas fa-star text-white w-6 h-4"></i>
+    </div>
+
+
+
+    <!-- Recherche et Menu -->
+    <div class="flex items-center mr-25 space-x-8">
+
+
+        <!-- Menu déroulant -->
+        <div class="relative group">
+          <button [routerLink]="['/accueil', 'about']" class="font-semibold">
+            Qui nous sommes ?
+          </button>
+
+
+        </div>
+
+        <a [routerLink]="['/espace-client/login']" class="bg-teal-500 text-white font-bold px-4 py-2 rounded-lg">
+          Connexion
+        </a>
+
+
+    </div>
+</nav>
+  <!-- Ligne de séparation entre les deux menus -->
+  <div class="hidden  border-t  border-gray-300 mx-10"></div>
+  <nav class="bg-gray-100 shadow-md p-4">
+    <div class="container mx-auto flex items-center justify-between"> <!-- Ajustement avec justify-between pour espacer -->
+      <!-- Logo -->
+      <div class="flex items-center gap-4 cursor-pointer" [routerLink]="['/accueil']">
+        <img src="\assets\images\logoFC.png" alt="STAR Assurances" class="h-20 w-auto" />
+      </div>
+
+
+    <!-- Menu -->
+    <ul class="flex space-x-6 text-gray-500 mt-2">
+      <!-- Menu Item: Assurance Vie Emprunteur -->
+
+
+      <!-- Menu Item: Ma voiture -->
+      <li class="relative group">
+        <a href="#" class="text-teal-800 font-semibold hover:text-teal-600 transition-colors px-2 py-1 rounded">Ma voiture</a>
+
+        <!-- Dropdown Menu for Ma voiture -->
+        <div class="absolute left-0 mt-2 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="p-6 bg-white shadow-lg rounded-lg w-[750px]">
+            <div class="flex items-center">
+              <div class="flex-1 pr-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de voiture -->
+                  <i class="fas fa-car w-6 h-6 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">
+                    <a [routerLink]="['/accueil/auto']" class="hover:underline">Nos produits</a>
+                  </h2>
+                </div>
+                <p class="text-sm text-gray-600">La solution d'assurance auto idéale pour une sécurité optimale !</p>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Démarches -->
+              <div class="flex-1 px-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de voiture -->
+                  <i class="fas fa-car-crash w-5 h-5 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">Démarches</h2>
+                </div>
+                <p class="text-sm text-gray-600">Constat amiable d'accident automobile</p>
+                <a href="#" class="text-teal-600 hover:text-teal-800 text-sm font-medium mt-2 inline-block">
+                  En savoir plus
+                  <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Devis - Améliorée et plus claire -->
+              <div class="flex-1 pl-6">
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-3">
+                    <!-- Icône de calculatrice -->
+                    <i class="fas fa-calculator w-6 h-6 text-teal-800"></i>
+                    <h2 class="text-lg font-semibold text-teal-800">Devis auto</h2>
+                  </div>
+                  <p class="text-sm text-gray-600 mb-3">Calculez le prix de votre assurance auto en quelques clics</p>
+                  <a [routerLink]="['/contrat', 'devi']" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded-md transition-colors inline-flex items-center justify-center">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Demander un devis
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="relative group">
+        <a href="#" class="text-teal-800 font-semibold hover:text-teal-600 transition-colors px-2 py-1 rounded">Assurance Emprunteur</a>
+
+        <!-- Dropdown Menu for Assurance Vie Emprunteur -->
+        <div class="absolute left-0 mt-2 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="p-6 bg-white shadow-lg rounded-lg w-[750px]">
+            <div class="flex items-center">
+              <div class="flex-1 pr-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de protection -->
+                  <i class="fas fa-shield-alt w-6 h-6 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">
+                    <a [routerLink]="['/accueil/vie-emprunteur']" class="hover:underline">Nos garanties</a>
+                  </h2>
+                </div>
+                <p class="text-sm text-gray-600">Protégez votre crédit et vos proches avec notre assurance emprunteur</p>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Avantages -->
+              <div class="flex-1 px-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône d'avantages -->
+                  <i class="fas fa-star w-5 h-5 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">Avantages</h2>
+                </div>
+                <ul class="text-sm text-gray-600 list-disc pl-5">
+                  <li>Couverture décès et invalidité</li>
+                  <li>Tarifs compétitifs</li>
+                  <li>Protection de vos proches</li>
+                </ul>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Devis - Améliorée et plus claire -->
+              <div class="flex-1 pl-6">
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-3">
+                    <!-- Icône de calculatrice -->
+                    <i class="fas fa-calculator w-6 h-6 text-teal-800"></i>
+                    <h2 class="text-lg font-semibold text-teal-800">Devis en ligne</h2>
+                  </div>
+                  <p class="text-sm text-gray-600 mb-3">Obtenez votre tarif personnalisé en 2 minutes</p>
+                  <a
+                  [routerLink]="['/accueil', 'devisvie']" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded-md transition-colors inline-flex items-center justify-center">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Obtenir un devis
+                  </a>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+      <!-- Contact Info -->
+      <div class="flex items-center space-x-6 mr-10 text-gray-500">
+        <!-- Téléphone -->
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-phone-alt text-teal-800"></i>
+          <span class="text-sm text-gray-700">+216 25 206 488</span>
+        </div>
+
+        <!-- Email -->
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-envelope text-teal-800"></i>
+          <span class="text-sm text-gray-700">contact&#64;fleskcover.com</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Introduction - Nouvelle section -->
+  <div class="bg-white py-8 border-b border-gray-200">
+    <div class="container mx-auto px-6">
+      <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-2xl font-bold text-teal-800 mb-4">L'assurance emprunteur avec Flesk Cover</h2>
+        <p class="text-gray-700">
+          Protégez votre crédit et vos proches avec notre assurance vie adaptée à tous vos projets de financement.
+        </p>
+      </div>
     </div>
   </div>
 
-  <!-- Section Contenu -->
-  <div class="container mx-auto px-4">
+  <!-- Assurance Description - Structure améliorée -->
+  <div class="container mx-auto px-6 py-12">
     <div class="grid md:grid-cols-2 gap-8 mb-12">
-      <!-- Temporaire décès -->
-      <div class="bg-white p-8 rounded-lg shadow-lg text-center transform transition-transform duration-300 hover:scale-105">
-        <div class="mb-4">
-          <img src="assets/images/coeur.jpg" alt="Temporaire décès" class="w-full h-150 object-cover rounded-lg">
-        </div>
-        <h2 class="text-3xl font-bold text-blue-900 mb-4">Temporaire Décès</h2>
-        <p class="text-gray-700 font-bold mb-4">
-          Protégez vos proches en cas de décès ou d’invalidité avec un contrat temporaire décès.
+      <div class="flex flex-col justify-center">
+        <h2 class="text-2xl font-bold text-teal-800 mb-4">Notre engagement</h2>
+        <p class="text-gray-700 mb-4">
+          Quelle que soit la nature de votre crédit bancaire et moyennant le paiement d'une prime unique, Flesk Cover s'engage à verser à l'organisme prêteur le capital restant dû en cas de décès ou d'invalidité absolue et définitive avant le terme du contrat.
         </p>
-        <!-- Bouton Savoir plus -->
-        <a routerLink="/tempdeces" class="inline-block">
-          <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center mx-auto">
-            <span>Savoir plus</span>
-            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </button>
-        </a>
+        <p class="text-gray-700">
+          Profitez de notre tarif compétitif pour votre assurance crédit bancaire.
+        </p>
       </div>
+      <div class="flex items-center justify-center">
+        <img src="assets/images/emprunt12.jpg" alt="Projet en cours" class="rounded-lg shadow-xl max-h-64 object-cover">
+      </div>
+    </div>
 
-      <!-- Épargne individuelle -->
-      <div class="bg-white p-8 rounded-lg shadow-lg text-center transform transition-transform duration-300 hover:scale-105">
-        <div class="mb-4">
-          <img src="assets/images/tirelire.jpg" alt="Épargne individuelle" class="w-full h-150 object-cover rounded-lg">
-        </div>
-        <h2 class="text-3xl font-bold text-green-900 mb-4">Épargne Individuelle</h2>
-        <p class="text-gray-700 font-bold mb-4">
-          Épargner, c’est penser à soi mais aussi à nos proches. C’est préparer en douceur des projets importants : achat immobilier, études,...
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="flex items-center justify-center order-2 md:order-1">
+        <img src="assets/images/emprunt3.jpg" alt="Projet en cours" class="rounded-lg shadow-xl max-h-64 object-cover">
+      </div>
+      <div class="flex flex-col justify-center order-1 md:order-2">
+        <h2 class="text-2xl font-bold text-teal-800 mb-4">Pour votre projet</h2>
+        <p class="text-gray-700 mb-4">
+          Vous avez un projet en cours (achat immobilier, acquisition d'une voiture, travaux…) et vous devez emprunter de l'argent...
         </p>
-        <!-- Bouton Savoir plus -->
-        <a routerLink="/epargne" class="inline-block">
-          <button class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center mx-auto">
-            <span>Savoir plus</span>
-            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </button>
-        </a>
+        <p class="text-gray-700">
+          L'organisme prêteur (banque, employeur…) vous demandera nécessairement, pour la validation de votre dossier de crédit, une assurance temporaire afin de lui garantir le remboursement de votre prêt en cas de décès ou d'invalidité.
+        </p>
       </div>
     </div>
   </div>
+
+  <!-- Benefits Section - Amélioré avec des icônes plus visibles -->
+  <div class="bg-teal-50 py-12">
+    <div class="container mx-auto px-6">
+      <h2 class="text-2xl font-bold text-teal-800 text-center mb-8">Pourquoi choisir Flesk Cover?</h2>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md text-center h-full flex flex-col">
+          <div class="bg-teal-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-teal-800 mb-3">Sécurité financière</h3>
+          <p class="text-gray-600 flex-grow">
+            L'assurance Emprunteur de Flesk Cover c'est la garantie d'une sécurité financière au moindre coût.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md text-center h-full flex flex-col">
+          <div class="bg-teal-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-teal-800 mb-3">Protection des proches</h3>
+          <p class="text-gray-600 flex-grow">
+            Protection optimale de vos proches en leur évitant la charge du remboursement de votre crédit en cas de décès.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md text-center h-full flex flex-col">
+          <div class="bg-teal-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-teal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-teal-800 mb-3">Tarifs compétitifs</h3>
+          <p class="text-gray-600 flex-grow">
+            Des primes uniques avantageuses et adaptées à votre situation pour une protection optimale.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Section - Plus moderne et interactive -->
+  <div class="container mx-auto px-6 py-12">
+    <h2 class="text-2xl font-bold text-teal-800 text-center mb-8">Vous avez des questions au sujet de l'assurance crédit bancaire ?</h2>
+
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="border-b border-gray-100">
+        <button (click)="toggleQuestion(1)" class="flex justify-between items-center w-full px-6 py-4 text-left">
+          <span class="text-lg font-medium text-teal-800">Que se passe-t-il en cas de remboursement anticipé du crédit?</span>
+          <svg class="w-5 h-5 text-teal-800 transform transition-transform duration-300" [class.rotate-180]="activeQuestion === 1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div *ngIf="activeQuestion === 1" class="px-6 py-4 bg-teal-50">
+          <p class="text-gray-700">En cas de remboursement anticipé de votre crédit, Flesk Cover vous remboursera le reliquat de la prime.</p>
+        </div>
+      </div>
+
+      <div class="border-b border-gray-100">
+        <button (click)="toggleQuestion(2)" class="flex justify-between items-center w-full px-6 py-4 text-left">
+          <span class="text-lg font-medium text-teal-800">Quel est l'âge limite autorisé à la souscription?</span>
+          <svg class="w-5 h-5 text-teal-800 transform transition-transform duration-300" [class.rotate-180]="activeQuestion === 2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div *ngIf="activeQuestion === 2" class="px-6 py-4 bg-teal-50">
+          <p class="text-gray-700">L'âge limite autorisé à la souscription est 65 ans.</p>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
 </div>

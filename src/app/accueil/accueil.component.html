@@ -1,141 +1,217 @@
 <head>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-      body {
-        font-family: 'Poppins', sans-serif;
-      }
-    </style>
-  </head>
-  <body >
-   <!-- Logo -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body >
+ <!-- Logo -->
 
 
-   <div class="  w-full flex flex-col">
-    <!-- Première barre de navigation -->
-    <nav class="w-full bg-gradient-to-r from-teal-900 to-teal-700 text-white p-3 flex items-center justify-between">
-      <!-- Onglets -->
-      <div class="flex space-x-1 ml-20 items-center">
-        <!-- Icône d'étoile blanche -->
-        <i class="fas fa-star text-white w-6 h-4"></i>
-        <p class=" text-white text-lg font-semibold">Roulez sereinement, vivez pleinement</p>
-        <i class="fas fa-star text-white w-6 h-4"></i>
-      </div>
+ <div class="  w-full flex flex-col">
+  <!-- Première barre de navigation -->
+  <nav class="w-full bg-gradient-to-r from-teal-900 to-teal-700 text-white p-3 flex items-center justify-between">
+    <!-- Onglets -->
+    <div class="flex space-x-1 ml-20 items-center">
+      <!-- Icône d'étoile blanche -->
+      <i class="fas fa-star text-white w-6 h-4"></i>
+      <p class=" text-white text-lg font-semibold">Roulez sereinement, vivez pleinement</p>
+      <i class="fas fa-star text-white w-6 h-4"></i>
+    </div>
 
 
 
-      <!-- Recherche et Menu -->
-      <div class="flex items-center mr-25 space-x-8">
+    <!-- Recherche et Menu -->
+    <div class="flex items-center mr-25 space-x-8">
 
 
-          <!-- Menu déroulant -->
-          <div class="relative group">
-            <button [routerLink]="['/accueil', 'about']" class="font-semibold">
-              Qui nous sommes ?
-            </button>
+        <!-- Menu déroulant -->
+        <div class="relative group">
+          <button [routerLink]="['/accueil', 'about']" class="font-semibold">
+            Qui nous sommes ?
+          </button>
 
 
-          </div>
-
-          <a [routerLink]="['/espace-client/login']" class="bg-teal-500 text-white font-bold px-4 py-2 rounded-lg">
-            Connexion
-          </a>
-
-
-      </div>
-  </nav>
-    <!-- Ligne de séparation entre les deux menus -->
-    <div class="hidden  border-t  border-gray-300 mx-10"></div>
-    <nav class="bg-gray-100 shadow-md p-4">
-      <div class="container mx-auto flex items-center justify-between"> <!-- Ajustement avec justify-between pour espacer -->
-        <!-- Logo -->
-        <div class="flex items-center space-x-4 mr-10 max-w-[200px]">
-          <img src="\assets\images\logoFC.png" alt="STAR Assurances" class="h-20 w-auto" />
         </div>
 
+        <a [routerLink]="['/espace-client/login']" class="bg-teal-500 text-white font-bold px-4 py-2 rounded-lg">
+          Connexion
+        </a>
 
-        <!-- Menu -->
-        <ul class="flex space-x-4 text-gray-500 mt-2"> <!-- Réduction de l'espace avec space-x-4 -->
-          <!-- Menu Item: Ma voiture -->
-          <li class="relative group">
-            <a href="#" class="text-teal-800 font-semibold">Ma voiture</a>
 
-            <!-- Dropdown Menu for Ma voiture -->
-            <div class="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg w-[500px]">
-                <div class="flex items-center">
-                  <div class="flex-1 pr-6">
-                    <div class="mt-2 flex items-center gap-2">
-                      <!-- Icône de voiture -->
-                      <i class="fas fa-car w-6 h-6 text-teal-800"></i>
-                      <h2 class="text-lg font-semibold text-teal-800">
-                        <a [routerLink]="['/accueil/auto']">Nos produits</a>
-                      </h2>
+    </div>
+</nav>
+  <!-- Ligne de séparation entre les deux menus -->
+  <div class="hidden  border-t  border-gray-300 mx-10"></div>
+  <nav class="bg-gray-100 shadow-md p-4">
+    <div class="container mx-auto flex items-center justify-between"> <!-- Ajustement avec justify-between pour espacer -->
+      <!-- Logo -->
+      <div class="flex items-center gap-4 cursor-pointer" [routerLink]="['/accueil']">
+        <img src="\assets\images\logoFC.png" alt="STAR Assurances" class="h-20 w-auto" />
+      </div>
 
-                    </div>
-                    <p class="text-sm text-gray-600">La solution d’assurance auto idéale pour une sécurité optimale !</p>
+
+    <!-- Menu -->
+    <ul class="flex space-x-6 text-gray-500 mt-2">
+      <!-- Menu Item: Assurance Vie Emprunteur -->
+
+
+      <!-- Menu Item: Ma voiture -->
+      <li class="relative group">
+        <a href="#" class="text-teal-800 font-semibold hover:text-teal-600 transition-colors px-2 py-1 rounded">Ma voiture</a>
+
+        <!-- Dropdown Menu for Ma voiture -->
+        <div class="absolute left-0 mt-2 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="p-6 bg-white shadow-lg rounded-lg w-[750px]">
+            <div class="flex items-center">
+              <div class="flex-1 pr-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de voiture -->
+                  <i class="fas fa-car w-6 h-6 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">
+                    <a [routerLink]="['/accueil/auto']" class="hover:underline">Nos produits</a>
+                  </h2>
+                </div>
+                <p class="text-sm text-gray-600">La solution d'assurance auto idéale pour une sécurité optimale !</p>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Démarches -->
+              <div class="flex-1 px-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de voiture -->
+                  <i class="fas fa-car-crash w-5 h-5 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">Démarches</h2>
+                </div>
+                <p class="text-sm text-gray-600">Constat amiable d'accident automobile</p>
+                <a href="#" class="text-teal-600 hover:text-teal-800 text-sm font-medium mt-2 inline-block">
+                  En savoir plus
+                  <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Devis - Améliorée et plus claire -->
+              <div class="flex-1 pl-6">
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-3">
+                    <!-- Icône de calculatrice -->
+                    <i class="fas fa-calculator w-6 h-6 text-teal-800"></i>
+                    <h2 class="text-lg font-semibold text-teal-800">Devis auto</h2>
                   </div>
-
-                  <!-- Ligne verticale -->
-                  <div class="border-r-2 border-gray-300 h-24"></div>
-
-                  <!-- Section Démarches -->
-                  <div class="flex-1 pl-6">
-                    <div class="mt-2 flex items-center gap-2">
-                      <!-- Icône de voiture -->
-                      <i class="fas fa-car-crash w-5 h-5 text-teal-800 mr-2"></i>
-                      <h2 class="text-lg font-semibold text-teal-800">Démarches</h2>
-                    </div>
-                    <p class="text-sm text-gray-600">Constat amiable d’accident automobile</p>
-                  </div>
+                  <p class="text-sm text-gray-600 mb-3">Calculez le prix de votre assurance auto en quelques clics</p>
+                  <a [routerLink]="['/contrat', 'devi']" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded-md transition-colors inline-flex items-center justify-center">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Demander un devis
+                  </a>
                 </div>
               </div>
             </div>
-          </li>
-
-          <!-- Menu Item: Ma prévoyance -->
-          <li><a href="#" class="hover:text-teal-800">Ma prévoyance</a></li>
-        </ul>
-
-        <!-- Contact Info -->
-        <div class="flex items-center space-x-6 mr-10 text-gray-500">
-          <!-- Téléphone -->
-          <div class="flex items-center space-x-2">
-            <i class="fas fa-phone-alt text-teal-800"></i>
-            <span class="text-sm text-gray-700">+216 25 206 488</span>
-          </div>
-
-          <!-- Email -->
-          <div class="flex items-center space-x-2">
-            <i class="fas fa-envelope text-teal-800"></i>
-            <span class="text-sm text-gray-700">admin.fleskcover.com</span>
           </div>
         </div>
-      </div>
-    </nav>
+      </li>
+      <li class="relative group">
+        <a href="#" class="text-teal-800 font-semibold hover:text-teal-600 transition-colors px-2 py-1 rounded">Assurance Emprunteur</a>
 
-    <div class="relative hidden md:block mt-4 w-full">
-      <div class="absolute inset-0 bg-gradient-to-l from-teal-700 to-transparent opacity-75 "></div>
-      <img src="assets/images/ass.png" alt="Image Assurance" class="object-cover w-full h-full ">
-      <div class="absolute inset-0 flex flex-col justify-center items-start px-4 py-8">
+        <!-- Dropdown Menu for Assurance Vie Emprunteur -->
+        <div class="absolute left-0 mt-2 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="p-6 bg-white shadow-lg rounded-lg w-[750px]">
+            <div class="flex items-center">
+              <div class="flex-1 pr-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de protection -->
+                  <i class="fas fa-shield-alt w-6 h-6 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">
+                    <a [routerLink]="['/accueil/vie-emprunteur']" class="hover:underline">Nos garanties</a>
+                  </h2>
+                </div>
+                <p class="text-sm text-gray-600">Protégez votre crédit et vos proches avec notre assurance emprunteur</p>
+              </div>
 
-        <!-- Petite div blanche ajoutée ici -->
-        <div class="mt-6 bg-white p-4 rounded-md shadow-md">
-          <div class="mt-2 flex items-center gap-2">
-            <!-- Icône de voiture -->
-            <i class="fas fa-car w-6 h-4 text-teal-800"></i>
-            <h3 class="text-lg font-semibold text-teal-800">FLESK COVER</h3>
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Avantages -->
+              <div class="flex-1 px-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône d'avantages -->
+                  <i class="fas fa-star w-5 h-5 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">Avantages</h2>
+                </div>
+                <ul class="text-sm text-gray-600 list-disc pl-5">
+                  <li>Couverture décès et invalidité</li>
+                  <li>Tarifs compétitifs</li>
+                  <li>Protection de vos proches</li>
+                </ul>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Devis - Améliorée et plus claire -->
+              <div class="flex-1 pl-6">
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-3">
+                    <!-- Icône de calculatrice -->
+                    <i class="fas fa-calculator w-6 h-6 text-teal-800"></i>
+                    <h2 class="text-lg font-semibold text-teal-800">Devis en ligne</h2>
+                  </div>
+                  <p class="text-sm text-gray-600 mb-3">Obtenez votre tarif personnalisé en 2 minutes</p>
+                  <a
+                  [routerLink]="['/accueil', 'devisvie']" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded-md transition-colors inline-flex items-center justify-center">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Obtenir un devis
+                  </a>
+
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </li>
+    </ul>
+      <!-- Contact Info -->
+      <div class="flex items-center space-x-6 mr-10 text-gray-500">
+        <!-- Téléphone -->
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-phone-alt text-teal-800"></i>
+          <span class="text-sm text-gray-700">+216 25 206 488</span>
+        </div>
 
-          <div class="mt-4">
-            <p class="text-sm text-gray-600 mb-2"> Votre Partenaire en Assurance Auto et Vie</p>
-            <p class="text-sm text-gray-600">  Protégez ce qui compte le plus, pour aujourd'hui et pour demain.!</p>
-          </div>
-
+        <!-- Email -->
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-envelope text-teal-800"></i>
+          <span class="text-sm text-gray-700">contact&#64;fleskcover.com</span>
         </div>
       </div>
     </div>
+  </nav>
+
+
+  <div class="relative hidden md:block mt-4 w-full h-160"> <!-- Hauteur fixée ici -->
+    <div class="absolute inset-0 bg-gradient-to-l from-teal-700 to-transparent opacity-75 "></div>
+    <img src="assets/images/couv.jpg" alt="Image Assurance" class="object-cover w-full h-full">
+    <div class="absolute inset-0 flex flex-col justify-center items-start px-4 py-8">
+      <div class="mt-6 bg-white p-4 rounded-md shadow-md">
+        <div class="mt-2 flex items-center gap-2">
+          <i class="fas fa-car w-6 h-4 text-teal-800"></i>
+          <h3 class="text-lg font-semibold text-teal-800">FLESK COVER</h3>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm text-gray-600 mb-2">Votre Partenaire en Assurance Auto et Vie</p>
+          <p class="text-sm text-gray-600">Protégez ce qui compte le plus, pour aujourd'hui et pour demain.!</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 
@@ -158,22 +234,19 @@
   <section class="bg-white py-8 ">
     <div class="flex flex-wrap justify-center items-center gap-x-30">
 
-      <!-- Carte Assurance Auto -->
-      <div class="w-full md:w-1/3 xl:w-1/5 p-6  flex flex-col">
-        <a [routerLink]="['/accueil/auto']">
+      <!-- Carreau Assurance Auto -->
+      <div class="bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+        <a [routerLink]="['/accueil/auto']" class="block">
           <img
-            class="hover:grow hover:shadow-lg rounded-full mx-auto"
-            src="assets/images/auto.png"
+            class="w-full h-48 object-cover"
+            src="assets/images/automobile.jpg"
             alt="Assurance Auto"
           />
-          <div class="pt-3 flex flex-col items-center text-center">
-            <h3 class="mt-2 text-2xl font-bold text-gray-600">
+          <div class="p-4 text-center">
+            <h3 class="text-xl font-bold text-gray-600 mb-2">
               Assurance Auto
             </h3>
-            <a
-              href="#"
-              class="inline-flex items-center text-teal-800 "
-            >
+            <div class="inline-flex items-center text-teal-800">
               En savoir plus
               <svg
                 class="w-4 h-4 ml-1 fill-current text-teal-800"
@@ -182,27 +255,24 @@
               >
                 <path d="M5.854 3.146a.5.5 0 00-.708.708L7.293 6H1.5a.5.5 0 000 1h5.793L5.146 8.146a.5.5 0 10.708.708l2.5-2.5a.5.5 0 000-.708l-2.5-2.5z"/>
               </svg>
-            </a>
+            </div>
           </div>
         </a>
       </div>
 
-      <!-- Carte Assurance Vie -->
-      <div class="w-full md:w-1/3 xl:w-1/5 p-6 flex flex-col">
-        <a [routerLink]="['/accueil/assurance-vie']">
+      <!-- Carreau Assurance Vie -->
+      <div class="bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+        <a [routerLink]="['/accueil/vie']" class="block">
           <img
-            class="hover:grow hover:shadow-lg rounded-full mx-auto"
-            src="assets/images/vie.jpg"
+            class="w-full h-48 object-cover"
+            src="assets/images/Avie.jpg"
             alt="Assurance Vie"
           />
-          <div class="pt-3 flex flex-col items-center text-center">
-            <h3 class="mt-2 text-xl font-bold text-gray-600">
+          <div class="p-4 text-center">
+            <h3 class="text-xl font-bold text-gray-600 mb-2">
               Assurance Vie
             </h3>
-            <a
-              href="#"
-              class="inline-flex items-center text-teal-800 "
-            >
+            <div class="inline-flex items-center text-teal-800">
               En savoir plus
               <svg
                 class="w-4 h-4 ml-1 fill-current text-teal-800"
@@ -211,7 +281,7 @@
               >
                 <path d="M5.854 3.146a.5.5 0 00-.708.708L7.293 6H1.5a.5.5 0 000 1h5.793L5.146 8.146a.5.5 0 10.708.708l2.5-2.5a.5.5 0 000-.708l-2.5-2.5z"/>
               </svg>
-            </a>
+            </div>
           </div>
         </a>
       </div>

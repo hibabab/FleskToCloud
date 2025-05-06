@@ -12,7 +12,7 @@ import autoTable from 'jspdf-autotable';
 })
 export class CreationCVieComponent implements OnInit {
   currentStep = 1;
-  cin: number=0;
+  cin: String="";
   userAge: number | null = null;
   isSubmitting = false;
   errorMessage: string | null = null;
@@ -84,7 +84,7 @@ export class CreationCVieComponent implements OnInit {
 
   verifyCin(): void {
 
-    this.getUserInfo(this.cin
+    this.getUserInfo(Number(this.cin)
     )
       .then(userData => {
         // Si la vérification est réussie, passer à l'étape suivante
@@ -143,6 +143,7 @@ export class CreationCVieComponent implements OnInit {
       contratVie: {
         dateEffet: this.empruntInfo.dateEffet,
         cotisation: cotisation,
+        etat:'valide',
         garanties: garantiesString.slice(0, -1) // Enlever le dernier ';'
       },
       emprunt: {
@@ -163,8 +164,10 @@ export class CreationCVieComponent implements OnInit {
     this.errorMessage = null;
 
     const formData = this.prepareFormData();
-    const cinValue = this.cin;
-
+    const cinValue = Number(this.cin);
+    if (!this.validateDates()) {
+      return;
+    }
     // Appel à l'API pour créer le contrat vie
     this.http.post(`http://localhost:3000/contratvie/${cinValue}`, formData)
       .subscribe(
@@ -173,7 +176,7 @@ export class CreationCVieComponent implements OnInit {
 
           // Si la création du contrat est réussie, créer le paiement local
           if (response && response.numero) {
-            this.downloadContratVie(response,cinValue);
+            this.downloadContratVie(response,Number(cinValue));
             this.createLocalPayment(response.numero);
           } else {
             this.isSubmitting = false;
@@ -218,7 +221,46 @@ export class CreationCVieComponent implements OnInit {
       );
   }
 
+  validateDates(): boolean {
+    if (!this.empruntInfo.dateEffet || !this.empruntInfo.datePremierR || !this.empruntInfo.dateDernierR) {
+      return false;
+    }
 
+    const dateEffet = new Date(this.empruntInfo.dateEffet);
+    const datePremierR = new Date(this.empruntInfo.datePremierR);
+    const dateDernierR = new Date(this.empruntInfo.dateDernierR);
+
+    // Vérifie que datePremierR >= dateEffet
+    if (datePremierR < dateEffet) {
+      this.errorMessage = "La date du premier remboursement doit être postérieure ou égale à la date d'effet";
+      return false;
+    }
+
+    // Vérifie que dateDernierR > datePremierR
+    if (dateDernierR <= datePremierR) {
+      this.errorMessage = "La date du dernier remboursement doit être postérieure à la date du premier remboursement";
+      return false;
+    }
+
+    this.errorMessage = '';
+    return true;
+  }
+
+  onDateEffetChange(): void {
+    // Réinitialiser les dates dépendantes quand la date d'effet change
+    if (this.empruntInfo.dateEffet) {
+      const dateEffet = new Date(this.empruntInfo.dateEffet);
+      this.empruntInfo.datePremierR = '';
+      this.empruntInfo.dateDernierR = '';
+    }
+  }
+
+  onDatePremierRChange(): void {
+    // Réinitialiser la date de dernier remboursement quand la date du premier remboursement change
+    if (this.empruntInfo.datePremierR) {
+      this.empruntInfo.dateDernierR = '';
+    }
+  }
   private async loadImageAsBase64(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -290,7 +332,7 @@ export class CreationCVieComponent implements OnInit {
             userInfo.Cin || 'N/A',
             userInfo.telephone || 'N/A',
             userInfo.date_naissance ? new Date(userInfo.date_naissance).toLocaleDateString() : 'N/A',
-            `${userInfo.adresse?.rue || ''} ${userInfo.adresse?.numMaison || ''}, ${userInfo.adresse?.codePostal || ''} ${userInfo.adresse?.ville || ''}, ${userInfo.adresse?.pays || ''}`
+            `${userInfo.adresse?.rue || ''} ${userInfo.adresse?.numMaison || ''}, ${userInfo.adresse?.codePostal || ''} ${userInfo.adresse?.ville || ''}, ${userInfo.adresse?.gouvernat || ''}`
           ]
         ],
         styles: {

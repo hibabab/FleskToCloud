@@ -38,8 +38,9 @@ export class RenouvellementCAComponent implements OnInit {
   contratNum: number | null = null;
   showRenewalForm = false;
   isExpired = false;
+  isNearExpiration = false;
   expirationMessage = '';
-
+  isRenewable: boolean = false;
   // Variables pour la partie paiement
   paymentData: any = null;
   paymentLoading: boolean = false;
@@ -74,65 +75,98 @@ export class RenouvellementCAComponent implements OnInit {
       packValueControl?.updateValueAndValidity();
     });
   }
-  searchContract() {this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-    this.contractData = null;
-    this.isExpired = false;
-    this.expirationMessage = '';
-    const Cin = this.renewalForm.get('Cin')?.value;
-    const Imat = this.renewalForm.get('Imat')?.value;
-    // Appel à l'API pour récupérer les détails du contrat
-    this.http.get<any>(
-      `http://localhost:3000/contrat-auto-geteway/search?Cin=${Cin}&Imat=${Imat}`
-    ).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        if (response && response.status === 200 && response.data && response.data.length > 0) {
-          this.contractData = response.data[0];
-          this.contratNum = this.contractData.id;
-          this.checkExpirationDate();
-
-
-        } else {
-          this.errorMessage = 'Aucun contrat trouvé pour les informations fournies';
-        }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.isLoading = false;
-        console.error('Erreur:', err);
-        let errorMessage = 'Erreur lors de la recherche du contrat';
-        if (err.error?.message) {
-          errorMessage = err.error.message;
-        } else if (err.message) {
-          errorMessage = err.message;
-        }
-        this.errorMessage = errorMessage;
-      }
-    });}
-    checkExpirationDate() {
-      if (!this.contractData || !this.contractData.dateExpiration) {
-        this.errorMessage = 'Impossible de vérifier la date d\'expiration: informations manquantes';
-        return;
-      }
-
-      const today = new Date();
-      const expirationDate = new Date(this.contractData.dateExpiration);
-
-      // Vérifier si le contrat est déjà expiré
-      const isExpired = today > expirationDate;
-
-      if (isExpired) {
-        this.isExpired = true;
-        this.expirationMessage = 'Votre contrat est expiré. Veuillez le renouveler.';
-        this.showRenewalForm = true;
-      } else {
+  searchContract(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        this.isLoading = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.contractData = null;
         this.isExpired = false;
-        const remainingDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-        this.expirationMessage = `Votre contrat est valide jusqu'au ${expirationDate.toLocaleDateString()}. Il reste ${remainingDays} jours avant l'échéance.`;
-        this.showRenewalForm = false;
-      }
+        this.isNearExpiration = false;
+        this.isRenewable = false;
+        this.expirationMessage = '';
+        const Imat = this.renewalForm.get('Imat')?.value;
+
+        this.http.get<any>(
+            `http://localhost:3000/contrat-auto-geteway/search?Cin=${this.userCin}&Imat=${Imat}`
+        ).subscribe({
+            next: (response) => {
+                this.isLoading = false;
+                if (response && response.status === 200 && response.data && response.data.length > 0) {
+                    this.contractData = response.data[0];
+                    this.contratNum = this.contractData.id;
+                    console.log("Contrat trouvé:", this.contractData);
+                    this.checkExpirationDate();
+                    resolve(); // Résoudre la promesse ici
+                } else {
+                    this.errorMessage = 'Aucun contrat trouvé pour les informations fournies';
+                    reject(this.errorMessage);
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                this.isLoading = false;
+                console.error('Erreur:', err);
+                let errorMessage = 'Erreur lors de la recherche du contrat';
+                if (err.error?.message) {
+                    errorMessage = err.error.message;
+                } else if (err.message) {
+                    errorMessage = err.message;
+                }
+                this.errorMessage = errorMessage;
+                reject(errorMessage);
+            }
+        });
+    });
+}
+
+  checkExpirationDate() {
+    if (!this.contractData?.dateExpiration) {
+      this.errorMessage = 'Impossible de vérifier la date d\'expiration: informations manquantes';
+      return;
     }
+
+    const today = new Date();
+    // Réinitialiser l'heure à 00:00:00 pour éviter les problèmes de comparaison
+    today.setHours(0, 0, 0, 0);
+
+    const expirationDate = new Date(this.contractData.dateExpiration);
+    // Réinitialiser l'heure pour la date d'expiration également
+    expirationDate.setHours(0, 0, 0, 0);
+
+    const warningDate = new Date(expirationDate);
+    warningDate.setDate(warningDate.getDate() - 14);
+
+    // Débogage - afficher les dates pour vérification
+    console.log('Today:', today);
+    console.log('Expiration date:', expirationDate);
+    console.log('Warning date:', warningDate);
+
+    // Logique pour déterminer l'état du contrat
+    this.isExpired = today > expirationDate; // Vrai si date dépassée (strictement supérieur)
+    this.isNearExpiration = today >= warningDate && today <= expirationDate; // Période d'alerte, inclut la date d'expiration
+
+    // Un contrat est renouvelable si aujourd'hui est égal à la date d'expiration ou dans les 14 jours avant
+    this.isRenewable = today.getTime() === expirationDate.getTime() ||
+                      (today >= warningDate && today <= expirationDate);
+
+    console.log('isExpired:', this.isExpired);
+    console.log('isNearExpiration:', this.isNearExpiration);
+    console.log('isRenewable:', this.isRenewable);
+
+    const remainingDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    console.log('Jours restants:', remainingDays);
+
+    if (this.isExpired) {
+      this.expirationMessage = 'Votre contrat est expiré. Veuillez le renouveler.';
+    } else if (this.isNearExpiration) {
+      this.expirationMessage = `Attention : Votre contrat expire dans ${remainingDays} jours.`;
+    } else {
+      this.expirationMessage = `Valide jusqu'au ${expirationDate.toLocaleDateString()} (${remainingDays} jours restants).`;
+    }
+
+    // Afficher le formulaire uniquement si le contrat est renouvelable
+    this.showRenewalForm = this.isRenewable;
+  }
   ngOnInit(): void {
     this.loadUserDataFromToken();
   }
@@ -194,14 +228,18 @@ export class RenouvellementCAComponent implements OnInit {
     });
   }
 
-  onSubmit() {
-    if (!this.renewalForm.valid || !this.isExpired) {
-      if (!this.isExpired) {
-        this.errorMessage = 'Le renouvellement n\'est possible que pour les contrats expirés.';
-      } else {
-        this.markFormGroupTouched(this.renewalForm);
-        window.alert('Veuillez remplir tous les champs requis');
-      }
+  async onSubmit() {
+    if (!this.renewalForm.valid) {
+      this.markFormGroupTouched(this.renewalForm);
+      window.alert('Veuillez remplir tous les champs requis');
+      return;
+    }
+    await this.searchContract();
+
+    // Maintenant checkExpirationDate() sera appelé dans searchContract()
+    console.log("dans onsubmit", this.isRenewable);
+    if (this.isRenewable==false) {
+      this.errorMessage = 'Le renouvellement n\'est autorisé que pour les contrats dont la date d\'expiration est aujourd\'hui ou dans les 14 prochains jours.';
       return;
     }
 
@@ -463,7 +501,7 @@ export class RenouvellementCAComponent implements OnInit {
             133,
             contratData.assure?.numSouscription || 'N/A',
             contratData.contrat.dateSouscription || 'N/A',
-            contratData.contrat.dateSouscription || 'N/A',
+            contratData.contrat.dateEffet || 'N/A',
             contratData.contrat.dateExpiration || 'N/A',
 
           ]
@@ -508,7 +546,7 @@ export class RenouvellementCAComponent implements OnInit {
             adresse.rue || 'N/A',
             adresse.numMaison || 'N/A',
             adresse.ville || 'N/A',
-            adresse.Gouvernat || 'N/A',
+            adresse.gouvernat || 'N/A',
             adresse.codePostal || 'N/A',
             ''
           ]

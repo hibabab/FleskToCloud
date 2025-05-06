@@ -123,7 +123,7 @@ async generateContratPDF(contratData: any): Promise<void> {
            133,
            contratData.assure?.NumSouscription || 'N/A',
            contratData.contrat.dateSouscription || 'N/A',
-           contratData.contrat.dateSouscription || 'N/A',
+           contratData.contrat.dateEffet|| 'N/A',
            contratData.contrat.dateExpiration || 'N/A',
 
          ]

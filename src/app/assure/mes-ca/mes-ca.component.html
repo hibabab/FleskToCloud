@@ -32,6 +32,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">N° Contrat</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">Date Souscription</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">Date Expiration</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">État</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">Véhicule</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-teal-800 uppercase tracking-wider">Actions</th>
             </tr>
@@ -46,6 +47,15 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 {{ c.contrat.dateExpiration | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span [ngClass]="{
+                  'bg-green-100 text-green-800': c.contrat.etat === 'valide',
+                  'bg-red-100 text-red-800': c.contrat.etat === 'invalide',
+                  'bg-yellow-100 text-yellow-800':c.contrat.etat === 'résilié'
+                }" class="px-2 py-1 rounded-full text-xs font-medium">
+                  {{c.contrat.etat }}
+                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 {{ c.vehicule.marque }} {{ c.vehicule.model }} ({{ c.vehicule.Imat }})

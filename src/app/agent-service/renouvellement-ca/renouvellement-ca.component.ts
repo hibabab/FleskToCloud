@@ -24,7 +24,9 @@ export class RenouvellementCAComponent {
   contratNum: number | null = null;
   showRenewalForm = false;
   isExpired = false;
+  isNearExpiration = false;
   expirationMessage = '';
+  isRenewable: boolean = false;
 
   constructor(private fb: FormBuilder, private http: HttpClient, private paymentService: PaymentService) {
     this.renewalForm = this.fb.group({
@@ -86,104 +88,175 @@ export class RenouvellementCAComponent {
       }
     });}
     checkExpirationDate() {
-      if (!this.contractData || !this.contractData.dateExpiration) {
+      if (!this.contractData?.dateExpiration) {
         this.errorMessage = 'Impossible de vérifier la date d\'expiration: informations manquantes';
         return;
       }
 
       const today = new Date();
+      // Réinitialiser l'heure à 00:00:00 pour éviter les problèmes de comparaison
+      today.setHours(0, 0, 0, 0);
+
       const expirationDate = new Date(this.contractData.dateExpiration);
+      // Réinitialiser l'heure pour la date d'expiration également
+      expirationDate.setHours(0, 0, 0, 0);
 
-      // Vérifier si le contrat est déjà expiré
-      const isExpired = today > expirationDate;
+      const warningDate = new Date(expirationDate);
+      warningDate.setDate(warningDate.getDate() - 14);
 
-      if (isExpired) {
-        this.isExpired = true;
+      // Débogage - afficher les dates pour vérification
+      console.log('Today:', today);
+      console.log('Expiration date:', expirationDate);
+      console.log('Warning date:', warningDate);
+
+      // Logique pour déterminer l'état du contrat
+      this.isExpired = today > expirationDate; // Vrai si date dépassée (strictement supérieur)
+      this.isNearExpiration = today >= warningDate && today <= expirationDate; // Période d'alerte, inclut la date d'expiration
+
+      // Un contrat est renouvelable si aujourd'hui est égal à la date d'expiration ou dans les 14 jours avant
+      this.isRenewable = today.getTime() === expirationDate.getTime() ||
+                        (today >= warningDate && today <= expirationDate);
+
+      console.log('isExpired:', this.isExpired);
+      console.log('isNearExpiration:', this.isNearExpiration);
+      console.log('isRenewable:', this.isRenewable);
+
+      const remainingDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+      console.log('Jours restants:', remainingDays);
+
+      if (this.isExpired) {
         this.expirationMessage = 'Votre contrat est expiré. Veuillez le renouveler.';
-        this.showRenewalForm = true;
+      } else if (this.isNearExpiration) {
+        this.expirationMessage = `Attention : Votre contrat expire dans ${remainingDays} jours.`;
       } else {
-        this.isExpired = false;
-        const remainingDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-        this.expirationMessage = `Votre contrat est valide jusqu'au ${expirationDate.toLocaleDateString()}. Il reste ${remainingDays} jours avant l'échéance.`;
-        this.showRenewalForm = false;
+        this.expirationMessage = `Valide jusqu'au ${expirationDate.toLocaleDateString()} (${remainingDays} jours restants).`;
       }
+
+      // Afficher le formulaire uniquement si le contrat est renouvelable
+      this.showRenewalForm = this.isRenewable;
     }
-  onSubmit() {
-    if (!this.renewalForm.valid || !this.isExpired) {
-      if (!this.isExpired) {
-        this.errorMessage = 'Le renouvellement n\'est possible que pour les contrats expirés.';
-      } else {
+    async onSubmit() {
+      if (!this.renewalForm.valid) {
         this.markFormGroupTouched(this.renewalForm);
         window.alert('Veuillez remplir tous les champs requis');
+        return;
       }
-      return;
-    }
 
-    // Map the form values to match the backend expectations
-    let packChoice: 'same' | 'Pack1' | 'Pack2' | 'Pack3';
+      // Recherche du contrat et attente de la fin de l'opération
+      await new Promise<void>((resolve) => {
+        this.isLoading = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+        this.contractData = null;
+        this.isExpired = false;
+        this.expirationMessage = '';
 
-    if (this.renewalForm.get('packOption')?.value === 'same') {
-      packChoice = 'same';
-    } else {
-      // Map the selected pack to the backend expected values
-      switch (this.renewalForm.get('packValue')?.value) {
-        case 'essentiel':
-          packChoice = 'Pack1';
-          break;
-        case 'dommage':
-          packChoice = 'Pack2';
-          break;
-        case 'tierce':
-          packChoice = 'Pack3';
-          break;
-        default:
-          packChoice = 'same';
+        const Cin = this.renewalForm.get('Cin')?.value;
+        const Imat = this.renewalForm.get('Imat')?.value;
+
+        this.http.get<any>(
+          `http://localhost:3000/contrat-auto-geteway/search?Cin=${Cin}&Imat=${Imat}`
+        ).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            if (response && response.status === 200 && response.data && response.data.length > 0) {
+              this.contractData = response.data[0];
+              this.contratNum = this.contractData.id;
+              this.checkExpirationDate();
+              resolve();
+            } else {
+              this.errorMessage = 'Aucun contrat trouvé pour les informations fournies';
+              resolve();
+            }
+          },
+          error: (err: HttpErrorResponse) => {
+            this.isLoading = false;
+            console.error('Erreur:', err);
+            let errorMessage = 'Erreur lors de la recherche du contrat';
+            if (err.error?.message) {
+              errorMessage = err.error.message;
+            } else if (err.message) {
+              errorMessage = err.message;
+            }
+            this.errorMessage = errorMessage;
+            resolve();
+          }
+        });
+      });
+
+      console.log("dans onsubmit", this.isRenewable);
+
+      // Maintenant que isRenewable est correctement défini, on peut vérifier
+      if (!this.isRenewable) {
+        this.errorMessage = 'Le renouvellement n\'est autorisé que pour les contrats dont la date d\'expiration est aujourd\'hui ou dans les 14 prochains jours.';
+        return;
       }
-    }
 
-    const requestData = {
-      Cin: this.renewalForm.get('Cin')?.value,
-      Imat: this.renewalForm.get('Imat')?.value,
-      packChoice: packChoice
-    };
+      // Map the form values to match the backend expectations
+      let packChoice: 'same' | 'Pack1' | 'Pack2' | 'Pack3';
 
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+      if (this.renewalForm.get('packOption')?.value === 'same') {
+        packChoice = 'same';
+      } else {
+        // Map the selected pack to the backend expected values
+        switch (this.renewalForm.get('packValue')?.value) {
+          case 'essentiel':
+            packChoice = 'Pack1';
+            break;
+          case 'dommage':
+            packChoice = 'Pack2';
+            break;
+          case 'tierce':
+            packChoice = 'Pack3';
+            break;
+          default:
+            packChoice = 'same';
+        }
+      }
 
-    this.http.post<{success: boolean, data: any, message: string}>(
-      'http://localhost:3000/contrat-auto-geteway/renouveler-contrat',
-      requestData
-    ).subscribe({
-      next: async (response) => {
-        if (response.success) {
-          console.log('Contrat renouvelé:', response.data);
-          // Get contract number from response
-          const contratNum = response.data.contrat.id;
+      const requestData = {
+        Cin: this.renewalForm.get('Cin')?.value,
+        Imat: this.renewalForm.get('Imat')?.value,
+        packChoice: packChoice
+      };
 
-          // Supprimer l'ancien paiement et créer un nouveau
-          this.cancelAndCreateNewPayment(contratNum, response.data);
-        } else {
+      this.isLoading = true;
+      this.errorMessage = '';
+      this.successMessage = '';
+
+      this.http.post<{success: boolean, data: any, message: string}>(
+        'http://localhost:3000/contrat-auto-geteway/renouveler-contrat',
+        requestData
+      ).subscribe({
+        next: async (response) => {
+          if (response.success) {
+            console.log('Contrat renouvelé:', response.data);
+            // Get contract number from response
+            const contratNum = response.data.contrat.id;
+
+            // Supprimer l'ancien paiement et créer un nouveau
+            this.cancelAndCreateNewPayment(contratNum, response.data);
+          } else {
+            this.isLoading = false;
+            console.error('Réponse inattendue:', response);
+            this.errorMessage = response.message || 'Erreur lors du renouvellement';
+          }
+        },
+        error: (err: HttpErrorResponse) => {
           this.isLoading = false;
-          console.error('Réponse inattendue:', response);
-          this.errorMessage = response.message || 'Erreur lors du renouvellement';
-        }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.isLoading = false;
-        console.error('Erreur:', err);
+          console.error('Erreur:', err);
 
-        let errorMessage = 'Erreur lors du renouvellement du contrat';
-        if (err.error?.message) {
-          errorMessage = err.error.message;
-        } else if (err.message) {
-          errorMessage = err.message;
-        }
+          let errorMessage = 'Erreur lors du renouvellement du contrat';
+          if (err.error?.message) {
+            errorMessage = err.error.message;
+          } else if (err.message) {
+            errorMessage = err.message;
+          }
 
-        this.errorMessage = errorMessage;
-      }
-    });
-  }
+          this.errorMessage = errorMessage;
+        }
+      });
+    }
 
   // Méthode pour annuler l'ancien paiement et en créer un nouveau
   cancelAndCreateNewPayment(contratNum: number, contractData: any): void {
@@ -430,7 +503,7 @@ console.log(contratNum);
             133,
             contratData.assure?.numSouscription || 'N/A',
             contratData.contrat.dateSouscription || 'N/A',
-            contratData.contrat.dateSouscription || 'N/A',
+            contratData.contrat.dateEffet || 'N/A',
             contratData.contrat.dateExpiration || 'N/A',
 
           ]
@@ -474,7 +547,7 @@ console.log(contratNum);
             adresse.rue || 'N/A',
             adresse.numMaison || 'N/A',
             adresse.ville || 'N/A',
-            adresse.Gouvernat || 'N/A',
+            adresse.gouvernat || 'N/A',
             adresse.codePostal || 'N/A',
             ''
           ]

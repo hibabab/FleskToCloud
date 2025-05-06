@@ -22,6 +22,7 @@ import { CreationCVieComponent } from './creation-c-vie/creation-c-vie.component
 import { DevisCVieComponent } from './devis-cvie/devis-cvie.component';
 import { ListeAssureVieComponent } from './liste-assure-vie/liste-assure-vie.component';
 import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/historique-contrat-vie-a.component';
+import { ResiliationComponent } from './resiliation/resiliation.component';
 
 
 
@@ -45,6 +46,7 @@ CreationCVieComponent,
 DevisCVieComponent,
 ListeAssureVieComponent,
 HistoriqueContratVieAComponent,
+ResiliationComponent,
 
   ],
   imports: [
