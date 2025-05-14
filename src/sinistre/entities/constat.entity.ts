@@ -1,4 +1,3 @@
-
 import { Adresse } from 'src/auth/entities/adresse.entity';
 import {
   Column,
@@ -11,14 +10,11 @@ import {
 } from 'typeorm';
 import { Temoin } from './temoin.entity';
 import { Conducteur } from './conducteur.entity';
-import { User } from 'src/auth/entities/user.entity';
+import { ConstatStatut } from '../Enum/constat-statut.enum';
 import { Expert } from 'src/gestion-utilisateur/entities/Expert.entity';
 import { AgentService } from 'src/gestion-utilisateur/entities/AgentService.entity';
-export enum ConstatStatut {
-  EN_ATTENTE = 'En attente',
-  EN_COURS = 'En cours de traitement',
-  CLOTURE = 'Clôturé',
-}
+import { PhotoJustificatif } from './photo.entity';
+import { Vehicule } from 'src/assurance-auto/entities/Vehicule.entity';
 
 @Entity('constat')
 export class constat {
@@ -47,9 +43,9 @@ export class constat {
   @OneToOne(() => Conducteur, { nullable: true }) // 📌 Conducteur peut être null
   @JoinColumn()
   conducteur?: Conducteur | null;
-  @ManyToOne(() => User, (user) => user.constats, { nullable: true }) // Ici nullable a du sens
-  @JoinColumn({ name: 'userId' })
-  user?: User; // Le ? rend la propriété optionnelle en TypeScript
+  @ManyToOne(() => Vehicule, (vehicule) => vehicule.constats)
+  @JoinColumn({ name: 'vehiculeId' })
+  vehicule: Vehicule;
   @Column({
     type: 'enum',
     enum: ConstatStatut,
@@ -61,7 +57,8 @@ export class constat {
   // ✅ Nouveau champ : montant estimé
   @Column({ type: 'float', nullable: true })
   montantEstime?: number;
-
+  @Column({ nullable: true })
+  rapportUrl?: string; // URL du rapport PDF de l'expert
   // ✅ Nouvelle relation avec l’expert
   @ManyToOne(() => Expert, (expert) => expert.constats, { nullable: true })
   @JoinColumn({ name: 'expertId' })
@@ -71,4 +68,9 @@ export class constat {
   })
   @JoinColumn({ name: 'agentServiceId' })
   agentService?: AgentService | null;
+  @OneToMany(() => PhotoJustificatif, (photo) => photo.constat, {
+    cascade: true,
+    nullable: true,
+  })
+  photos?: PhotoJustificatif[];
 }

@@ -3,19 +3,18 @@ import {
   Body,
   Post,
   Get,
-  UseGuards,
-  Req,
   Param,
   InternalServerErrorException,
   BadRequestException,
   NotFoundException,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/SignupDto';
 import { LoginDto } from './dto/loginDto';
 import { ForgotPasswordDto } from './dto/ForgotPasswordDto.dto';
 import { ResetPasswordDto } from './dto/Restpassworld.dto';
-import { AuthenticationGuard } from '../guards/auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { User } from './entities/user.entity';
 
@@ -41,12 +40,12 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() credentials: LoginDto) {
-      try {
-          return await this.authService.login(credentials);
-      } catch (error) {
-          console.error('Controller login error:', error);
-          throw error; // Laissez passer l'erreur originale
-      }
+    try {
+      return await this.authService.login(credentials);
+    } catch (error) {
+      console.error('Controller login error:', error);
+      throw error;
+    }
   }
 
   // Endpoints de gestion de mot de passe
@@ -55,21 +54,23 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 
-  @Post('change-password')
-  @UseGuards(AuthenticationGuard)
-  changePassword(@Body() changePasswordDto: ChangePasswordDto, @Req() req) {
-    return this.authService.changePassword(
-      changePasswordDto.oldPassword,
-      changePasswordDto.newPassword,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-      req.userId,
-    );
-  }
   @Post('reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(
       resetPasswordDto.newPassword,
       resetPasswordDto.resetToken,
+    );
+  }
+
+  @Post(':userId/change-password')
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Param('userId') userId: number,
+  ) {
+    return this.authService.changePassword(
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
+      userId,
     );
   }
 
@@ -84,69 +85,61 @@ export class AuthController {
   getOk() {
     return 'OK';
   }
+
   @Get('users')
-async getAllUsers() {
-  try {
-    return await this.authService.getAllUsers();
-  } catch (error) {
-    if (error instanceof InternalServerErrorException) {
-      throw error;
+  async getAllUsers() {
+    try {
+      return await this.authService.getAllUsers();
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Erreur lors de la récupération des utilisateurs',
+      );
     }
-    throw new InternalServerErrorException(
-      'Erreur lors de la récupération des utilisateurs'
-    );
   }
-}
-@Get('users/:id')
-async getUserById(@Param('id') id: number): Promise<User> {
-  
-  if (isNaN(id)) {
-    throw new BadRequestException('ID invalide');
-  }
-  return this.authService.getUserById(id);
-}
-@Get('user/:Cin')
-async getUserByCin(@Param('Cin') Cin: number): Promise<User> {
-  
-  if (isNaN(Cin)) {
-    throw new BadRequestException('ID invalide');
-  }
-  return this.authService.getUserByCin(Cin);
-}
-@Get('check-email/:email')
-async checkEmailExists(@Param('email') email: string): Promise<{ exists: boolean }> {
-  try {
-    const exists = await this.authService.isEmailExists(email);
-    return { exists };
-  } catch (error) {
-    throw new InternalServerErrorException('Erreur lors de la vérification de l\'email');
-  }
-}
 
-@Get('check-cin/:cin')
-async checkCinExists(@Param('cin') cin: number): Promise<{ exists: boolean }> {
-  if (isNaN(cin)) {
-    throw new BadRequestException('CIN invalide');
-  }
-  try {
-    const exists = await this.authService.isCinExists(cin);
-    return { exists };
-  } catch (error) {
-    throw new InternalServerErrorException('Erreur lors de la vérification du CIN');
-  }
-}
-
-@Get('check-blocked/:email')
-async checkUserBlocked(@Param('email') email: string): Promise<{ isBlocked: boolean }> {
-  try {
-    const isBlocked = await this.authService.isUserBlocked(email);
-    return { isBlocked };
-  } catch (error) {
-    if (error instanceof NotFoundException) {
-      throw error;
+  @Get('users/:id')
+  async getUserById(@Param('id') id: number): Promise<User> {
+    if (isNaN(id)) {
+      throw new BadRequestException('ID invalide');
     }
-    throw new InternalServerErrorException('Erreur lors de la vérification du statut de blocage');
+    return this.authService.getUserById(id);
   }
-}
-}
 
+  @Get('user/:Cin')
+  async getUserByCin(@Param('Cin') Cin: number): Promise<User> {
+    if (isNaN(Cin)) {
+      throw new BadRequestException('ID invalide');
+    }
+    return this.authService.getUserByCin(Cin);
+  }
+
+
+  @Post('refresh')
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  /*const refreshToken = req.cookies.refresh_token;
+  const tokens = await this.authService.refreshToken(refreshToken);
+  
+  res.cookie('access_token', tokens.access_token, { 
+    httpOnly: true, 
+    secure: true,
+    sameSite: 'strict', 
+    maxAge: 15 * 60 * 1000 // 15 min
+  });
+  
+  res.cookie('refresh_token', tokens.refresh_token, {
+    httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+    });
+
+    return { message: 'Tokens refreshed' };
+ */ }
+}

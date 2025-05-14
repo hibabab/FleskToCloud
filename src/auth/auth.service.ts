@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -19,6 +20,7 @@ import { VerificationmailService } from '../service/verificationmail/verificatio
 import { User } from './entities/user.entity';
 import { Adresse } from './entities/adresse.entity';
 import { AdresseDto } from './dto/adresse.dto';
+import { RefreshToken } from './entities/refresh-token.entity';
 
 interface CachedUserData {
   code: string;
@@ -38,7 +40,8 @@ export class AuthService {
 
     @InjectRepository(Adresse)
     private readonly adresseRepository: Repository<Adresse>,
-
+    @InjectRepository(RefreshToken)
+    private refreshTokenRepository: Repository<RefreshToken>,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly verificationmailService: VerificationmailService,
@@ -127,38 +130,83 @@ export class AuthService {
 
     return savedUser;
   }
-
-  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
-    try {
+  async login(
+  loginDto: LoginDto,
+): Promise<{ access_token: string; refresh_token: string }> {
+  try {
       console.log('Tentative de connexion avec:', loginDto.email);
-      
-      const user = await this.userRepository.findOne({ where: { email: loginDto.email } });
-      console.log('Utilisateur trouvé:', user);
-      
-      if (!user) {
-        console.log('Aucun utilisateur trouvé avec cet email');
-        throw new UnauthorizedException('Identifiants invalides');
-      }
 
-      console.log('Comparaison du mot de passe...');
-      const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
-      
-      if (!isPasswordValid) {
-        console.log('Mot de passe incorrect');
-        throw new UnauthorizedException('Identifiants invalides');
-      }
-
-      console.log('Génération du token JWT...');
-      const payload = { sub: user.id, username: `${user.nom} ${user.prenom}` };
-      const access_token = await this.jwtService.signAsync(payload);
-      
-      console.log('Connexion réussie');
-      return { access_token };
-      
-    } catch (error) {
-      console.error('Erreur lors du login:', error);
-      throw new InternalServerErrorException('Erreur interne du serveur');
+    
+    const user = await this.userRepository.findOne({
+      where: { email: loginDto.email },
+    });
+    console.log('Utilisateur trouvé:', user);
+    
+    if (!user) {
+      console.log('Aucun utilisateur trouvé avec cet email');
+      throw new UnauthorizedException({
+        statusCode: 401,
+        message: 'Identifiants invalides',
+      });
     }
+    
+    // Vérification si l'utilisateur est bloqué
+    if (user.isBlocked) {
+      console.log('Tentative de connexion d\'un utilisateur bloqué');
+      throw new ForbiddenException({
+        statusCode: 403,
+        message: 'Votre compte a été bloqué. Veuillez contacter l\'administrateur.',
+      });
+    }
+    
+    console.log('Comparaison du mot de passe...');
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      console.log('Mot de passe incorrect');
+      throw new UnauthorizedException({
+        statusCode: 401,
+        message: 'Identifiants invalides',
+      });
+    }
+    
+    console.log('Génération du token JWT...');
+    const payload = { sub: user.id, username: `${user.nom} ${user.prenom}` };
+    const access_token = await this.jwtService.signAsync(payload, {
+      expiresIn: '60m',
+    });
+    const refresh_token = await this.jwtService.signAsync(
+      { sub: user.id },
+      { expiresIn: '7d' },
+    );
+    
+    await this.refreshTokenRepository.save({
+      token: refresh_token,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      user,
+    });
+    
+    return { 
+      access_token, 
+      refresh_token 
+    };
+  } catch (error) {
+    console.error('Erreur lors du login:', error);
+    
+    // Gestion spécifique des erreurs
+    if (error instanceof UnauthorizedException) {
+      throw error; // Déjà formaté avec statusCode 401
+    } else if (error instanceof ForbiddenException) {
+      throw error; // Déjà formaté avec statusCode 403
+    } else {
+      throw new InternalServerErrorException({
+        statusCode: 500,
+        message: 'Erreur interne du serveur',
+      });
+    }
+  }
 }
 
   async forgotPassword(email: string) {
@@ -342,8 +390,7 @@ export class AuthService {
           'date_naissance',
           'role',
           'isBlocked',
-         
-        ]
+        ],
       });
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs:', error);
@@ -409,7 +456,7 @@ export class AuthService {
   async isUserBlocked(email: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ 
       where: { email },
-      select: ['isBlocked']
+      select: ['isBlocked'],
     });
     
     if (!user) {
@@ -418,4 +465,32 @@ export class AuthService {
     
     return user.isBlocked;
   }
+  // auth.service.ts
+async refreshToken(oldRefreshToken: string) {
+  const tokenEntity = await this.refreshTokenRepository.findOne({
+    where: { token: oldRefreshToken },
+    relations: ['user']
+  });
+
+  if (!tokenEntity || tokenEntity.expiresAt < new Date()) {
+    throw new UnauthorizedException('Refresh token invalide');
+  }
+
+  // Générer nouveaux tokens
+  const payload = { sub: tokenEntity.user.id };
+  const access_token = await this.jwtService.signAsync(payload, { expiresIn: '15m' });
+  const refresh_token = await this.jwtService.signAsync(payload, { expiresIn: '7d' });
+
+  // Mettre à jour le refresh token en BDD
+  await this.refreshTokenRepository.update(tokenEntity.id, {
+    token: refresh_token,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  });
+
+  return { access_token, refresh_token };
+}
+
+async invalidateRefreshToken(token: string) {
+  await this.refreshTokenRepository.delete({ token });
+}
 }

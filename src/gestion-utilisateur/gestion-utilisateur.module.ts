@@ -21,15 +21,31 @@ import { Payment } from 'src/paiement/entities/payment.entity';
 import { NotificationEntity } from 'src/notification/entities/notification.entity';
 import { AdminService } from './services/admin/admin.service';
 import { AdminController } from './controllers/admin/admin.controller';
+import { constat } from 'src/sinistre/entities/constat.entity';
 
-@Module({imports: [
-    TypeOrmModule.forFeature([ContratAuto, Garanties, Vehicule, Assure, TemplateGaranties,CarteGrise,Expert,AgentService,User,Payment,NotificationEntity]),
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([
+      ContratAuto,
+      Garanties,
+      Vehicule,
+      Assure,
+      TemplateGaranties,
+      CarteGrise,
+      Expert,
+      AgentService,
+      User,
+      Payment,
+      NotificationEntity,
+      constat,
+    ]),
     AuthModule,
     PaiementModule,
     forwardRef(() => NotificationModule),
-    SinistreModule,],
-  providers: [ExpertService, AgentServiceService,AdminService],
-  controllers: [AgentServiceController, ExpertController,AdminController],
-  exports: [TypeOrmModule,ExpertService,AgentServiceService]
+    SinistreModule,
+  ],
+  providers: [ExpertService, AgentServiceService, AdminService],
+  controllers: [AgentServiceController, ExpertController, AdminController],
+  exports: [TypeOrmModule, ExpertService, AgentServiceService],
 })
 export class GestionUtilisateurModule {}

@@ -1,7 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { ContratAuto } from './ContratAuto.entity';
 import { CarteGrise } from './carte-grise.entity';
-
+import { constat } from 'src/sinistre/entities/constat.entity';
 
 @Entity()
 export class Vehicule {
@@ -9,7 +15,7 @@ export class Vehicule {
   id: number;
 
   @Column()
-  type: string; 
+  type: string;
 
   @Column()
   marque: string;
@@ -25,8 +31,6 @@ export class Vehicule {
 
   @Column()
   nbPlace: number;
-
-  
 
   @Column({ type: 'date' })
   DPMC: Date;
@@ -53,4 +57,6 @@ export class Vehicule {
   carteGrise: CarteGrise;
   @OneToOne(() => ContratAuto, (contratAuto) => contratAuto.vehicule)
   contratAuto: ContratAuto;
+  @OneToMany(() => constat, (constat) => constat.vehicule)
+  constats: constat[];
 }

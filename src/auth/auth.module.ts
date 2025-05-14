@@ -14,11 +14,12 @@ import { Adresse } from './entities/adresse.entity';
 import { Admin } from '../gestion-utilisateur/entities/admin.entity';
 import { UserService } from './services/user/user.service';
 import { UserGatewayController } from './controllers/user/user.controller';
+import { RefreshToken } from './entities/refresh-token.entity';
 
 @Module({
   imports: [
     // Configuration TypeORM pour les entités
-    TypeOrmModule.forFeature([User, ResetToken, Adresse, Admin]),
+    TypeOrmModule.forFeature([User, ResetToken, Adresse, Admin, RefreshToken]),
 
     // Configuration du module Config
     ConfigModule.forRoot({
@@ -33,27 +34,17 @@ import { UserGatewayController } from './controllers/user/user.controller';
     // Configuration asynchrone du JwtModule
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('PASS', '1234'), // Valeur par défaut '1234' si PASS non défini
-        signOptions: { 
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '1h') // Durée de validité du token
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '1h'), // Durée de validité du token
         },
       }),
       inject: [ConfigService],
     }),
   ],
   controllers: [AuthController, UserGatewayController],
-  providers: [
-    AuthService, 
-    MailService, 
-    VerificationmailService, 
-    UserService
-  ],
-  exports: [
-    TypeOrmModule,
-    AuthService,
-    JwtModule,
-    MailService
-  ],
+  providers: [AuthService, MailService, VerificationmailService, UserService],
+  exports: [TypeOrmModule, AuthService, JwtModule, MailService],
 })
 export class AuthModule {}

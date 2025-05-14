@@ -8,8 +8,6 @@ import {
 } from 'typeorm';
 import { constat } from './constat.entity';
 
-
-
 @Entity('temoins')
 export class Temoin {
   @PrimaryGeneratedColumn()

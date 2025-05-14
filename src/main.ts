@@ -1,39 +1,48 @@
-import { NestFactory } from '@nestjs/core'; // Importation de NestFactory pour créer l'application Nest
-import { AppModule } from './app.module'; // Importation du module principal de l'application
-import { ValidationPipe } from '@nestjs/common'; // Importation du ValidationPipe
-import { Logger } from '@nestjs/common'; // Importation du Logger pour ajouter des logs
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { NotificationService } from './notification/services/notification/notification.service';
+import * as path from 'path';
+import * as express from 'express';
 
 async function bootstrap() {
-  // Création de l'application NestJS normale
-  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+
+  // Configuration CORS
   app.enableCors({
-    origin: 'http://localhost:4200', // Your Angular app's origin
+    origin: 'http://localhost:4200',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // If you need to pass cookies/authentication
+    credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
-  // Utilisation du ValidationPipe globalement pour valider les requêtes
+
+  // Configuration des fichiers statiques (uploads)
+  const uploadsPath = path.join(__dirname, '..', 'upload');
+  app.use('/upload', express.static(uploadsPath));
+
+  // Validation globale
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Supprime les propriétés non définies dans le DTO
-      forbidNonWhitelisted: true, // Rejette la requête si des propriétés non définies sont présentes
+      whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
-  const notificationService = app.get(NotificationService);
 
-  await app.listen(3000);
-  Logger.log('Application started on port 3000', 'Bootstrap'); // Log lorsque l'application commence à écouter
+  // Vérification des contrats expirants
   try {
-    logger.log('Vérification des contrats en expiration au démarrage (sans envoi de notifications)...');
-    // Passer false pour ne pas envoyer de notifications au démarrage
-    const contratsExpirants = await notificationService.verifierContratsExpiration(false);
-    logger.log(`Vérification terminée. ${contratsExpirants} contrats expirent dans les 14 prochains jours.`);
+    const notificationService = app.get(NotificationService);
+    const contratsExpirants =
+      await notificationService.verifierContratsExpiration(false);
+    logger.log(`${contratsExpirants} contrats à vérifier`);
   } catch (error) {
-    logger.error('Erreur lors de la vérification des contrats en expiration', error.stack);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    logger.error('Erreur lors de la vérification des contrats', error.stack);
   }
+
+  // Démarrage du serveur
+  await app.listen(3000);
+  logger.log('Serveur démarré sur http://localhost:3000');
 }
 
-// Appelle la fonction bootstrap pour lancer l'application
 bootstrap();

@@ -8,7 +8,6 @@ import {
   OneToMany,
 } from 'typeorm';
 
-
 @Entity()
 export class Expert {
   @PrimaryGeneratedColumn()

@@ -1,375 +1,627 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
-import { promises as fs } from 'fs';
 import { join } from 'path';
-import { Repository } from 'typeorm';
-import { constat } from '../entities/constat.entity';
+import { CannotExecuteNotConnectedError, EntityNotFoundError, QueryFailedError, Repository } from 'typeorm';
+
 import { User } from 'src/auth/entities/user.entity';
 import { Expert } from 'src/gestion-utilisateur/entities/Expert.entity';
-import { NotificationService } from 'src/notification/services/notification/notification.service';
-import { AgentServiceService } from 'src/gestion-utilisateur/services/agent-service/agent-service.service';
+import { AdresseService } from './adresse-service.service';
+import { TemoinService } from './temoin.service';
+import { MailConstatService } from './mailconstat.service';
+import { ConducteurService } from './conducteur.service';
 import { ExpertService } from 'src/gestion-utilisateur/services/expert/expert.service';
-import { MailService } from 'src/service/mail.service';
+import { AgentServiceService } from 'src/gestion-utilisateur/services/agent-service/agent-service.service';
+import { NotificationService } from 'src/notification/services/notification/notification.service';
+import { ConstatDto } from '../dto/constat-dto.dto';
 
+import { constat } from '../entities/constat.entity';
+import { ConstatStatut } from '../Enum/constat-statut.enum';
+import { VehiculeService } from '../../assurance-auto/services/vehicule/vehicule.service';
+import { PhotoJustificatif } from '../entities/photo.entity';
+import { AgentService } from 'src/gestion-utilisateur/entities/AgentService.entity';
+import { Vehicule } from 'src/assurance-auto/entities/Vehicule.entity';
 
 @Injectable()
-export class ConstaatService {
-  // constructor(
-  //   @InjectRepository(constat)
-  //   private readonly constatRepository: Repository<constat>,
-  //   @InjectRepository(User) // ✅ Ajout essentiel ici
-  //   private readonly userRepository: Repository<User>,
-  //   @InjectRepository(Expert) // ✅ Ajout essentiel ici
-  //   private readonly expertRepository: Repository<Expert>,
-  //   private readonly adresseService: AdresseService,
-  //   private readonly temoinService: TemoinService,
-  //   private readonly mailService: MailService,
-  //   private readonly conducteurService: ConducteurService,
-  //   private readonly expertService: ExpertService,
-  //   private readonly AgentServiceService: AgentServiceService,
-  //   private readonly notificationService: NotificationService,
-  // ) {}
+export class ConstatService {
+  private readonly uploadPath = join(__dirname, '../../../upload/constat');
 
-  // async getUserConstats(userId: number): Promise<constat[]> {
-  //   return this.constatRepository.find({
-  //     where: { user: { id: userId } },
-  //     relations: ['lieu', 'conducteur', 'temoins'],
-  //     order: { dateAccident: 'DESC' },
-  //   });
-  // }
-  // async createConstat(
-  //   constatDto: ConstatDto,
-  //   userId: number,
-  //   conducteur1Email: string,
-  //   conducteur2Email: string,
-  // ): Promise<constat> {
-  //   // Recherche de l'utilisateur par ID
-  //   const user = await this.userRepository.findOneBy({ id: userId });
-  //   if (!user) {
-  //     throw new NotFoundException(`Utilisateur avec l'ID ${userId} non trouvé`);
-  //   }
+  constructor(
+    @InjectRepository(constat)
+    private readonly constatRepository: Repository<constat>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Expert)
+    private readonly expertRepository: Repository<Expert>,
+    private readonly adresseService: AdresseService,
+    private readonly temoinService: TemoinService,
+    private readonly VehiculeService: VehiculeService,
+    private readonly mailService: MailConstatService,
+    private readonly conducteurService: ConducteurService,
+    private readonly expertService: ExpertService,
+    private readonly agentService: AgentServiceService,
+    private readonly notificationService: NotificationService,
+  ) {}
+  async createConstat(
+    constatDto: ConstatDto,
+    immatriculation: string,
+    conducteur1Email: string,
+    conducteur2Email?: string, // Made optional with ?
+  ): Promise<constat> {
+    try {
+      // Find vehicle by immatriculation
+      const vehicule =
+        await this.VehiculeService.findByImmatriculation(immatriculation);
 
-  //   // Création ou récupération de l'adresse
-  //   const lieu = await this.adresseService.findOrCreate(constatDto.lieu);
+      if (!vehicule) {
+        throw new NotFoundException(
+          `Vehicle with registration ${immatriculation} not found`,
+        );
+      }
 
-  //   // Création du conducteur si nécessaire
-  //   const conducteur = constatDto.conducteur
-  //     ? await this.conducteurService.create(constatDto.conducteur)
-  //     : undefined;
+      // Create or find location address
+      const lieu = await this.adresseService.findOrCreate(constatDto.lieu);
 
-  //   // Création du constat
-  //   const newConstat = this.constatRepository.create({
-  //     ...constatDto,
-  //     lieu,
-  //     temoins: constatDto.temoins
-  //       ? await Promise.all(
-  //           constatDto.temoins.map((temoinDto) =>
-  //             this.temoinService.create(temoinDto),
-  //           ),
-  //         )
-  //       : [],
-  //     conducteur,
-  //     user,
-  //   });
+      // Create conductor if provided in DTO
+      const conducteur = constatDto.conducteur
+        ? await this.conducteurService.create(constatDto.conducteur)
+        : undefined;
 
-  //   // Sauvegarde du constat
-  //   const savedConstat = await this.constatRepository.save(newConstat);
+      // Create witnesses if provided in DTO
+      const temoins = constatDto.temoins
+        ? await Promise.all(
+            constatDto.temoins.map((temoinDto) =>
+              this.temoinService.create(temoinDto),
+            ),
+          )
+        : [];
 
-  //   // Vérification de la dateAccident et formatage
-  //   let dateAccidentFormatted = '';
-  //   if (savedConstat.dateAccident instanceof Date) {
-  //     dateAccidentFormatted = savedConstat.dateAccident
-  //       .toISOString()
-  //       .split('T')[0]; // Format 'YYYY-MM-DD'
-  //   } else {
-  //     // Si la dateAccident n'est pas un objet Date, on tente de la parser (cas d'une chaîne)
-  //     dateAccidentFormatted = new Date(savedConstat.dateAccident)
-  //       .toISOString()
-  //       .split('T')[0];
-  //   }
+      const photoEntities = constatDto.photos
+        ? constatDto.photos.map((url) => {
+            const photo = new PhotoJustificatif();
+            photo.url = url;
+            return photo;
+          })
+        : [];
 
-  //   // Récupération de l'heure
-  //   const heureFormatted = savedConstat.heure;
+      // Exclude photos from the DTO to avoid type issues
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { photos: _, ...constatData } = constatDto;
 
-  //   // Vérification que les conducteurs ont un email et envoi
-  //   if (conducteur1Email && conducteur2Email) {
-  //     const constatDetails = {
-  //       date: dateAccidentFormatted,
-  //       heure: heureFormatted,
-  //       lieu: `${lieu.ville}, ${lieu.rue}`,
-  //     };
+      // Create new constat with all relationships
+      const newConstat = this.constatRepository.create({
+        ...constatData, // Spread remaining DTO data without photos
+        lieu,
+        conducteur,
+        temoins,
+        vehicule,
+        photos: photoEntities, // Assign photo entities
+      });
 
-  //     // Envoi de l'email aux deux conducteurs
-  //     await this.mailService.sendConstatEmail(
-  //       conducteur1Email,
-  //       conducteur2Email,
-  //       constatDetails,
-  //     );
-  //   }
-  //   await this.notificationService.envoyerNotificationTousAgentsDeService(
-  //     `🔔 Monsieur ${savedConstat.user?.nom}  ${savedConstat.user?.prenom}a declaré un constat Veuillez consulter les détails.`,
-  //   );
-  //   // Retour du constat sauvegardé
-  //   return savedConstat;
-  // }
+      // Save the constat (cascades to save photos)
+      const savedConstat = await this.constatRepository.save(newConstat);
 
-  // async getConstatsByUserId(userId: number): Promise<constat[]> {
-  //   try {
-  //     const constats = await this.constatRepository.find({
-  //       where: { user: { id: userId } }, // Filtrer par ID de l'utilisateur
-  //       relations: ['user', 'lieu', 'conducteur', 'temoins'],
-  //       order: { dateAccident: 'DESC' }, // Charger les relations nécessaires
-  //     });
+      // Add constat to vehicle
+      await this.VehiculeService.ajouterConstatAuVehicule(
+        vehicule.id,
+        savedConstat.idConstat,
+      );
 
-  //     return constats; // Retourner tous les constats de cet utilisateur
-  //   } catch (error) {
-  //     console.error('Erreur lors de la récupération des constats:', error);
-  //     throw new Error('Erreur lors de la récupération des constats');
-  //   }
-  // }
-  // async getAllConstats(): Promise<constat[]> {
-  //   try {
-  //     const constats = await this.constatRepository.find({
-  //       relations: ['user', 'lieu', 'conducteur', 'temoins'],
-  //       order: { dateAccident: 'DESC' },
-  //     });
+      // Format date and time for email
+      const dateAccidentFormatted = new Date(savedConstat.dateAccident)
+        .toISOString()
+        .split('T')[0];
+      const heureFormatted = savedConstat.heure;
 
-  //     return constats;
-  //   } catch (error) {
-  //     console.error(
-  //       'Erreur lors de la récupération de tous les constats:',
-  //       error,
-  //     );
-  //     throw new Error('Erreur lors de la récupération de tous les constats');
-  //   }
-  // }
+      // Get constat URL
+      const constatUrl = savedConstat.pathurl
+        ? `https://fleskcover.com${savedConstat.pathurl}`
+        : 'URL non disponible encore';
 
-  // private readonly uploadPath = join(__dirname, '../../../upload/constat');
+      // Send email to both conductors if emails provided
+      if (conducteur1Email && conducteur2Email) {
+        const constatDetails = {
+          date: dateAccidentFormatted,
+          heure: heureFormatted,
+          lieu: `${lieu.ville}, ${lieu.rue}`,
+          constatUrl,
+        };
 
-  // async saveFile(file: Express.Multer.File): Promise<string> {
-  //   await fs.mkdir(this.uploadPath, { recursive: true });
+        await this.mailService.sendConstatEmail(
+          conducteur1Email,
+          conducteur2Email,
+          constatDetails,
+        );
+      }
 
-  //   const safeName = file.originalname
-  //     .replace(/[^\w.-]/g, '-')
+      // Send notification to service agents
+      if (vehicule.contratAuto?.assure?.user) {
+        await this.notificationService.envoyerNotificationTousAgentsDeService(
+          `🔔 Monsieur ${vehicule.contratAuto.assure.user.nom} ${vehicule.contratAuto.assure.user.prenom} a déclaré un constat. Veuillez consulter les détails.`,
+        );
+      }
 
-  //     .replace(/\s+/g, '-');
-  //   const fileName = `${Date.now()}-${safeName}`;
-  //   const filePath = join(this.uploadPath, fileName);
+      return savedConstat;
+    } catch (error) {
+      console.error('❌ Erreur lors de la création du constat:', error);
+      throw error;
+    }
+  }
+  async getUserConstats(userId: number): Promise<constat[]> {
+    try {
+      return this.constatRepository.find({
+        where: {
+          vehicule: { contratAuto: { assure: { user: { id: userId } } } },
+        },
+        relations: ['lieu', 'conducteur', 'temoins', 'vehicule'],
+        order: { dateAccident: 'DESC' },
+      });
+    } catch (error) {
+      console.error('❌ Erreur lors de la récupération des constats:', error);
+      throw new InternalServerErrorException(
+        'Erreur lors de la récupération des constats',
+      );
+    }
+  }
 
-  //   await fs.writeFile(filePath, file.buffer);
+  // Get detailed constats where user is associated through vehicle ownership
+  async getConstatsByUserId(userId: number): Promise<constat[]> {
+    try {
+      const constats = await this.constatRepository.find({
+        where: {
+          vehicule: { contratAuto: { assure: { user: { id: userId } } } },
+        },
+        relations: [
+          'lieu',
+          'conducteur',
+          'temoins',
+          'vehicule',
+          'vehicule.contratAuto',
+          'vehicule.contratAuto.assure',
+          'vehicule.contratAuto.assure.user',
+          'expert',
+          'expert.user',
+        ],
+        order: { dateAccident: 'DESC' },
+      });
 
-  //   return `/upload/constat/${fileName}`;
-  // }
+      return constats;
+    } catch (error) {
+      console.error('❌ Erreur lors de la récupération des constats:', error);
+      throw new InternalServerErrorException(
+        'Erreur lors de la récupération des constats',
+      );
+    }
+  }
 
-  // async updateConstatPath(
-  //   constatId: number,
-  //   pathurl: string,
-  // ): Promise<constat> {
-  //   const constat = await this.constatRepository.findOneBy({
-  //     idConstat: constatId,
-  //   });
-  //   if (!constat) {
-  //     throw new NotFoundException(`Constat ${constatId} non trouvé`);
-  //   }
+  async getAllConstats(): Promise<constat[]> {
+    try {
+      const constats = await this.constatRepository.find({
+        relations: [
+          'lieu',
+          'conducteur',
+          'temoins',
+          'vehicule',
+          'vehicule.contratAuto.assure.user',
+        ],
+        order: { dateAccident: 'DESC' },
+      });
 
-  //   constat.pathurl = pathurl;
-  //   return this.constatRepository.save(constat);
-  // }
-  // async getConstatById(id: number): Promise<constat> {
-  //   const constat = await this.constatRepository.findOne({
-  //     where: { idConstat: id },
-  //     relations: ['user', 'expert', 'expert.user'],
-  //   });
-  //   if (!constat) {
-  //     throw new NotFoundException(`Constat avec l'ID ${id} non trouvé`);
-  //   }
-  //   return constat;
-  // }
+      return constats;
+    } catch (error) {
+      console.error(
+        'Erreur lors de la récupération de tous les constats:',
+        error,
+      );
+      throw new Error('Erreur lors de la récupération de tous les constats');
+    }
+  }
 
-  // async addExpertToConstat(
-  //   constatId: number,
-  //   expertId: number,
-  // ): Promise<constat> {
-  //   const constat = await this.getConstatById(constatId);
-  //   const expert = await this.expertRepository.findOneBy({ id: expertId });
+  async updateConstatPath(
+    constatId: number,
+    pathurl: string,
+  ): Promise<constat> {
+    const constat = await this.constatRepository.findOneBy({
+      idConstat: constatId,
+    });
+    if (!constat) {
+      throw new NotFoundException(`Constat ${constatId} non trouvé`);
+    }
 
-  //   if (!expert) {
-  //     throw new NotFoundException(`Expert avec l'ID ${expertId} non trouvé`);
-  //   }
+    constat.pathurl = pathurl;
+    return this.constatRepository.save(constat);
+  }
 
-  //   constat.expert = expert;
-  //   return this.constatRepository.save(constat);
-  // }
-  // async affecterExpertAConstat(
-  //   expertId: number,
-  //   constatId: number,
-  //   agentId: number,
-  // ): Promise<constat> {
-  //   try {
-  //     // 1. Get all necessary data in parallel
-  //     const [updatedConstat, Agent, expert] = await Promise.all([
-  //       this.addExpertToConstat(constatId, expertId),
-  //       this.AgentServiceService.getAgentById(agentId),
-  //       this.expertService.getExpertById(expertId),
-  //     ]);
+  async getConstatById(id: number): Promise<constat> {
+    const constat = await this.constatRepository.findOne({
+      where: { idConstat: id },
+      relations: ['vehicule', 'expert', 'expert.user'],
+    });
+    if (!constat) {
+      throw new NotFoundException(`Constat avec l'ID ${id} non trouvé`);
+    }
+    return constat;
+  }
 
-  //     if (!Agent?.user) {
-  //       throw new NotFoundException('Agent user information not found');
-  //     }
+  async addExpertToConstat(
+    constatId: number,
+    expertId: number,
+  ): Promise<constat> {
+    const constat = await this.getConstatById(constatId);
+    const expert = await this.expertRepository.findOneBy({ id: expertId });
 
-  //     // 2. Update expert's disponibilite to false and add constat
-  //     await this.expertService.updateExpertDisponibilite(expertId, false);
+    if (!expert) {
+      throw new NotFoundException(`Expert avec l'ID ${expertId} non trouvé`);
+    }
 
-  //     // 3. Execute parallel operations
-  //     await Promise.all([
-  //       this.expertService.ajouterConstatAExpert(expertId, constatId),
-  //       this.AgentServiceService.ajouterConstatAgent(agentId, constatId),
-  //     ]);
+    constat.expert = expert;
+    return this.constatRepository.save(constat);
+  }
 
-  //     // 4. Send notifications
-  //     await Promise.all([
-  //       this.notificationService.envoyerNotificationTousAgentsDeServiceSaufUn(
-  //         `🔔 Monsieur ${Agent.user.nom} ${Agent.user.prenom} s'occuppe du constat n°${constatId}.`,
-  //         Agent.user.id,
-  //       ),
-  //       this.notificationService.creerNotification(
-  //         expert.user.id,
-  //         `🔔 Nouvelle mission ! Vous avez été affecté(e) au constat n°${constatId}. Veuillez consulter les détails.`,
-  //       ),
-  //       updatedConstat.user &&
-  //         this.notificationService.creerNotification(
-  //           updatedConstat.user.id,
-  //           `👨‍🔧 Un expert a été désigné pour votre constat n°${constatId} : ${expert.user.nom} ${expert.user.prenom}. Il prendra contact avec vous sous peu.`,
-  //         ),
-  //     ]);
+  
 
-  //     return updatedConstat;
-  //   } catch (error) {
-  //     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  //     console.error("Erreur lors de l'affectation:", error.stack);
-  //     throw new BadRequestException(
-  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  //       error.message || "Erreur lors de l'affectation de l'expert",
-  //     );
-  //   }
-  // }
-  // async programmerExpertise(
-  //   constatId: number,
-  //   date: Date,
-  //   heure: string,
-  //   lieu: string,
-  //   commentaire: string,
-  // ): Promise<{ constat: constat; message: string }> {
-  //   try {
-  //     // 1. Vérification des paramètres d'entrée
-  //     if (!constatId || !date || !heure || !lieu) {
-  //       throw new BadRequestException(
-  //         'Paramètres manquants pour la programmation',
-  //       );
-  //     }
+  async affecterExpertAConstat(
+    expertId: number,
+    constatId: number,
+    agentId: number,
+    commentaire?: string,
+  ): Promise<constat> {
+    try {
+      const [updatedConstat, agent, expert] = await Promise.all([
+        this.addExpertToConstat(constatId, expertId),
+        this.agentService.getAgentById2(agentId),
+        this.expertService.getExpertById2(expertId),
+      ]);
+  
+      if (!agent?.user) {
+        throw new NotFoundException('Agent user information not found');
+      }
+  
+      await this.expertService.updateExpertDisponibilite(expertId, false);
+  
+      await Promise.all([
+        this.expertService.ajouterConstatAExpert(expertId, constatId),
+        this.agentService.ajouterConstatAgent(agentId, constatId),
+      ]);
+  
+      updatedConstat.statut = ConstatStatut.AFFECTE;
+      await this.constatRepository.save(updatedConstat);
+  
+      const messageExpert = commentaire
+        ? `🔔 Nouvelle mission ! Vous avez été affecté(e) au constat n°${constatId}. Commentaire : "${commentaire}" Veuillez consulter les détails.`
+        : `🔔 Nouvelle mission ! Vous avez été affecté(e) au constat n°${constatId}. Veuillez consulter les détails.`;
+  
+      // Get vehicle owner information correctly from updatedConstat
+      const vehicleOwner = updatedConstat.vehicule?.contratAuto?.assure?.user;
+  
+      // Prepare notification promises
+      const notificationPromises = [
+        this.notificationService.envoyerNotificationTousAgentsDeServiceSaufUn(
+          `🔔 Monsieur ${agent.user.nom} ${agent.user.prenom} s'occupe du constat n°${constatId}.`,
+          agent.user.id,
+        ),
+        this.notificationService.creerNotification(
+          expert.user.id,
+          messageExpert,
+        ),
+      ];
+  
+      // Add vehicle owner notification if exists
+      if (vehicleOwner) {
+        notificationPromises.push(
+          this.notificationService.creerNotification(
+            vehicleOwner.id,
+            `👨‍🔧 Un expert a été désigné pour votre constat n°${constatId} : ${expert.user.nom} ${expert.user.prenom}. Il prendra contact avec vous sous peu.`,
+          ),
+        );
+      }
+  
+      // Execute all notifications
+      await Promise.all(notificationPromises);
+  
+      const constatComplet = await this.getConstatAvecRelations(
+        updatedConstat.idConstat,
+      );
+      if (!constatComplet) {
+        throw new NotFoundException('Constat non trouvé avec les relations');
+      }
+      return constatComplet;
+    } catch (error) {
+      console.error("Erreur lors de l'affectation:", error.stack);
+      throw new BadRequestException(
+        error.message || "Erreur lors de l'affectation de l'expert",
+      );
+    }
+  }
+private async getConstatAvecRelations(id: number): Promise<constat> {
+  const constat = await this.constatRepository.findOne({
+    where: { idConstat: id },
+    relations: [
+      'vehicule',
+      'vehicule.contratAuto',
+      'vehicule.contratAuto.assure',
+      'vehicule.contratAuto.assure.user',
+      'expert',
+      'expert.user',
+      'agentService',
+      'agentService.user',
+    ],
+  });
 
-  //     // 2. Récupération du constat avec vérification des relations
-  //     const constat = await this.constatRepository.findOne({
-  //       where: { idConstat: constatId },
-  //       relations: ['user', 'expert'], // Ajout de 'expert' si nécessaire
-  //     });
+  if (!constat) {
+    throw new NotFoundException(`Constat ${id} introuvable`);
+  }
 
-  //     if (!constat) {
-  //       throw new NotFoundException(`Constat ${constatId} non trouvé`);
-  //     }
+  return constat;
+}
 
-  //     if (!constat.user) {
-  //       throw new BadRequestException(
-  //         `Aucun utilisateur associé au constat ${constatId}`,
-  //       );
-  //     }
 
-  //     // 3. Validation de la date
-  //     if (isNaN(date.getTime())) {
-  //       throw new BadRequestException('Date invalide');
-  //     }
+  async programmerExpertise(
+    constatId: number,
+    date: Date,
+    heure: string,
+    lieu: string,
+    commentaire?: string,
+  ): Promise<{ constat: constat; message: string }> {
+    try {
+      if (!constatId || !date || !heure || !lieu) {
+        throw new BadRequestException(
+          'Paramètres manquants pour la programmation',
+        );
+      }
 
-  //     // 4. Formatage de la date pour l'affichage
-  //     const formattedDate = date.toLocaleDateString('fr-FR', {
-  //       weekday: 'long',
-  //       year: 'numeric',
-  //       month: 'long',
-  //       day: 'numeric',
-  //     });
+      const constat = await this.constatRepository.findOne({
+        where: { idConstat: constatId },
+        relations: [
+          'vehicule',
+          'vehicule.contratAuto',
+          'vehicule.contratAuto.assure',
+          'vehicule.contratAuto.assure.user',
+          'expert',
+          'expert.user',
+          'agentService',
+          'agentService.user',
+        ],
+      });
 
-  //     // 5. Mise à jour complète du constat
-  //     const updatedConstat = await this.constatRepository.save({
-  //       ...constat,
-  //       statut: ConstatStatut.EN_COURS, // Assurez-vous que ConstatStatut est correctement importé
-  //     });
+      if (!constat) {
+        throw new NotFoundException(`Constat ${constatId} non trouvé`);
+      }
 
-  //     // 6. Construction du message de notification
-  //     const notificationMessage = this.buildNotificationMessage(
-  //       constat.user.prenom,
-  //       constatId,
-  //       formattedDate,
-  //       heure,
-  //       lieu,
-  //       commentaire,
-  //     );
+      const vehicleOwner = constat.vehicule?.contratAuto?.assure?.user;
+      if (!vehicleOwner) {
+        throw new BadRequestException(
+          `Aucun utilisateur associé au constat ${constatId}`,
+        );
+      }
 
-  //     // 7. Envoi de la notification
-  //     await this.notificationService.creerNotification(
-  //       constat.user.id,
-  //       notificationMessage,
-  //     );
+      if (isNaN(date.getTime())) {
+        throw new BadRequestException('Date invalide');
+      }
 
-  //     return {
-  //       constat: updatedConstat,
-  //       message: `Notification envoyée à ${constat.user.prenom} ${constat.user.nom} (${constat.user.email})`,
-  //     };
-  //   } catch (error) {
-  //     console.error('Erreur détaillée:', {
-  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  //       error: error.message,
-  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  //       stack: error.stack,
-  //       constatId,
-  //       date,
-  //       heure,
-  //     });
+      const formattedDate = date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
 
-  //     throw new BadRequestException({
-  //       status: 'error',
-  //       message: 'Erreur lors de la programmation',
-  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  //       details: error.message,
-  //       timestamp: new Date().toISOString(),
-  //     });
-  //   }
-  // }
+      const updatedConstat = await this.constatRepository.save({
+        ...constat,
+        statut: ConstatStatut.EN_COURS,
+      });
 
-  // private buildNotificationMessage(
-  //   prenom: string,
-  //   constatId: number,
-  //   date: string,
-  //   heure: string,
-  //   lieu: string,
-  //   commentaire?: string,
-  // ): string {
-  //   return `
-  //     🚗 Programmation d'expertise confirmée
+      const notificationMessage = this.buildNotificationMessage(
+        vehicleOwner.prenom,
+        constatId,
+        formattedDate,
+        heure,
+        lieu,
+        commentaire ? `Commentaire: ${commentaire}\n` : '',
+      );
+
+      await this.notificationService.creerNotification(
+        vehicleOwner.id,
+        notificationMessage,
+      );
+
+      return {
+        constat: updatedConstat,
+        message: `Notification envoyée à ${vehicleOwner.prenom} ${vehicleOwner.nom} (${vehicleOwner.email})`,
+      };
+    } catch (error) {
+      console.error('Erreur détaillée:', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        error: error.message,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        stack: error.stack,
+        constatId,
+        date,
+        heure,
+      });
+
+      throw new BadRequestException({
+        status: 'error',
+        message: 'Erreur lors de la programmation',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        details: error.message,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  private buildNotificationMessage(
+    prenom: string,
+    constatId: number,
+    date: string,
+    heure: string,
+    lieu: string,
+    commentaire?: string,
+  ): string {
+    return `
+      🚗 Programmation d'expertise confirmée
       
-  //     Bonjour ${prenom},
-  //     Votre expertise pour le constat #${constatId} a été programmée :
+      Bonjour ${prenom},
+      Votre expertise pour le constat #${constatId} a été programmée :
       
-  //     📅 Date: ${date}
-  //     ⏰ Heure: ${heure}
-  //     📍 Lieu: ${lieu}
-  //     ${commentaire ? `💬 Commentaire: ${commentaire}` : ''}
+      📅 Date: ${date}
+      ⏰ Heure: ${heure}
+      📍 Lieu: ${lieu}
+      ${commentaire ? `💬 Commentaire: ${commentaire}` : ''}
       
-  //     Cordialement,
-  //     L'équipe d'expertise
-  //   `.replace(/^\s+/gm, '');
-  // }
+      Cordialement,
+      L'équipe d'expertise
+    `.replace(/^\s+/gm, '');
+  }
+
+  async estimerConstatParExpert(
+    constatId: number,
+    montant: number,
+    degats: string,
+    rapportUrl: string,
+    commentaire?: string,
+  ): Promise<constat> {
+    if (!montant || montant <= 0)
+      throw new BadRequestException('Le montant doit être positif');
+    if (!degats?.trim())
+      throw new BadRequestException(
+        'La description des dégâts est obligatoire',
+      );
+
+    const constat = await this.constatRepository.findOne({
+      where: { idConstat: constatId },
+      relations: [
+        'vehicule',
+        'vehicule.contratAuto',
+        'vehicule.contratAuto.assure',
+        'vehicule.contratAuto.assure.user',
+        'expert',
+        'expert.user',
+        'agentService',
+        'agentService.user',
+      ],
+    });
+
+    if (!constat)
+      throw new NotFoundException(`Constat ${constatId} non trouvé`);
+
+    // Explicitly type the array as string[]
+    const missingRelations: string[] = [];
+    if (!constat.vehicule?.contratAuto?.assure?.user)
+      missingRelations.push('vehicule.contratAuto.assure.user');
+    if (!constat.expert?.user) missingRelations.push('expert.user');
+    if (!constat.agentService?.user) missingRelations.push('agentService.user');
+
+    if (missingRelations.length > 0) {
+      throw new BadRequestException(
+        `Relations manquantes: ${missingRelations.join(', ')} pour le constat ${constatId}`,
+      );
+    }
+
+    const vehicleOwner = constat.vehicule.contratAuto.assure.user;
+    if (!vehicleOwner || !constat.expert?.user || !constat.agentService?.user) {
+      throw new Error('Unexpected null values after validation');
+    }
+
+    constat.statut = ConstatStatut.ESTIME;
+    constat.rapportUrl = rapportUrl;
+    const updatedConstat = await this.constatRepository.save(constat);
+
+    await this.notificationService.creerNotification(
+      constat.agentService.user.id,
+      `✅ Expert ${constat.expert.user.nom} a estimé le constat #${constat.idConstat} de ${vehicleOwner.nom} ${vehicleOwner.prenom}
+       Montant: ${montant}€
+       Dégâts: ${degats}
+       ${commentaire ? `Commentaire: ${commentaire}` : ''}`,
+    );
+
+    return updatedConstat;
+  }
+
+  async estimerMontantParAgent(
+    constatId: number,
+    agentId: number,
+    montant: number,
+    degats?: string,
+    commentaire?: string,
+  ): Promise<constat> {
+    // Validation des paramètres obligatoires
+    if (!montant || montant <= 0) {
+      throw new BadRequestException('Le montant doit être positif');
+    }
+
+    if (!agentId) {
+      throw new BadRequestException('Agent ID requis');
+    }
+
+    // Récupération parallèle des données
+    const [constat, agent] = await Promise.all([
+      this.constatRepository.findOne({
+        where: { idConstat: constatId },
+        relations: [
+          'vehicule',
+          'vehicule.contratAuto',
+          'vehicule.contratAuto.assure',
+          'vehicule.contratAuto.assure.user',
+          'agentService',
+          'agentService.user',
+        ],
+      }),
+      this.agentService.getAgentById(agentId),
+    ]);
+
+    // Vérification des entités
+    if (!constat) {
+      throw new NotFoundException(`Constat ${constatId} introuvable`);
+    }
+
+    if (!agent?.user) {
+      throw new NotFoundException(`Agent ${agentId} introuvable`);
+    }
+
+    const vehicleOwner = constat.vehicule?.contratAuto?.assure?.user;
+    if (!vehicleOwner) {
+      throw new BadRequestException('Propriétaire du véhicule introuvable');
+    }
+
+    // Mise à jour du constat
+    constat.montantEstime = montant;
+    constat.statut = ConstatStatut.CLOTURE;
+    const updatedConstat = await this.constatRepository.save(constat);
+
+    // Préparation du message
+    const messageLines = [
+      `💰 Estimation effectuée par ${agent.user.nom} ${agent.user.prenom}`,
+      `📋 Montant estimé : ${montant}€`,
+      degats && `🛠 Dégâts constatés : ${degats}`,
+      commentaire && `📝 Commentaire : ${commentaire}`,
+    ].filter(Boolean);
+
+    try {
+      await this.notificationService.creerNotification(
+        vehicleOwner.id,
+        messageLines.join('\n'),
+      );
+    } catch (notifError) {
+      console.error('Erreur de notification:', notifError);
+    }
+
+    return updatedConstat;
+  }
+
+  async getConstatsByImatriculation(
+    imatriculation: string,
+  ): Promise<constat[]> {
+    return this.constatRepository
+      .createQueryBuilder('constat')
+      .leftJoinAndSelect('constat.vehicule', 'vehicule')
+      .where('vehicule.Imat = :imat', { imat: imatriculation })
+      .orderBy('constat.dateAccident', 'DESC')
+      .addOrderBy('constat.heure', 'DESC')
+      .getMany();
+  }
 }

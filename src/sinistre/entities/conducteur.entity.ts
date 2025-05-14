@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { constat } from './constat.entity';
 
-
 @Entity('conducteurs')
 export class Conducteur {
   @PrimaryGeneratedColumn()
