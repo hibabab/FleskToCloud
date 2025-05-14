@@ -1,64 +1,84 @@
 <div class="flex">
-    <app-dehasbort></app-dehasbort>
-  
-    <div class="flex-1 mt-20 ml-60">
-      <section class="min-h-screen p-4 space-y-10">
-        <!-- Titre -->
-        <div class="flex justify-between items-center mb-6">
-          <div>
-            <h2 class="text-2xl font-semibold text-gray-800">Constats - Terminés</h2>
-            <p class="text-sm text-gray-600 mt-1">Liste des constats clôturés</p>
-          </div>
+  <app-dehasbort></app-dehasbort>
+
+  <div class="flex-1 mt-20 ml-60">
+    <section class="min-h-screen p-4 space-y-10">
+      <!-- Titre -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold text-teal-700">Constats - Terminés</h2>
+          <p class="text-sm text-gray-600 mt-1">Liste des constats clôturés</p>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md overflow-x-auto border border-gray-200">
+        <!-- Empty State -->
+        <div *ngIf="constatestime.length === 0" class="text-center py-10">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-gray-600">Aucun constat en cours</h3>
+          <p class="mt-1 text-sm text-gray-500">Tous les constats ont été traités.</p>
+        </div>
+
+        <!-- Data Table -->
         
-        </div>
-  
-        <!-- Tableau des constats terminés -->
-        <div class="bg-white p-6 rounded-2xl shadow-md overflow-x-auto border border-gray-200">
-          <table class="w-full border-collapse">
-            <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
-              <tr>
-                <th class="px-4 py-3 text-left">ID</th>
-                <th class="px-4 py-3 text-left">Date Accident</th>
-                <th class="px-4 py-3 text-left">Heure</th>
-                <th class="px-4 py-3 text-left">Blessés</th>
-                <th class="px-4 py-3 text-left">Dégâts</th>
-                <th class="px-4 py-3 text-left">Statut</th>
-                
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              <tr *ngFor="let c of constatestime" class="hover:bg-gray-50 transition">
-                <td class="px-4 py-3">{{ c.idConstat }}</td>
-                <td class="px-4 py-3">{{ c.dateAccident | date:'dd/MM/yyyy' }}</td>
-                <td class="px-4 py-3">{{ c.heure }}</td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full"
-                    [ngClass]="c.blessees ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
-                    {{ c.blessees ? 'Oui' : 'Non' }}
-                  </span>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full"
-                    [ngClass]="c.degatMateriels ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
-                    {{ c.degatMateriels ? 'Oui' : 'Non' }}
-                  </span>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full"
-                    [ngClass]="{
-                      'bg-yellow-100 text-yellow-700': c.statut === 'En attente',
-                      'bg-blue-100 text-blue-700': c.statut === 'En cours de traitement',
-                      'bg-green-100 text-green-700': c.statut === 'Terminé'
-                    }">
-                    {{ c.statut }}
-                  </span>
-                </td>
-                
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+      
+        <table *ngIf="constatestime.length > 0"  class="w-full border-collapse">
+          <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
+            <tr>
+              <th class="px-4 py-3 text-left">Date Accident</th>
+              <th class="px-4 py-3 text-left">Heure</th>
+              <th class="px-4 py-3 text-left">Blessés</th>
+              <th class="px-4 py-3 text-left">Dégâts</th>
+              <th class="px-4 py-3 text-left">Statut</th>
+              <th class="px-4 py-3 text-left">Constat PDF</th>
+              <th class="px-4 py-3 text-left">Montant Estimé</th>
+              <th class="px-4 py-3 text-left">Rapport PDF</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let c of constatestime" class="hover:bg-gray-50 transition">
+              <td class="px-4 py-3">{{ c.dateAccident | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3">{{ c.heure }}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-1 text-xs font-medium rounded-full"
+                  [ngClass]="c.blessees ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                  {{ c.blessees ? 'Oui' : 'Non' }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-1 text-xs font-medium rounded-full"
+                  [ngClass]="c.degatMateriels ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                  {{ c.degatMateriels ? 'Oui' : 'Non' }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                  {{ c.statut }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <a  [href]="'http://localhost:3000' + c.pathurl" target="_blank" class="text-teal-700 hover:text-teal-500">
+                  <i class="fas fa-file-pdf mr-1"></i> Voir PDF
+                </a>
+              </td>
+             <!-- ... (le reste du code reste inchangé) ... -->
+<td class="px-4 py-3 font-medium">
+  <div class="flex items-center">
+    <i class="fas fa-coins text-yellow-600 mr-2"></i>
+    <span>{{ c.montantEstime}} DT</span>
+  </div>
+</td>
+<!-- ... (suite du code) ... -->
+              <td class="px-4 py-3">
+                <a [href]="'http://localhost:3000'+c.rapportUrl" target="_blank" class="text-blue-600 hover:text-blue-800">
+                  <i class="fas fa-file-contract mr-1"></i> Voir rapport
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </div>
-  

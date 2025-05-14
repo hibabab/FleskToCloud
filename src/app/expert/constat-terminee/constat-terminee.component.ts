@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-
 import { jwtDecode } from 'jwt-decode';
 import { ExpertconstatService } from '../service/expertconstat.service';
+import { ConstatStatut } from '../enum/constatstatut';
+
 
 @Component({
   selector: 'app-constat-terminee',
   templateUrl: './constat-terminee.component.html',
-  standalone:false,
+  standalone: false,
   styleUrls: ['./constat-terminee.component.css']
 })
 export class ConstatTermineeComponent implements OnInit {
@@ -81,7 +82,8 @@ export class ConstatTermineeComponent implements OnInit {
 
     this.expertconstatService.getConstatsByExpertId(this.expertId).subscribe({
       next: (data) => {
-        this.constatestime = data.filter((constat: any) => constat.statut === 'ESTIMÉ');
+        // Updated to use the enum for ESTIME status
+        this.constatestime = data.filter((constat: any) => constat.statut === ConstatStatut.ESTIME);
         this.isLoading = false;
       },
       error: (error) => {

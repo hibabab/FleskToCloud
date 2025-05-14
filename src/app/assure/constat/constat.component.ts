@@ -1,12 +1,46 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import SignaturePad from 'signature_pad';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VehiculeComponent } from '../vehicule/vehicule.component';
 import { ConstatService } from '../services/constat.service';
 import { jwtDecode } from 'jwt-decode';
 import html2pdf from 'html2pdf.js';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+interface PhotoData {
+  file: File;
+  preview: string;
+  metadata?: any;
+}
+
+interface ImpactPoint {
+  x: number;
+  y: number;
+  label: string;
+  description: string;
+  severity: string;
+  rayure?: boolean;
+  enfoncement?: boolean;
+  brisure?: boolean;
+  peinture?: boolean;
+  photo?: string;
+  formGroup?: FormGroup;
+}
 
 
+interface ImpactPoint {
+  x: number;
+  y: number;
+  label: string;
+  description: string;
+  rayure?: boolean;
+  enfoncement?: boolean;
+  brisure?: boolean;
+  peinture?: boolean;
+  photo?: string;
+  formGroup?: FormGroup;
+  cssClass?: string;
+}
 
 
 @Component({
@@ -16,6 +50,7 @@ import html2pdf from 'html2pdf.js';
   styleUrls: ['./constat.component.css']  // Assurez-vous que c'est bien "styleUrls" et pas "styleUrl"
 })
 export class ConstatComponent implements OnInit {
+  @ViewChild('sketchContainer') sketchContainer!: ElementRef<HTMLDivElement>;
   // Formulaires
   generalInfoForm!: FormGroup;
   temoins!: FormArray;
@@ -23,17 +58,18 @@ export class ConstatComponent implements OnInit {
    // Données des véhicules
    vehiculeAData: any;
    vehiculeBData: any;
-
+   
    // États de validation
    vehiculeAValid = false;
    vehiculeBValid = false;
+   
 
 // Méthode pour recevoir les données du composant véhicule
 
 
-
-
-  savedSignatures: { [key: string]: string | null } = { A: null, B: null };
+  
+  
+ 
   onVehiculeStatusChange(status: { valid: boolean; data: any }, prefix: string) {
     if (prefix === 'A') {
       this.vehiculeAData = status.data;
@@ -45,25 +81,8 @@ export class ConstatComponent implements OnInit {
       this.steps[1].valid = status.valid;
     }
   }
-
-  // Croquis
-  @ViewChild('roadBackground') roadBackground!: ElementRef<SVGElement>;
-  @ViewChild('exportContainer') exportContainer!: ElementRef;
-  icons = [
-    { name: 'Voiture', svg: '🚗', type: 'car' },
-    { name: 'Camion', svg: '🚚', type: 'truck' },
-    { name: 'Moto', svg: '🏍️', type: 'motorcycle' },
-    { name: 'Feu stop', svg: '🚦', type: 'traffic_light' },
-    { name: 'Panneau stop', svg: '🛑', type: 'stop_sign' },
-    { name: 'Piéton', svg: '🚶', type: 'pedestrian' }
-  ];
-  placedItems: any[] = [];
-  selectedIcon: any = null;
-  selectedItemIndex: number | null = null;
-  isDragging = false;
-  dragStartX = 0;
-  dragStartY = 0;
-  croquisPreview: string | null = null;
+  
+ 
 
   // Étapes
   steps = [
@@ -100,11 +119,13 @@ export class ConstatComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private cdRef: ChangeDetectorRef,
+    
     private constatService: ConstatService // ✅ injection correcte
   ) {
     this.initializeForms();
   }
-
+  
 
   ngOnInit(): void {
     // Initialisation supplémentaire si nécessaire
@@ -118,16 +139,20 @@ export class ConstatComponent implements OnInit {
 
   private initializeGeneralInfoForm(): void {
     this.generalInfoForm = this.fb.group({
-      dateAccident: ['', Validators.required],
-      heureAccident: ['', Validators.required],
-      ville: ['', Validators.required],
-      rue: ['', Validators.required],
-      codePostal: ['', [
-        Validators.required,
-        Validators.pattern(/^\d{4}$/)
-      ]],
+      dateAccident: ['', [Validators.required]],
+      heureAccident: ['12:00'],
       degatsMateriels: [false],
-      blesses: [false]
+      blesses: [false],
+      rue: ['Rue Exemple'],
+      ville: ['Tunis'],
+      codePostal: [1000, [
+        Validators.pattern(/^\d{4}$/),
+        Validators.min(1000),
+        Validators.max(9999)
+      ]],
+      pays: ['Tunisie'],
+      gouvernat: ['Tunis'],
+      numMaison: ['1']
     });
   }
 
@@ -146,29 +171,32 @@ export class ConstatComponent implements OnInit {
 
   createTemoinForm(): FormGroup {
     return this.fb.group({
-      nom: [null, Validators.required],
-      prenom: [null],
-      telephone: [null, [
-        Validators.required,
+      nom: ['NomTémoin'],
+      prenom: ['PrénomTémoin'],
+      telephone: ['00000000', [
         Validators.pattern(/^\d{8}$/)
       ]],
-      villeTemoin: [null, Validators.required],
-      rueTemoin: [null, Validators.required],
-      codePostalTemoin: [null, [
-        Validators.required,
-        Validators.pattern(/^\d{4}$/)
-      ]]
+      rue: ['Rue Témoin'],
+      ville: ['Ville Témoin'],
+      codePostal: [1000, [
+        Validators.pattern(/^\d{4}$/),
+        Validators.min(1000),
+        Validators.max(9999)
+      ]],
+      pays: ['Tunisie'],
+      gouvernat: ['Gouvernorat Témoin'],
+      numMaison: ['2']
     });
   }
-
+  
   addTemoin(): void {
     this.temoins.push(this.createTemoinForm());
   }
 
   removeTemoin(index: number): void {
-
+    
       this.temoins.removeAt(index);
-
+    
   }
 
   private atLeastOneTemoinValidator(control: AbstractControl): {[key: string]: boolean} | null {
@@ -187,12 +215,12 @@ export class ConstatComponent implements OnInit {
     });
   }
 
-
+  
   // Méthodes pour le formulaire
   nextStep(): void {
     if (this.currentStep < this.steps.length - 1) {
       const currentStepValid = this.$validateCurrentStep();
-
+      
       if (currentStepValid) {
         this.steps[this.currentStep].valid = true;
         this.currentStep++;
@@ -225,140 +253,16 @@ export class ConstatComponent implements OnInit {
         return false;
     }
   }
-  onFormSubmitted(data: any, driver: string) {
-    console.log(`Données du véhicule ${driver} :`, data);
 
-    if (driver === 'A') {
-      this.vehiculeAData = data;
-      this.vehiculeAValid = true;
-    } else if (driver === 'B') {
-      this.vehiculeBData = data;
-      this.vehiculeBValid = true;
-    }
-  }
+ 
   
-  @ViewChild('signatureCanvasA', { static: true }) canvasA!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('signatureCanvasB', { static: true }) canvasB!: ElementRef<HTMLCanvasElement>;
-
-  // Instances SignaturePad pour chaque conducteur
-  signaturePadA!: SignaturePad;
-  signaturePadB!: SignaturePad;
-
-  // Données des signatures (base64)
-  signatureDataA: string | null = null;
-  signatureDataB: string | null = null;
-
-  ngAfterViewInit() {
-    // Initialisation des pads de signature
-    this.signaturePadA = new SignaturePad(this.canvasA.nativeElement);
-    this.signaturePadB = new SignaturePad(this.canvasB.nativeElement);
-    this.resizeCanvas(this.canvasA.nativeElement);
-    this.resizeCanvas(this.canvasB.nativeElement);
-  }
-
-  // Redimensionnement du canvas pour haute résolution
-  private resizeCanvas(canvas: HTMLCanvasElement) {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext('2d')?.scale(ratio, ratio);
-  }
-
-  // Effacer une signature spécifique
-  clearSignature(signaturePad: 'A' | 'B') {
-    if (signaturePad === 'A') {
-      this.signaturePadA.clear();
-      this.signatureDataA = null;
-    } else {
-      this.signaturePadB.clear();
-      this.signatureDataB = null;
-    }
-  }
-
-  // Sauvegarder une signature spécifique
-  saveSignature(signaturePad: 'A' | 'B') {
-    const pad = signaturePad === 'A' ? this.signaturePadA : this.signaturePadB;
-    if (pad.isEmpty()) {
-      alert(`Veuillez signer pour le Conducteur ${signaturePad} !`);
-      return;
-    }
-    const signatureData = pad.toDataURL('image/png');
-    if (signaturePad === 'A') {
-      this.signatureDataA = signatureData;
-    } else {
-      this.signatureDataB = signatureData;
-    }
-    console.log(`Signature ${signaturePad} sauvegardée :`, signatureData);
-  }
-
-  // Méthodes pour le croquis
-  selectIcon(icon: any): void {
-    this.selectedIcon = icon;
-    this.selectedItemIndex = null;
-  }
-
-  placeIcon(event: MouseEvent): void {
-    if (!this.selectedIcon || this.isDragging) return;
-
-    const container = event.currentTarget as HTMLElement;
-    const rect = container.getBoundingClientRect();
-    const x = event.clientX - rect.left - 20;
-    const y = event.clientY - rect.top - 20;
-
-    this.placedItems.push({
-      ...this.selectedIcon,
-      x,
-      y
-    });
-  }
-
-  startDrag(event: MouseEvent, index: number): void {
-    this.isDragging = true;
-    this.selectedItemIndex = index;
-    this.dragStartX = event.clientX - this.placedItems[index].x;
-    this.dragStartY = event.clientY - this.placedItems[index].y;
-    event.preventDefault();
-  }
-
-  @HostListener('document:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent): void {
-    if (!this.isDragging || this.selectedItemIndex === null) return;
-
-    const container = this.roadBackground.nativeElement.parentElement!;
-    const rect = container.getBoundingClientRect();
-
-    let x = event.clientX - rect.left - this.dragStartX;
-    let y = event.clientY - rect.top - this.dragStartY;
-
-    x = Math.max(0, Math.min(x, rect.width - 40));
-    y = Math.max(0, Math.min(y, rect.height - 40));
-
-    this.placedItems[this.selectedItemIndex].x = x;
-    this.placedItems[this.selectedItemIndex].y = y;
-  }
-
-  @HostListener('document:mouseup')
-  onMouseUp(): void {
-    this.isDragging = false;
-  }
-
-  deleteSelected(): void {
-    if (this.selectedItemIndex !== null) {
-      this.placedItems.splice(this.selectedItemIndex, 1);
-      this.selectedItemIndex = null;
-    }
-  }
-
-  clearAll(): void {
-    this.placedItems = [];
-    this.selectedItemIndex = null;
-  }
-
+ 
+  
   // Méthodes pour les circonstances
   toggleCirconstance(id: string, vehicle: 'A' | 'B'): void {
     const selectedArray = vehicle === 'A' ? this.selectedCirconstancesA : this.selectedCirconstancesB;
     const index = selectedArray.indexOf(id);
-
+    
     if (index === -1) {
       selectedArray.push(id);
     } else {
@@ -367,99 +271,78 @@ export class ConstatComponent implements OnInit {
   }
 
   isSelected(id: string, vehicle: 'A' | 'B'): boolean {
-    return vehicle === 'A'
-      ? this.selectedCirconstancesA.includes(id)
+    return vehicle === 'A' 
+      ? this.selectedCirconstancesA.includes(id) 
       : this.selectedCirconstancesB.includes(id);
   }
 
   getSelectedCount(vehicle: 'A' | 'B'): number {
-    return vehicle === 'A'
-      ? this.selectedCirconstancesA.length
+    return vehicle === 'A' 
+      ? this.selectedCirconstancesA.length 
       : this.selectedCirconstancesB.length;
   }
-  async exportFullReport(): Promise<Blob> {
-    try {
-      // Récupération des données
-      const generalInfo = this.generalInfoForm?.value || {};
-      const temoinsList = this.temoins?.value || [];
-      const vehiculeAData = this.vehiculeAData || {};
-      const vehiculeBData = this.vehiculeBData || {};
 
-      // Génération du HTML pour les témoins
-      const generateTemoinHTML = (temoin: any, index: number) => {
-        console.log("Données des témoins:", this.temoins.value);
-        // Vérification approfondie des données
-        const nom = temoin?.nom || 'Non renseigné';
-        const prenom = temoin?.prenom || '';
-        const telephone = temoin?.telephone ? `Tel: ${temoin.telephone}` : 'Tel: Non renseigné';
 
-        // Construction de l'adresse
-        const adresseParts = [
-          temoin?.rueTemoin,
-          temoin?.codePostalTemoin,
-          temoin?.villeTemoin
-        ].filter(part => part && part.trim() !== '');
-
-        const adresse = adresseParts.length > 0
-          ? adresseParts.join(', ')
-          : 'Adresse non renseignée';
-
-        return `
-          <div class="temoin-block" style="margin-bottom: 10px;">
-            <strong>Témoin #${index + 1}</strong><br>
-            <span class="filled-field">${nom} ${prenom}</span><br>
-            <span class="filled-field">${adresse}</span><br>
-            <span class="filled-field">${telephone}</span>
-          </div>
-        `;
-      }
-
-      // Génération du contenu HTML complet
-      const htmlContent = this.generateHTMLContent({
-        generalInfo,
-        temoinsList,
-        vehiculeAData,
-        vehiculeBData,
-        generateTemoinHTML
-      });
-
-      const pdfBlob = await this.generatePDF(htmlContent);
-      return pdfBlob;
-
-    } catch (error) {
-      console.error('Erreur lors de la génération du rapport:', error);
-      throw error;
-    }
+onFormSubmitted(formData: any, vehicleType: 'A' | 'B'): void {
+  if (vehicleType === 'A') {
+    this.vehiculeAData = formData;
+    
+  } else {
+    this.vehiculeBData = formData;
+  
   }
+}
 
-  private generateHTMLContent(data: {
-    generalInfo: any,
-    temoinsList: any[],
-    vehiculeAData: any,
-    vehiculeBData: any,
-    generateTemoinHTML: Function
-  }): string {
-    const { generalInfo, temoinsList, vehiculeAData, vehiculeBData, generateTemoinHTML } = data;
 
-    return `<!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Constat Amiable d'Accident</title>
-        <style>
-          ${this.getCSSStyles()}
-        </style>
-      </head>
-      <body>
 
-          ${this.generateHeader()}
-          ${this.generateGeneralInfoTable(generalInfo, temoinsList, generateTemoinHTML)}
-          ${this.generateVehicleSections(vehiculeAData, vehiculeBData)}
-          ${this.generateSignatureSection()}
+vehicleImageDataA: string | null = null;
+vehicleImageDataB: string | null = null;
 
-      </body>
-      </html>`;
+vehicleImpactPointsA: ImpactPoint[] = [];
+vehicleImpactPointsB: ImpactPoint[] = [];
+
+@ViewChild('vehiculeA') vehiculeA!: VehiculeComponent;
+  @ViewChild('vehiculeB') vehiculeB!: VehiculeComponent;
+// Update exportFullReport to use the new sketch capture
+
+// Dans appendVehicleComparisonToHTML()
+private appendVehicleComparisonToHTML(htmlContent: string, vehicleImageDataUrl: string): string {
+  if (!vehicleImageDataUrl) {
+    return htmlContent;
   }
+  
+  const htmlWithoutClosing = htmlContent.replace('</body></html>', '');
+  
+  const vehicleComparisonHTML = `
+    <div class="page-break"></div>
+    <div class="vehicle-comparison-section" style="margin-top: 20px;">
+      <h2 style="text-align: center; margin-bottom: 15px; color: #2c3e50; font-family: 'Arial', sans-serif;">
+        Constats des dommages - Comparaison des véhicules
+      </h2>
+      
+      <div style="text-align: center; margin: 0 auto 20px; max-width: 90%;">
+        <img src="${vehicleImageDataUrl}" 
+             style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+      </div>
+      
+      <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+        <div style="text-align: center;">
+          <span style="display: inline-block; width: 12px; height: 12px; background-color: #0000DC; border-radius: 50%; margin-right: 5px;"></span>
+          <span style="color: #0000DC; font-weight: bold;">Véhicule A</span>
+        </div>
+        <div style="text-align: center;">
+          <span style="display: inline-block; width: 12px; height: 12px; background-color: #009600; border-radius: 50%; margin-right: 5px;"></span>
+          <span style="color: #009600; font-weight: bold;">Véhicule B</span>
+        </div>
+      </div>
+    </div>
+    </body></html>
+  `;
+  
+  return htmlWithoutClosing + vehicleComparisonHTML;
+}
+
+
 
   private getCSSStyles(): string {
     return `
@@ -470,7 +353,7 @@ export class ConstatComponent implements OnInit {
         background-color: #f5f5f5;
         color: #333;
       }
-
+  
       .container {
         width: 60%;
         margin: auto;
@@ -479,37 +362,65 @@ export class ConstatComponent implements OnInit {
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
-
+  
       .header {
         text-align: center;
         margin-bottom: 20px;
       }
-
+  
       .header h1 {
         font-size: 18px;
         margin: 0;
         color: #333;
       }
-
+  .page-break {
+      page-break-before: always;
+    }
+    
+    .vehicle-comparison-section {
+      margin-top: 20px;
+    }
+    
+    .impact-points-container {
+      margin-bottom: 15px;
+    }
+       .impact-point {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: red;
+        transform: translate(-50%, -50%);
+        z-index: 999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .avoid-page-break {
+        page-break-inside: avoid;
+      }
+      .page-break {
+        page-break-before: always;
+      }
       .constat-table {
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 20px;
         table-layout: fixed;
       }
-
+  
       .constat-header {
         font-weight: bold;
         background-color: #f2f2f2;
         border: 1px solid #000;
       }
-
+  
       .constat-table td {
         border: 1px solid #000;
         padding: 8px;
         vertical-align: top;
       }
-
+  
       .underline {
         border-bottom: 1px solid #000;
         display: inline-block;
@@ -517,13 +428,13 @@ export class ConstatComponent implements OnInit {
         height: 16px;
         margin-left: 5px;
       }
-
+  
       .checkbox-container {
         display: flex;
         align-items: center;
         margin-top: 5px;
       }
-
+  
       .checkbox {
         border: 1px solid #000;
         width: 12px;
@@ -531,34 +442,34 @@ export class ConstatComponent implements OnInit {
         margin-right: 5px;
         display: inline-block;
       }
-
+  
       .divided-cell {
         display: flex;
         height: 100%;
       }
-
+  
       .cell-part {
         flex: 1;
         padding: 0 5px;
       }
-
+  
       .dotted-divider {
         border-right: 2px dotted #000;
       }
-
+  
       .main-container {
         display: flex;
         justify-content: space-between;
         margin: 20px 0;
       }
-
+  
       .vehicle-section {
         width: 34%;
         padding: 10px;
         border: 1px solid #000;
         border-radius: 3px;
       }
-
+  
       .vehicle-section h2 {
         text-align: center;
         font-size: 14px;
@@ -566,19 +477,19 @@ export class ConstatComponent implements OnInit {
         padding-bottom: 5px;
         border-bottom: 1px solid #000;
       }
-
+  
       .vehicle-section h3 {
         font-size: 12px;
         margin: 10px 0 5px 0;
       }
-
+  
       .circumstances {
         width: 38%;
         padding: 10px;
         border: 1px solid #000;
         border-radius: 3px;
       }
-
+  
       .circumstances h2 {
         text-align: center;
         font-size: 14px;
@@ -586,50 +497,50 @@ export class ConstatComponent implements OnInit {
         padding-bottom: 5px;
         border-bottom: 1px solid #000;
       }
-
+  
       .circumstance-instructions {
         font-size: 11px;
         text-align: center;
         margin-bottom: 10px;
         font-style: italic;
       }
-
+  
       .circumstance-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 8px;
       }
-
+  
       .circumstance-item {
         display: flex;
         align-items: center;
         margin-bottom: 5px;
       }
-
+  
       .vehicle-labels {
         display: flex;
         justify-content: space-between;
         margin-bottom: 5px;
         font-weight: bold;
       }
-
+  
       .signature-section {
         display: flex;
         justify-content: space-between;
         margin-top: 40px;
       }
-
+  
       .signature-box {
         width: 45%;
         text-align: center;
       }
-
+  
       .signature-line {
         border-bottom: 1px solid #000;
         height: 30px;
         margin-top: 5px;
       }
-
+  
       .sketch-img {
         width: 100%;
         height: auto;
@@ -637,23 +548,23 @@ export class ConstatComponent implements OnInit {
         object-fit: contain;
         border: 1px solid #ddd;
       }
-
+  
       .section {
         margin-bottom: 30px;
       }
-
+  
       .section-title {
         font-weight: bold;
         margin-bottom: 10px;
         border-bottom: 1px solid #000;
       }
-
+  
       .observation-content {
         min-height: 100px;
         border: 1px dashed #ccc;
         padding: 10px;
       }
-
+  
       .section_degat {
         width: 20%;
         padding: 10px;
@@ -661,17 +572,17 @@ export class ConstatComponent implements OnInit {
         border-radius: 3px;
         margin-bottom: 20px;
       }
-
+  
       .filled-field {
         color: red;
         font-weight: bold;
       }
-
+  
       @media print {
         body {
           padding: 10px;
         }
-
+  
         .vehicle-section,
         .circumstances {
           page-break-inside: avoid;
@@ -679,14 +590,14 @@ export class ConstatComponent implements OnInit {
       }
     `;
   }
-
+  
   private generateHeader(): string {
     return `
       <div class="header">
         <h1>CONSTAT AMIABLE D'ACCIDENT</h1>
       </div>`;
   }
-
+  
   private generateGeneralInfoTable(generalInfo: any, temoinsList: any[], generateTemoinHTML: Function): string {
     return `
       <table class="constat-table">
@@ -725,15 +636,15 @@ export class ConstatComponent implements OnInit {
           </td>
           <td colspan="2">
             <strong>5. Témoins</strong><br>
-            ${temoinsList.length > 0 ?
-              temoinsList.map((temoin, index) => generateTemoinHTML(temoin, index)).join('') :
+            ${temoinsList.length > 0 ? 
+              temoinsList.map((temoin, index) => generateTemoinHTML(temoin, index)).join('') : 
               '<span class="filled-field">Aucun témoin déclaré</span>'
             }
           </td>
         </tr>
       </table>`;
   }
-
+  
   private generateVehicleSections(vehiculeAData: any, vehiculeBData: any): string {
     return `
       <div class="main-container">
@@ -742,41 +653,41 @@ export class ConstatComponent implements OnInit {
         ${this.generateVehicleSection('B', vehiculeBData)}
       </div>`;
   }
-
+  
   private generateVehicleSection(vehicleLetter: string, vehicleData: any): string {
     const bgColor = vehicleLetter === 'A' ? '#d4edda' : '#fff3cd'; // vert clair ou jaune clair
     const borderColor = vehicleLetter === 'A' ? '#155724' : '#856404'; // vert foncé ou jaune foncé
-
+  
     return `
       <div class="vehicle-section" style="background-color: ${bgColor}; border: 2px solid ${borderColor}; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
         <h2>VÉHICULE ${vehicleLetter}</h2>
-
+        
         <h3>6. Société d'Assurances</h3>
         <p>Véhicule assuré par <span class="underline filled-field">${vehicleData.vehiculeAssure || ''}</span></p>
         <p>Contrat N° <span class="underline filled-field" style="min-width: 60%;">${vehicleData.contratAssurance || ''}</span></p>
         <p>Agence <span class="underline filled-field" style="min-width: 70%;">${vehicleData.agence || ''}</span></p>
         <p>Attestation valable <span class="underline filled-field" style="min-width: 70%;">${vehicleData.dateDebut || ''} - ${vehicleData.dateFin || ''}</span></p>
-
+  
         <h3>7. Identité du Conducteur</h3>
         <p>Nom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.nomConducteur || vehicleData.nomAssure || ''}</span></p>
         <p>Prénom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.prenomConducteur || vehicleData.prenomAssure || ''}</span></p>
         <p>Adresse <span class="underline filled-field" style="min-width: 80%;">${vehicleData.rueConducteur || ''}, ${vehicleData.codePostalConducteur || ''} ${vehicleData.villeConducteur || ''}</span></p>
         <p>Permis de conduire n° <span class="underline filled-field" style="min-width: 60%;">${vehicleData.numPermis || ''}</span></p>
         <p>Délivré le <span class="underline filled-field" style="min-width: 60%;">${vehicleData.dateDelivrance || ''}</span></p>
-
+  
         <h3>8. Assuré (voir attestation d'assurance)</h3>
         <p>Nom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.nomAssure || ''}</span></p>
         <p>Prénom <span class="underline filled-field" style="min-width: 70%;">${vehicleData.prenomAssure || ''}</span></p>
         <p>Adresse <span class="underline filled-field" style="min-width: 80%;">${vehicleData.rueAssure || ''}, ${vehicleData.codePostalAssure || ''} ${vehicleData.villeAssure || ''}</span></p>
         <p>Téléphone <span class="underline filled-field" style="min-width: 60%;">${vehicleData.telAssure || ''}</span></p>
-
+  
         <h3>9. Identité du véhicule</h3>
         <p>Marque, Type <span class="underline filled-field" style="min-width: 70%;">${vehicleData.marqueVehicule || ''} ${vehicleData.modeleVehicule || ''}</span></p>
         <p>N° d'immatriculation <span class="underline filled-field" style="min-width: 70%;">${vehicleData.numImmatriculation || ''}</span></p>
         <p>Sens suivi <span class="underline filled-field" style="min-width: 80%;">${vehicleData.venantDe || ''} vers ${this.vehiculeAData.allantA || ''}</span></p>
       </div>`;
   }
-
+  
   private generateCircumstancesSection(): string {
     return `
       <div class="circumstances" style="width: 34%; max-width: 600px; margin: 0 auto;">
@@ -784,12 +695,12 @@ export class ConstatComponent implements OnInit {
         <p style="text-align: center; font-style: italic; margin-bottom: 15px; font-size: 12px;">
           Mettre une croix (x) dans les cases correspondantes pour chaque véhicule
         </p>
-
+  
         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
           <div style="width: 48%; text-align: left; font-weight: bold;">Véhicule A (${this.getSelectedCount('A')})</div>
           <div style="width: 48%; text-align: right; font-weight: bold;">Véhicule B (${this.getSelectedCount('B')})</div>
         </div>
-
+  
         <div style="border: 1px solid #ddd; padding: 10px;">
           ${this.circonstancesOptions.map(option => `
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;">
@@ -812,150 +723,360 @@ export class ConstatComponent implements OnInit {
       </div>
     `;
   }
+  
+
+  photosFiles: File[] = [];
 
 
-  private generateSignatureSection(): string {
-    return `
-      <div class="signature-section">
-        <div class="signature-box">
-          <p>A. Signature du conducteur A</p>
-          <div class="signature-line"></div>
-          <p>Date et signature</p>
-        </div>
-        <div class="signature-box">
-          <p>B. Signature du conducteur B</p>
-          <div class="signature-line"></div>
-          <p>Date et signature</p>
-        </div>
-      </div>`;
-  }
 
-  private async generatePDF(htmlContent: string): Promise<Blob> {
+ 
 
-    const element = document.createElement('div');
-    element.innerHTML = htmlContent;
-
-    const opt = {
-      margin: 5,
-      filename: 'constat-amiable.pdf',
-      html2canvas: {
-        scale: 2,
-        scrollY: 0,
-        useCORS: true,
-        allowTaint: true
-      },
-      jsPDF: {
-        unit: 'mm',
-        format: [240, 320], // [width, height] (A4 standard: [210, 297])
-        orientation: 'portrait'
-      }
-    };
-    const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
-    return pdfBlob;
-
-
-  }
-  getCookie(name: string): string | null {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
-  }
+  isDragging = false;
+  private previewUrls: string[] = [];
 
   async submitConstat(): Promise<void> {
-    const token = this.getCookie('access_token');
-
-    if (token) {
-      const decoded: any = jwtDecode(token); // Décode le token
-      const userId = Number(decoded.sub);
-
+    try {
       const generalData = this.generalInfoForm.value;
-      const temoins = this.temoins.value;
-
-      const pdfBlob = await this.exportFullReport();
-
-      // Ouverture du PDF dans un nouvel onglet
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-
-      // Création du FormData pour le PDF
-      const formData = new FormData();
-      formData.append('file', pdfBlob, 'constat-amiable.pdf');
-
-      // Préparation du constatPayload
-      const constatPayload: any = {
-        dateAccident: generalData.dateAccident,
+      const temoinsData = this.temoins.value;
+  
+      // Conversion de la date
+      const dateAccident = new Date(generalData.dateAccident);
+      if (isNaN(dateAccident.getTime())) {
+        throw new Error('Format de date invalide');
+      }
+  
+      // Création du payload
+      const constatPayload = {
+        dateAccident: dateAccident.toISOString(),
         heure: generalData.heureAccident,
         lieu: {
           rue: generalData.rue,
           ville: generalData.ville,
+          gouvernat: generalData.gouvernat,
           codePostal: generalData.codePostal,
           pays: 'Tunisia'
         },
         blessees: generalData.blesses,
         degatMateriels: generalData.degatsMateriels,
-        temoins: temoins.map((t: any) => ({
+        temoins: temoinsData.map((t: any) => ({
           nom: t.nom,
           prenom: t.prenom,
           telephone: t.telephone,
           adresse: {
             rue: t.rueTemoin,
             ville: t.villeTemoin,
+            gouvernat: t.gouvernat,
             codePostal: t.codePostalTemoin,
-            pays: 'Tunisia',
-          },
+            pays: 'Tunisia'
+          }
         })),
-        pdfUrl
-      };
-
-      // Ajout du conducteur du véhicule A si ce n'est pas l'assuré
-      if (!this.vehiculeAData.isAssureConducteur) {
-        constatPayload.conducteur = {
+        conducteur: !this.vehiculeAData.isAssureConducteur ? {
           nom: this.vehiculeAData.nomConducteur,
           prenom: this.vehiculeAData.prenomConducteur,
           numPermis: this.vehiculeAData.numPermis,
           adresse: {
             rue: this.vehiculeAData.rueConducteur,
             ville: this.vehiculeAData.villeConducteur,
+            gouvernat: this.vehiculeAData.gouvernatConducteur,
             codePostal: this.vehiculeAData.codePostalConducteur,
             pays: 'Tunisia'
           }
-        };
-      }
-
-      // Détermination des adresses email des conducteurs
-      const conducteur1Email = this.vehiculeAData.isAssureConducteur
-        ? this.vehiculeAData.emailAssure
-        : this.vehiculeAData.emailConducteur;
-
-      const conducteur2Email = this.vehiculeBData.isAssureConducteur
-        ? this.vehiculeBData.emailAssure
-        : this.vehiculeBData.emailConducteur;
-
-      // Création du constat et récupération de l'ID
-      this.constatService.createConstat(userId, constatPayload, conducteur1Email, conducteur2Email).subscribe({
-        next: (res) => {
-          console.log('✅ Constat créé avec succès', res);
-
-          // On récupère l'ID du constat créé
-          const constatId = res.idConstat;  // Assure-toi que l'API retourne un id de constat
-
-          // Upload du PDF après la création du constat avec l'ID retourné
-          this.constatService.uploadConstatPDF(constatId, pdfBlob).subscribe({
-            next: (uploadRes) => {
-              console.log('✅ PDF uploadé avec succès', uploadRes);
-            },
-            error: (uploadErr) => {
-              console.error('❌ Erreur lors de l’upload du PDF', uploadErr);
-            }
-          });
-        },
-        error: (err) => {
-          console.error('❌ Erreur lors de la création du constat', err);
-        }
+        } : undefined
+      };
+  
+      // Création du FormData unique
+      const formData = new FormData();
+  
+      // Ajout des photos
+      this.photosFiles.forEach(file => {
+        formData.append('photos', file);
       });
+  
+      // Ajout du DTO
+      formData.append('constatDto', JSON.stringify(constatPayload));
+  
+      // Ajout des emails
+      const getEmail = (vehicule: any) => 
+        vehicule.isAssureConducteur 
+          ? vehicule.emailAssure 
+          : vehicule.emailConducteur;
+  
+      formData.append('conducteur1Email', getEmail(this.vehiculeAData));
+      if (this.vehiculeBData) {
+        formData.append('conducteur2Email', getEmail(this.vehiculeBData));
+      }
+  
+      // Appel API
+      this.constatService.createConstat(
+        this.vehiculeAData.numImmatriculation,
+        formData
+      ).subscribe({
+        next: async (res) => {
+          console.log('✅ Constat créé:', res);
+          
+          // Upload du PDF après création
+          const pdfBlob = await this.exportFullReport();
+          if (res.idConstat) {
+            this.constatService.uploadConstatPDF(res.idConstat, pdfBlob)
+              .subscribe(() => {
+                console.log('📄 PDF uploadé');
+                // If you need to update the UI after PDF upload, use detectChanges
+                
+              });
+          }
+        },
+        error: (err) => console.error('❌ Erreur:', err)
+      });
+  
+    } catch (error) {
+      console.error('⚠️ Erreur:', error);
+      // Gestion des erreurs UI
     }
   }
 
+  // Gestion du drag & drop
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+  }
 
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+    
+    if (event.dataTransfer?.files) {
+      this.handleFiles(event.dataTransfer.files);
+    }
+  }
+
+  // Sélection de fichiers
+  onPhotosSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      this.handleFiles(input.files);
+    }
+  }
+
+  private handleFiles(files: FileList) {
+    const newFiles = Array.from(files);
+    
+    // Validation du nombre de fichiers
+    if (this.photosFiles.length + newFiles.length > 5) {
+      alert('Maximum 5 photos autorisées');
+      return;
+    }
+
+    // Validation de la taille et du type
+    const validFiles = newFiles.filter(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`Le fichier ${file.name} dépasse 5MB`);
+        return false;
+      }
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert(`Format non supporté pour ${file.name}`);
+        return false;
+      }
+      return true;
+    });
+
+    this.photosFiles = [...this.photosFiles, ...validFiles];
+  }
+
+  // Prévisualisation des images
+  getPreview(file: File): string {
+    const url = URL.createObjectURL(file);
+    this.previewUrls.push(url);
+    return url;
+  }
+
+  // Gestion des photos
+  removePhoto(index: number) {
+    this.photosFiles.splice(index, 1);
+  }
+
+  clearAllPhotos() {
+    this.photosFiles = [];
+    this.cleanupPreviews();
+  }
+
+  // Visualisation en plein écran
+  openFullscreen(file: File) {
+    const url = URL.createObjectURL(file);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  // Nettoyage des URLs
+  private cleanupPreviews() {
+    this.previewUrls.forEach(url => URL.revokeObjectURL(url));
+    this.previewUrls = [];
+  }
+
+  ngOnDestroy() {
+    this.cleanupPreviews();
+  }
+  // Créer un FormGroup pour un point d'impact
+
+  
+
+  // Définir le type de véhicule actif
+  
+
+  
+  
+
+
+  
+  
+
+ 
+ 
+  
+  async exportFullReport(): Promise<Blob> {
+    try {
+      // Récupération des données de formulaire
+      const generalInfo = this.generalInfoForm?.value || {};
+      const temoinsList = this.temoins?.value || [];
+      const vehiculeAData = this.vehiculeAData || {};
+      const vehiculeBData = this.vehiculeBData || {};
+      
+      // Génération du HTML pour les témoins
+      const generateTemoinHTML = (temoin: any, index: number) => {
+        console.log("Données des témoins:", this.temoins.value);
+        
+        // Vérification approfondie des données
+        const nom = temoin?.nom || 'Non renseigné';
+        const prenom = temoin?.prenom || '';
+        const telephone = temoin?.telephone ? `Tel: ${temoin.telephone}` : 'Tel: Non renseigné';
+        
+        // Construction de l'adresse
+        const adresseParts = [
+          temoin?.rueTemoin,
+          temoin?.codePostalTemoin,
+          temoin?.villeTemoin
+        ].filter(part => part && part.trim() !== '');
+        
+        const adresse = adresseParts.length > 0
+          ? adresseParts.join(', ')
+          : 'Adresse non renseignée';
+        
+        return `
+          <div class="temoin-block" style="margin-bottom: 10px;">
+            <strong>Témoin #${index + 1}</strong><br>
+            <span class="filled-field">${nom} ${prenom}</span><br>
+            <span class="filled-field">${adresse}</span><br>
+            <span class="filled-field">${telephone}</span>
+          </div>
+        `;
+      };
+      
+      // Capturer l'image de comparaison des véhicules avant de générer le HTML principal
+     
+      
+      // Générer le HTML en incluant l'image de comparaison dans le contenu principal
+      const finalHtmlContent = this.generateHTMLContent({
+        generalInfo,
+        temoinsList,
+        vehiculeAData,
+        vehiculeBData,
+        generateTemoinHTML,
+      });
+      
+  const pdfOptions = {
+  margin: 10,
+  filename: 'constat-amiable.pdf',
+  image: { type: 'jpeg', quality: 0.98 },
+  html2canvas: {
+    scale: 2,
+    scrollY: 0,
+    useCORS: true,
+    allowTaint: true,
+    logging: true // Activer le logging pour déboguer
+  },
+  jsPDF: {
+    unit: 'mm',
+    format: [240,400], // [width, height] (A4 standard: [210, 297])
+    orientation: 'portrait',
+    compress: true
+  },
+  pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+};
+
+// Effectuer une pause avant l'export pour s'assurer que tout est rendu
+await new Promise(resolve => setTimeout(resolve, 500));
+
+// Générer le PDF
+const pdfBlob = await html2pdf()
+  .set(pdfOptions)
+  .from(finalHtmlContent)
+  .outputPdf('blob');
+
+return pdfBlob;
+
+} catch (error) {
+console.error('Erreur lors de la génération du rapport:', error);
+throw error;
+}
+}
+ 
+  
+  
+  // Méthode pour générer le contenu HTML
+  private generateHTMLContent(data: {
+    generalInfo: any;
+    temoinsList: any[];
+    vehiculeAData: any;
+    vehiculeBData: any;
+    generateTemoinHTML: (temoin: any, index: number) => string;
+  }): string {
+    const { 
+      generalInfo, 
+      temoinsList, 
+      vehiculeAData, 
+      vehiculeBData, 
+      generateTemoinHTML,
+     
+    } = data;
+  
+    // Créer la section de comparaison des véhicules intégrée au flux principal
+    
+  
+    return `<!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Constat Amiable d'Accident</title>
+        <style>
+          ${this.getCSSStyles()}
+          .section {
+            margin-bottom: 20px;
+          }
+          .avoid-page-break {
+            page-break-inside: avoid;
+          }
+          .vehicle-comparison-section {
+            margin-top: 10px;
+            max-height: 300px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="avoid-page-break">
+          ${this.generateHeader()}
+        </div>
+        <div class="avoid-page-break">
+          ${this.generateGeneralInfoTable(generalInfo, temoinsList, generateTemoinHTML)}
+        </div>
+        <div class="avoid-page-break">
+          ${this.generateVehicleSections(vehiculeAData, vehiculeBData)}
+        </div>
+       
+      </body>
+      </html>`;
+  }
+ 
 }

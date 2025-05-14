@@ -4,33 +4,55 @@
 
   <!-- Main Content -->
   <div class="flex-1 mt-20 ml-60 p-6">
+    <!-- Notification system -->
+    <div *ngIf="showNotification" 
+         [ngClass]="isSuccess ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700'"
+         class="border-l-4 p-4 mb-6 rounded-md shadow-sm relative">
+      <button (click)="hideNotification()" class="absolute top-1 right-2 text-gray-500 hover:text-gray-800">
+        &times;
+      </button>
+      <p>{{ notificationMessage }}</p>
+    </div>
+
     <section class="space-y-10">
       <!-- Titre + Bouton Actualiser -->
       <div class="flex justify-between items-center">
         <div>
-          <h2 class="text-3xl font-bold text-gray-800">Constats - En attente</h2>
+          <h2 class="text-3xl font-bold text-teal-700">Constats - En attente</h2>
           <p class="text-sm text-gray-500 mt-1">Liste des déclarations à planifier</p>
         </div>
-        
+        <button (click)="loadConstatsEnAttente()" 
+                class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded shadow flex items-center">
+          <i class="fas fa-sync-alt mr-2"></i> Actualiser
+        </button>
       </div>
 
       <!-- Tableau -->
       <div class="bg-white p-6 rounded-2xl shadow-md overflow-x-auto border border-gray-200">
-        <table class="w-full border-collapse">
+        <!-- Message si tableau vide -->
+        <div *ngIf="constatsEnAttente.length === 0" class="text-center py-10">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-gray-600">Aucun constat en attente</h3>
+          <p class="mt-1 text-sm text-gray-500">Vous n'avez aucun constat à planifier pour le moment.</p>
+        </div>
+
+        <!-- Tableau affiché uniquement s'il y a des données -->
+        <table *ngIf="constatsEnAttente.length > 0" class="w-full border-collapse">
           <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
             <tr>
-              <th class="px-4 py-3 text-left">ID</th>
               <th class="px-4 py-3 text-left">Date Accident</th>
               <th class="px-4 py-3 text-left">Heure</th>
               <th class="px-4 py-3 text-left">Blessés</th>
               <th class="px-4 py-3 text-left">Dégâts</th>
               <th class="px-4 py-3 text-left">Statut</th>
+              <th class="px-4 py-3 text-left">Constat PDF</th>
               <th class="px-4 py-3 text-left">Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
             <tr *ngFor="let c of constatsEnAttente" class="hover:bg-gray-50 transition">
-              <td class="px-4 py-3">{{ c.idConstat }}</td>
               <td class="px-4 py-3">{{ c.dateAccident | date:'dd/MM/yyyy' }}</td>
               <td class="px-4 py-3">{{ c.heure }}</td>
               <td class="px-4 py-3">
@@ -50,10 +72,16 @@
                   [ngClass]="{
                     'bg-yellow-100 text-yellow-700': c.statut === 'En attente',
                     'bg-blue-100 text-blue-700': c.statut === 'En cours de traitement',
+                    'bg-orange-100 text-orange-700': c.statut === 'Expert assigné',
                     'bg-green-100 text-green-700': c.statut === 'Terminé'
                   }">
                   {{ c.statut }}
                 </span>
+              </td>
+              <td class="px-4 py-3">
+                <a [href]="'http://localhost:3000' + c.pathurl" target="_blank" class="text-teal-700 hover:text-teal-500">
+                  <i class="fas fa-file-pdf mr-1"></i> Voir PDF
+                </a>
               </td>
               <td class="px-4 py-3">
                 <button (click)="openModal(c)" class="flex items-center px-3 py-1 bg-teal-600 text-white text-xs rounded shadow hover:bg-teal-700 transition">
@@ -67,67 +95,76 @@
     </section>
   </div>
 
-<!-- Modal -->
-<!-- Modal -->
-<div *ngIf="showModal" class="fixed inset-0 z-50 flex justify-center items-center bg-gray-500/50">
-  <div class="relative p-4 w-full max-w-2xl max-h-full flex justify-center items-center">
-    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700 w-full p-6">
-      
-      <!-- Titre -->
-      <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Programmer une expertise</h3>
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 z-50 flex justify-center items-center bg-gray-500/50">
+    <div class="relative p-4 w-full max-w-2xl max-h-full flex justify-center items-center">
+      <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700 w-full p-6">
+        
+        <!-- Titre -->
+        <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Programmer une expertise</h3>
 
-      <!-- Informations sur le constat -->
-      <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-6">
-        <p><strong>ID Constat :</strong> {{ selectedConstat?.idConstat }}</p>
-        <p><strong>Date Accident :</strong> {{ selectedConstat?.dateAccident | date:'dd/MM/yyyy' }}</p>
-        <p><strong>Heure :</strong> {{ selectedConstat?.heure }}</p>
-        <p><strong>Blessés :</strong> {{ selectedConstat?.blessees ? 'Oui' : 'Non' }}</p>
-        <p><strong>Dégâts Matériels :</strong> {{ selectedConstat?.degatMateriels ? 'Oui' : 'Non' }}</p>
-      </div>
-
-      <!-- Form -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-200">
-        <div>
-          <label class="block mb-1 font-medium">Date :</label>
-          <input type="date" [(ngModel)]="selectedConstat.date" 
-                 class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500" />
+        <!-- Informations sur le constat -->
+        <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-6">
+          <p><strong>ID Constat :</strong> {{ selectedConstat?.idConstat }}</p>
+          <p><strong>Date Accident :</strong> {{ selectedConstat?.dateAccident | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Heure :</strong> {{ selectedConstat?.heure }}</p>
+          <p><strong>Blessés :</strong> {{ selectedConstat?.blessees ? 'Oui' : 'Non' }}</p>
+          <p><strong>Dégâts Matériels :</strong> {{ selectedConstat?.degatMateriels ? 'Oui' : 'Non' }}</p>
         </div>
 
-        <div>
-          <label class="block mb-1 font-medium">Heure :</label>
-          <input type="time" [(ngModel)]="selectedConstat.heure" 
-                 class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500" />
+        <!-- Form -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-200">
+          <div>
+            <label class="block mb-1 font-medium">Date : <span class="text-red-500">*</span></label>
+            <input type="date" [(ngModel)]="selectedConstat.date" 
+                  class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  [ngClass]="{'border-red-500 bg-red-50': formErrors.date && touchedFields.date}"
+                  (blur)="onFieldBlur('date')" />
+            <div *ngIf="formErrors.date && touchedFields.date" class="text-red-500 text-xs mt-1">Ce champ est requis</div>
+          </div>
+
+          <div>
+            <label class="block mb-1 font-medium">Heure : <span class="text-red-500">*</span></label>
+            <input type="time" [(ngModel)]="selectedConstat.heure" 
+                  class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  [ngClass]="{'border-red-500 bg-red-50': formErrors.heure && touchedFields.heure}"
+                  (blur)="onFieldBlur('heure')" />
+            <div *ngIf="formErrors.heure && touchedFields.heure" class="text-red-500 text-xs mt-1">Ce champ est requis</div>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block mb-1 font-medium">Lieu : <span class="text-red-500">*</span></label>
+            <input type="text" [(ngModel)]="selectedConstat.lieu" 
+                  placeholder="Lieu de l'expertise"
+                  class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  [ngClass]="{'border-red-500 bg-red-50': formErrors.lieu && touchedFields.lieu}"
+                  (blur)="onFieldBlur('lieu')" />
+            <div *ngIf="formErrors.lieu && touchedFields.lieu" class="text-red-500 text-xs mt-1">Ce champ est requis</div>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block mb-1 font-medium">Commentaire (optionnel) :</label>
+            <textarea [(ngModel)]="selectedConstat.commentaire"
+                      rows="3"
+                      placeholder="Ajoutez un commentaire..."
+                      class="w-full p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+          </div>
         </div>
 
-        <div class="md:col-span-2">
-          <label class="block mb-1 font-medium">Lieu :</label>
-          <input type="text" [(ngModel)]="selectedConstat.lieu" 
-                 placeholder="Lieu de l'expertise"
-                 class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-teal-500" />
+        <!-- Boutons -->
+        <div class="mt-6 flex justify-end gap-3">
+          <button (click)="closeModal()" 
+                  class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition">Annuler</button>
+          <button (click)="programmerExpert()" 
+                  class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition">Confirmer</button>
         </div>
 
-        <div class="md:col-span-2">
-          <label class="block mb-1 font-medium">Commentaire (optionnel) :</label>
-          <textarea [(ngModel)]="selectedConstat.commentaire"
-                    rows="3"
-                    placeholder="Ajoutez un commentaire..."
-                    class="w-full p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
-        </div>
-      </div>
-
-      <!-- Boutons -->
-      <div class="mt-6 flex justify-end gap-3">
+        <!-- Bouton de fermeture -->
         <button (click)="closeModal()" 
-                class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition">Annuler</button>
-        <button (click)="programmerExpert()" 
-                class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition">Confirmer</button>
+                class="absolute top-2 right-3 text-gray-400 hover:text-red-600 text-2xl font-bold">
+          &times;
+        </button>
       </div>
-
-      <!-- Bouton de fermeture -->
-      <button (click)="closeModal()" 
-              class="absolute top-2 right-3 text-gray-400 hover:text-red-600 text-2xl font-bold">
-        &times;
-      </button>
     </div>
   </div>
 </div>

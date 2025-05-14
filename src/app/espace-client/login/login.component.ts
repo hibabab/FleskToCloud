@@ -3,19 +3,20 @@ import { AuthentificationService } from '../services/authentification.service';
 import { Router } from '@angular/router';
 import { AuthentificationDto } from '../models/authentification-dto';
 import { jwtDecode } from 'jwt-decode';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
   selector: 'app-login',
-  standalone: false,
   templateUrl: './login.component.html',
+  standalone: false,
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   user: AuthentificationDto = {} as AuthentificationDto;
-  errorMessage: string | null = null;
   isLoading: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   constructor(
     private authService: AuthentificationService,
@@ -23,84 +24,82 @@ export class LoginComponent {
   ) {}
 
   onSubmit() {
+    // Réinitialisation des messages
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.isLoading = true;
+
+    // Validation des champs
     if (!this.user.email || !this.user.password) {
-      this.errorMessage = 'Tous les champs sont obligatoires.';
+      this.errorMessage = 'Veuillez remplir tous les champs';
+      this.isLoading = false;
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = null;
+    this.authService.login(this.user.email, this.user.password).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.successMessage = 'Connexion réussie!';
+        
+        // Le stockage des tokens est maintenant géré par le service d'authentification
+        // Nous n'avons plus besoin d'appeler une méthode séparée ici
 
-    this.authService.verifyAdmin(this.user.email, this.user.password).pipe(
-      switchMap(isAdmin => {
-        if (isAdmin) {
-          // Si admin, on redirige directement sans appel login supplémentaire
-          this.router.navigate(['/admin/interface']);
-          return of({ role: 'admin' });
-        } else {
-          return this.authService.login(this.user.email, this.user.password).pipe(
-            switchMap(response => {
-              this.handleLoginSuccess(response);
-              const decoded: any = jwtDecode(response.access_token);
-              return this.authService.getRole(decoded.sub).pipe(
-                catchError(() => of({ role: 'user' }))
-              );
-            })
-          );
-        }
-      })
-    ).subscribe({
-      next: (roleResponse) => {
-        this.handleRoleResponse(roleResponse);
-        this.isLoading = false;
+        const decoded: any = jwtDecode(response.access_token);
+        const userId = decoded.sub;
+
+        this.authService.getRole(userId).pipe(
+          catchError((error) => {
+            console.error('Erreur de récupération du rôle:', error);
+            return of({ role: 'user' });
+          })
+        ).subscribe({
+          next: (roleResponse) => this.handleRoleResponse(roleResponse),
+          error: (error) => {
+            this.errorMessage = 'Erreur lors de la vérification du rôle';
+            console.error(error);
+          }
+        });
       },
-      error: (error) => {
-        this.handleLoginError(error);
-        this.isLoading = false;
-      }
+     error: (error) => {
+  this.isLoading = false;
+  if (error.status === 401) {
+    this.errorMessage = 'Identifiants incorrects. Veuillez vérifier vos identifiants.';
+  } else if (error.status === 403) {
+    this.errorMessage = 'Votre compte a été bloqué. Veuillez contacter l\'administrateur.';
+  } else {
+    this.errorMessage = 'Une erreur est survenue. Veuillez réessayer plus tard.';
+  }
+  console.error('Erreur de login:', error);
+}
+
     });
   }
 
-  private handleLoginSuccess(response: any) {
-    const token = response.access_token;
-    this.setTokenInCookie(token);
-  }
-
   private handleRoleResponse(roleResponse: any) {
-    if (!roleResponse?.role) {
-      this.errorMessage = 'Impossible de déterminer votre rôle.';
-      return;
+    if (roleResponse && roleResponse.role) {
+      const role = roleResponse.role;
+
+      switch(role) {
+        case 'assure':
+        case 'user':
+          this.router.navigate(['/dashboard-assure']);
+          break;
+        case 'agent service':
+          this.router.navigate(['/agent/dashbort-agent']);
+          break;
+        case 'expert':
+          this.router.navigate(['/expert/dashboard-expert']);
+          break;
+        case 'admin':
+          this.router.navigate(['/admin/interface']);
+          break;
+        default:
+          this.errorMessage = 'Rôle utilisateur non reconnu';
+          console.error('Rôle de l\'utilisateur inconnu:', role);
+      }
+    } else {
+      this.errorMessage = 'Erreur de configuration du profil';
+      console.error('Réponse inattendue du serveur:', roleResponse);
     }
-
-    switch (roleResponse.role.toLowerCase()) {
-      case 'admin':
-        this.router.navigate(['/admin/interface']);
-        break;
-      case 'assure':
-      case 'user':
-        this.router.navigate(['/dashboard-assure/interface']);
-        break;
-      case 'agent service':
-        this.router.navigate(['/agent/interface']);
-        break;
-      case 'expert':
-        this.router.navigate(['/dashboard-expert']);
-        break;
-      default:
-        this.errorMessage = 'Votre rôle ne permet pas d\'accéder à cette application.';
-        console.error('Rôle inconnu:', roleResponse.role);
-    }
-  }
-
-  private handleLoginError(error: any) {
-    console.error('Erreur de connexion:', error);
-    this.errorMessage = error.error?.message ||
-      (error.status === 401 ? 'Identifiants incorrects' : 'Erreur lors de la connexion. Veuillez réessayer.');
-  }
-
-  private setTokenInCookie(token: string) {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000)); // 24h
-    document.cookie = `access_token=${token}; expires=${expires.toUTCString()}; path=/; secure; SameSite=Strict`;
   }
 }

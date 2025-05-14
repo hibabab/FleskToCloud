@@ -1,0 +1,112 @@
+<div class="flex animate-fade-in">
+    <app-dehasbort></app-dehasbort>
+  
+    <div class="flex-1">
+      <div class="ml-60 mt-20 p-6 min-h-screen bg-gradient-to-br from-gray-50 to-teal-50">
+        <!-- Header -->
+        <div class="mb-10">
+          <div class="flex items-center mb-4">
+            <div class="mr-4 p-2 bg-teal-100 rounded-xl shadow-md">
+              <i class="fas fa-chart-line text-xl text-teal-600"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl font-semibold text-teal-900 tracking-tight">Tableau de bord expert</h1>
+              <p class="text-gray-500 text-sm mt-1 font-light">Analyse des constats en temps réel</p>
+            </div>
+          </div>
+          <div class="border-b border-gray-200"></div>
+        </div>
+  
+        <!-- Cartes principales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            <!-- Carte En attente -->
+            <a [routerLink]="['/expert/constats/en-attente']"
+              class="group bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-l-[4px] border-orange-500 transform hover:-translate-y-1">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-400 uppercase font-medium">En attente</p>
+                  <p class="text-3xl font-bold text-gray-800 mt-2">{{ counts.enAttente }}</p>
+                </div>
+                <i class="fas fa-hourglass-half text-2xl text-orange-500"></i>
+              </div>
+              <div class="mt-5 flex items-center justify-between text-teal-700">
+                <span class="text-sm font-medium">Voir les détails</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+              </div>
+            </a>
+          
+            <!-- Carte En cours -->
+            <a [routerLink]="['/expert/constats/en-cours']"
+              class="group bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-l-[4px] border-yellow-500 transform hover:-translate-y-1">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-400 uppercase font-medium">En cours</p>
+                  <p class="text-3xl font-bold text-gray-800 mt-2">{{ counts.programmes }}</p>
+                </div>
+                <i class="fas fa-spinner text-2xl text-yellow-500 "></i>
+              </div>
+              <div class="mt-5 flex items-center justify-between text-teal-700">
+                <span class="text-sm font-medium">Voir les détails</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+              </div>
+            </a>
+          
+            <!-- Carte Terminés -->
+            <a [routerLink]="['/expert/constats/termines']"
+              class="group bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-l-[4px] border-green-500 transform hover:-translate-y-1">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-400 uppercase font-medium">Terminés</p>
+                  <p class="text-3xl font-bold text-gray-800 mt-2">{{ counts.termines }}</p>
+                </div>
+                <i class="fas fa-check-circle text-2xl text-green-500"></i>
+              </div>
+              <div class="mt-5 flex items-center justify-between text-teal-700">
+                <span class="text-sm font-medium">Voir les détails</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+              </div>
+            </a>
+          </div>
+          
+  
+        <!-- Répartition -->
+        <div class="bg-white/80 backdrop-blur-md rounded-xl shadow-md overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-gray-800 flex items-center">
+              <i class="fas fa-chart-pie text-teal-600 mr-2 text-lg"></i>
+              Répartition des constats
+            </h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+            <div *ngFor="let stat of stats" class="p-6 hover:bg-gray-50 transition-colors">
+              <div class="flex items-center">
+                <div class="relative w-10 h-10 flex items-center justify-center mr-3">
+                  <div class="absolute inset-0 bg-teal-100 rounded-xl transform rotate-45"></div>
+                  <i [class]="stat.icon" class="relative text-teal-600 text-lg z-10"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400 uppercase">{{ stat.label }}</p>
+                  <p class="text-2xl font-semibold text-gray-800 mt-1">{{ stat.value }}</p>
+                  <div class="mt-1">
+                    <div class="h-1 bg-gray-200 rounded-full">
+                      <div class="h-full bg-teal-500 rounded-full"
+                        [style.width]="(stat.value / totalStats) * 100 + '%'"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Mise à jour -->
+        <div class="mt-6 text-center">
+          <p class="text-xs text-gray-400">
+            <i class="fas fa-sync-alt mr-1"></i>
+            Dernière mise à jour : {{ currentTime | date:'HH:mm' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  

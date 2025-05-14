@@ -1,7 +1,6 @@
-import { NgModule } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AccountComponent } from './account/account.component';
-import { ChangePasswordComponent } from './change-password/change-password.component';
 import { AceuilComponent } from './aceuil/aceuil.component';
 import { DeviComponent } from './devi/devi.component';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
@@ -22,10 +21,10 @@ import { PaymentSuccessVieComponent } from './payment-success-vie/payment-succes
 import { PaymentInitiateVieComponent } from './payment-initiate-vie/payment-initiate-vie.component';
 import { DemandeSouscriptionVieComponent } from './demande-souscription-vie/demande-souscription-vie.component';
 import { HistoriqueContratVieComponent } from './historique-contrat-vie/historique-contrat-vie.component';
+import { CarteGriseComponent } from './carte-grise/carte-grise.component';
 
 const routes: Routes = [
   { path: 'account', component: AccountComponent },
-  { path: 'change-password', component: ChangePasswordComponent },
   { path: 'aceuil', component: AceuilComponent },
   { path: 'historiqueCV', component:HistoriqueContratVieComponent },
   { path: 'contrat/:id/payment', component: PaymentInitiateComponent },
@@ -50,7 +49,8 @@ const routes: Routes = [
 
     { path: 'declarer constat', component: ConstatComponent },
     { path: 'constat', component:ConstatListComponent },
-    {path:'notification',component:NotificationComponent}  ,]
+    {path:'notification',component:NotificationComponent}  ,
+    {path:'cartegrise',component:CarteGriseComponent},]
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

@@ -10,6 +10,8 @@ import { ConstatEnAttenteComponent } from './constat-en-attente/constat-en-atten
 import { ConstatEnCoursComponent } from './constat-en-cours/constat-en-cours.component';
 import { ConstatTermineeComponent } from './constat-terminee/constat-terminee.component';
 import { NotificationComponent } from './notification/notification.component';
+import { AccountComponent } from './account/account.component';
+import { AcceuilComponent } from './acceuil/acceuil.component';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import { NotificationComponent } from './notification/notification.component';
     ConstatEnAttenteComponent,
     ConstatEnCoursComponent,
     ConstatTermineeComponent,
-    NotificationComponent
+    NotificationComponent,
+    AccountComponent,
+    AcceuilComponent
   ],
   imports: [
     CommonModule,

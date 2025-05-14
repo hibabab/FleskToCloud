@@ -4,6 +4,9 @@ import { UserService } from '../services/user-service.service';
 import { jwtDecode } from 'jwt-decode';
 import { NotificationService } from '../../agent-service/Services/notification.service';
 
+import { Router } from '@angular/router';
+import { AuthentificationService } from '../../espace-client/services/authentification.service';
+
 @Component({
   selector: 'app-dashboard',
   standalone: false,
@@ -27,13 +30,15 @@ export class DashboardComponent implements OnInit {
     date_naissance: new Date()
   };
 
-  unreadNotificationsCount: number = 0; // Nouvelle propriété
+  unreadNotificationsCount: number = 0;
+  showLogoutModal: boolean = false; // Pour contrôler l'affichage du modal
 
   constructor(
     private userService: UserService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthentificationService, // Injectez le service d'authentification
+    private router: Router // Injectez le router pour la redirection
   ) {}
-
 
   // Fonction pour récupérer un cookie spécifique
   getCookie(name: string): string | null {
@@ -51,21 +56,19 @@ export class DashboardComponent implements OnInit {
         const decoded: any = jwtDecode(token);
         const userId = Number(decoded.sub); // Récupère l'ID utilisateur
         this.loadUserData(userId);
-        this.loadUnreadNotifications(userId); // Ajoutez cette ligne
+        this.loadUnreadNotifications(userId);
       } catch (error) {
         console.error('Erreur lors du décodage du token', error);
       }
     } else {
       console.error('Token JWT non trouvé');
+      this.router.navigate(['/login']); // Rediriger vers la page de connexion si pas de token
     }
   }
-
-
 
   loadUnreadNotifications(userId: number): void {
     this.notificationService.getUnreadNotifications(userId).subscribe({
       next: (notifications) => {
-        
         this.unreadNotificationsCount = notifications.length;
         console.log('Nombre de notifications non lues:', this.unreadNotificationsCount);
       },
@@ -85,5 +88,22 @@ export class DashboardComponent implements OnInit {
         console.error('Erreur lors du chargement des données utilisateur', error);
       }
     );
+  }
+
+  // Afficher le modal de déconnexion
+  logout(): void {
+    this.showLogoutModal = true;
+  }
+
+  // Annuler la déconnexion
+  cancelLogout(): void {
+    this.showLogoutModal = false;
+  }
+
+  // Confirmer la déconnexion
+  confirmLogout(): void {
+    this.authService.logout(); // Appel à la méthode de déconnexion du service
+    this.showLogoutModal = false;
+    this.router.navigate(['/espace-client/login']); // Redirection vers la page d'accueil au lieu de login
   }
 }

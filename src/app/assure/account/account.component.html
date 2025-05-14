@@ -1,132 +1,189 @@
 <div class="flex">
-    <app-dashboard></app-dashboard>
-  
-    <div class="flex-1 mt-30 ml-50">
-      <section class="min-h-screen flex items-center justify-center p-4">
-        <!-- Conteneur principal -->
-        <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-4xl p-5 w-full h-auto md:h-[100vh]">
-        
-          <!-- Partie centrale : Logo et titre -->
-        <!-- Partie centrale : Nouveau texte -->
-<div class="flex items-center  text-2xl font-semibold text-teal-800">
-  <!-- Logo directement devant le texte -->
-  <i class="fas fa-user-circle w-8 h-8 text-teal-800 mr-2"></i>
-  <p>Votre information personnelle</p>
-</div>
-<p class="text-gray-500 text-sm">Gérez vos données personnelles, informations de contact et adresse facilement</p>
+  <app-dashboard></app-dashboard>
 
-
-
+  <div class="flex-1 mt-30 ml-50">
+    <section class="min-h-screen flex items-center justify-center p-4">
+      <!-- Conteneur principal -->
+      <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-4xl p-5 w-full h-auto md:h-[150vh]">
       
-          <!-- Partie du formulaire -->
-          <div class="w-full md:w-7/8 space-x-8 px-4 md:px-16">
-            <form #registerForm="ngForm" (ngSubmit)="updateUser()" class="space-y-5 mt-6">
-            
-              <!-- Nom et Prénom (côte à côte) -->
+        <!-- En-tête -->
+        <div class="flex items-center text-2xl font-semibold text-teal-800">
+          <i class="fas fa-user-circle w-8 h-8 text-teal-800 mr-2"></i>
+          <p>Votre information personnelle</p>
+        </div>
+        <p class="text-gray-500 text-sm">Gérez vos données personnelles, informations de contact et adresse facilement</p>
+
+        <!-- Notifications -->
+        <div *ngIf="updateSuccess" class="w-full mt-4 mb-2 p-3 bg-green-100 text-green-800 rounded-lg">
+          <p class="text-sm font-medium flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            Les modifications ont été enregistrées avec succès!
+          </p>
+        </div>
+
+        <div *ngIf="updateError" class="w-full mt-4 mb-2 p-3 bg-red-100 text-red-800 rounded-lg">
+          <p class="text-sm font-medium flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            {{ errorMessage }}
+          </p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="w-full md:w-7/8 space-x-8 px-4 md:px-16">
+          <form #registerForm="ngForm" (ngSubmit)="updateUser()" class="space-y-5 mt-6">
+          
+            <!-- Section 1: Informations personnelles (non modifiables) -->
+            <div class="border-b border-gray-200 pb-4">
+              <h3 class="text-lg font-medium text-teal-800 mb-3">Informations personnelles</h3>
+              
               <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <div class="flex-1">
-                  <label for="nom" class="block mb-2 text-sm font-medium text-gray-700">Nom </label>
-                  <input type="text" name="nom" id="nom" [(ngModel)]="user.nom" #nom="ngModel" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre nom" required readonly />
-                  <div class="text-red-500 text-sm mt-1" *ngIf="nom.touched && nom.invalid">
-                    <div *ngIf="nom.errors?.['required']">Le nom est requis.</div>
-                  </div>
+                  <label class="block mb-2 text-sm font-medium text-gray-700">Nom</label>
+                  <input type="text" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg block w-full p-2"
+                    [value]="user.nom" readonly>
                 </div>
                 <div class="flex-1">
-                  <label for="prenom" class="block mb-2 text-sm font-medium text-gray-700">Prénom </label>
-                  <input type="text" name="prenom" id="prenom" [(ngModel)]="user.prenom" #prenom="ngModel" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre prénom" required readonly/>
-                  <div class="text-red-500 text-sm mt-1" *ngIf="prenom.touched && prenom.invalid">
-                    <div *ngIf="prenom.errors?.['required']">Le prénom est requis.</div>
-                  </div>
+                  <label class="block mb-2 text-sm font-medium text-gray-700">Prénom</label>
+                  <input type="text" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg block w-full p-2"
+                    [value]="user.prenom" readonly>
                 </div>
               </div>
-      
-              <!-- CIN et Langue (côte à côte) -->
-              <div class="flex flex-col disabled text-gray-400 md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+
+              <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-4">
                 <div class="flex-1">
-                  <label for="cin" class="block mb-2 text-sm font-medium text-gray-700">CIN </label>
-                  <input  type="text" name="cin" id="cin" [(ngModel)]="user.Cin" #cin="ngModel" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre CIN" required readonly />
-                  <div class="text-red-500 text-sm mt-1" *ngIf="cin.touched && cin.invalid">
-                    <div *ngIf="cin.errors?.['required']">Le CIN est requis.</div>
-                  </div>
+                  <label class="block mb-2 text-sm font-medium text-gray-700">CIN</label>
+                  <input type="number" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg block w-full p-2"
+                    [value]="user.Cin" readonly>
+                </div>
+                <div class="flex-1">
+                  <label class="block mb-2 text-sm font-medium text-gray-700">Date de naissance</label>
+                  <input type="text" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg block w-full p-2"
+                    [value]="user.date_naissance | date:'dd/MM/yyyy'" readonly>
                 </div>
               </div>
-      
-              <!-- Email et Téléphone (côte à côte) -->
+            </div>
+
+            <!-- Section 2: Coordonnées (modifiables) -->
+            <div class="border-b border-gray-200 pb-4">
+              <h3 class="text-lg font-medium text-teal-800 mb-3">Coordonnées</h3>
+              
               <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <div class="flex-1">
-                  <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email </label>
-                  <input type="email" name="email" id="email" [(ngModel)]="userUpdate.email" #email="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre email" required />
-                  <div class="text-red-500 text-sm mt-1" *ngIf="email.touched && email.invalid">
-                    <div *ngIf="email.errors?.['required']">L'email est requis.</div>
-                    <div *ngIf="email.errors?.['email']">L'email doit être valide.</div>
-                  </div>
+                  <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email</label>
+                  <input type="email" name="email" [(ngModel)]="userUpdate.email" #email="ngModel"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                    required>
                 </div>
                 <div class="flex-1">
                   <label for="telephone" class="block mb-2 text-sm font-medium text-gray-700">Téléphone</label>
-                  <input type="text" name="telephone" id="telephone" [(ngModel)]="userUpdate.telephone" #telephone="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre numéro de téléphone" required />
-                  <div class="text-red-500 text-sm mt-1" *ngIf="telephone.touched && telephone.invalid">
-                    <div *ngIf="telephone.errors?.['required']">Le numéro de téléphone est requis.</div>
-                  </div>
+                  <input type="tel" name="telephone" [(ngModel)]="userUpdate.telephone" #telephone="ngModel"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                    required>
                 </div>
               </div>
-      
-              <!-- Mot de passe et Confirmer mot de passe (côte à côte) -->
-             
-              <!-- Adresse et Pays (côte à côte) -->
+            </div>
+
+            <!-- Section 3: Adresse (modifiable) -->
+            <div>
+              <h3 class="text-lg font-medium text-teal-800 mb-3">Adresse</h3>
+              
               <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <div class="flex-1">
-                  <label for="adresse" class="block mb-2 text-sm font-medium text-gray-700">pays</label>
-                  <input type="text" name="adresse" id="adresse" [(ngModel)]="userUpdate.adresse.pays" #adresse="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre rue" required />
-                  <div class="text-red-500 text-sm mt-1" *ngIf="adresse.touched && adresse.invalid">
-                    <div *ngIf="adresse.errors?.['required']">L'adresse est requise.</div>
-                  </div>
+                  <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue</label>
+                  <input type="text" name="rue" [(ngModel)]="userUpdate.adresse.rue" #rue="ngModel"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                    required>
                 </div>
                 <div class="flex-1">
-                  <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville </label>
-        <input type="text" name="ville" id="ville" [(ngModel)]="userUpdate.adresse.ville" #ville="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre ville" required />
-        <div class="text-red-500 text-sm mt-1" *ngIf="ville.touched && ville.invalid">
-          <div *ngIf="ville.errors?.['required']">La ville est requise.</div>
-        </div>
+                  <label for="numMaison" class="block mb-2 text-sm font-medium text-gray-700">Numéro de maison</label>
+                  <input type="number" name="numMaison" [(ngModel)]="userUpdate.adresse.numMaison" #numMaison="ngModel"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600">
                 </div>
               </div>
-              <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+
+              <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-4">
                 <div class="flex-1">
-                  <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue </label>
-                  <input type="text" name="rue" id="rue" [(ngModel)]="userUpdate.adresse.rue" #rue="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre rue" required />
-                  <div class="text-red-500 text-sm mt-1" *ngIf="rue.touched && rue.invalid">
-                    <div *ngIf="rue.errors?.['required']">Le rue est requise.</div>
-                  </div>
+                  <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville</label>
+                  <input type="text" name="ville" [(ngModel)]="userUpdate.adresse.ville" #ville="ngModel"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                    required>
                 </div>
                 <div class="flex-1">
-                  <label for="code" class="block mb-2 text-sm font-medium text-gray-700">Code postal </label>
-                  <input type="text" name=" code" id="code" [(ngModel)]="userUpdate.adresse.codePostal" #code="ngModel" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600" placeholder="Entrez votre pays" required />
-                  <div class="text-red-500 text-sm mt-1" *ngIf="code.touched && code.invalid">
-                    <div *ngIf="code.errors?.['required']">Le code postal est requis.</div>
-                  </div>
+                  <label for="gouvernat" class="block mb-2 text-sm font-medium text-gray-700">Gouvernorat</label>
+                  <input type="text" name="gouvernat" [(ngModel)]="userUpdate.adresse.gouvernat" #gouvernat="ngModel"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                    required>
                 </div>
               </div>
-      
-             
-              <!-- Bouton -->
-              <button type="submit" class="w-full py-2 px-4 bg-teal-800 text-white rounded-lg mt-5 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800">
-                Sauvgarder
+
+              <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-4">
+                <div class="flex-1">
+                  <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal</label>
+                  <input type="number" name="codePostal" [(ngModel)]="userUpdate.adresse.codePostal" #codePostal="ngModel"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                    required>
+                </div>
+                <div class="flex-1">
+                  <label class="block mb-2 text-sm font-medium text-gray-700">Pays</label>
+                  <input type="text" class="bg-gray-50 border border-gray-300 text-gray-400 rounded-lg block w-full p-2"
+                    [value]="user.adresse.pays" readonly>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <button type="submit" class="w-full py-2 px-4 bg-teal-800 text-white rounded-lg mt-5 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800">
+              Sauvegarder les modifications
+            </button>
+            
+            <!-- Lien pour changer le mot de passe -->
+            <p class="text-sm font-light text-gray-500 mt-4">
+              Changer de mot de passe ? 
+              <button type="button" (click)="openModal()" class="font-medium text-teal-800 hover:underline">
+                Cliquer ici
               </button>
-              <p class="text-sm font-light text-gray-500 mt-4">
-                Changer de mot de passe ? 
-                <button  (click)="openModal()" class="font-medium text-teal-800 hover:underline">
-                  Cliquer ici
-                </button>
-              </p>
-              
-              
-            </form>
-          </div>
+            </p>
+          </form>
         </div>
-      </section>
-      
-    </div>
-  
-    <app-change-password *ngIf="isModalOpen" (close)="closeModal()"></app-change-password>
-    
+      </div>
+    </section>
   </div>
-  
+</div>
+
+<!-- Modal de changement de mot de passe -->
+<div *ngIf="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg w-full max-w-md">
+    <h3 class="text-lg font-semibold text-teal-800 mb-4">Changer le mot de passe</h3>
+    
+    <div class="space-y-4">
+      <div>
+        <label for="oldPassword" class="block text-sm font-medium text-gray-700 mb-1">Ancien mot de passe</label>
+        <input type="password" id="oldPassword" [(ngModel)]="passwordData.oldPassword" 
+          class="w-full p-2 border border-gray-300 rounded-lg focus:ring-teal-800 focus:border-teal-800">
+      </div>
+      
+      <div>
+        <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
+        <input type="password" id="newPassword" [(ngModel)]="passwordData.newPassword" 
+          class="w-full p-2 border border-gray-300 rounded-lg focus:ring-teal-800 focus:border-teal-800">
+      </div>
+      
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
+        <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword" 
+          class="w-full p-2 border border-gray-300 rounded-lg focus:ring-teal-800 focus:border-teal-800">
+      </div>
+    </div>
+
+    <div class="flex justify-end space-x-3 mt-6">
+      <button type="button" (click)="closeModal()" 
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+        Annuler
+      </button>
+      <button type="button" (click)="changePassword()" 
+        class="px-4 py-2 bg-teal-800 text-white rounded-lg hover:bg-teal-700">
+        Confirmer
+      </button>
+    </div>
+  </div>
+</div>

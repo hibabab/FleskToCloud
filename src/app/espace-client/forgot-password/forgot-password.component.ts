@@ -1,42 +1,51 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-
 import { AuthentificationService } from '../services/authentification.service';
 import { UserDto } from '../models/userDto';
 
-
-
 @Component({
   selector: 'app-forgot-password',
-  standalone: false,
   templateUrl: './forgot-password.component.html',
-  styleUrl: './forgot-password.component.css'
+  standalone:false,
+  styleUrls: ['./forgot-password.component.css']
 })
 export class ForgotPasswordComponent {
   @Output() closeModal = new EventEmitter<void>();
-   user: UserDto = {} as UserDto;
-constructor(private authService: AuthentificationService) {}
-onClose() {
-  this.closeModal.emit();
-}
+  user: UserDto = { email: '' } as UserDto;
+  message: string = '';
+  isSuccess: boolean = false;
+  isLoading: boolean = false;
+
+  constructor(private authService: AuthentificationService) {}
+
+  onClose() {
+    this.closeModal.emit();
+  }
+
   onSubmit() {
-    // Validation of fields
-    if (!this.user.email ) {
-      console.error('Tous les champs sont obligatoires.');
+    this.isLoading = true;
+    this.message = '';
+    this.isSuccess = false;
+
+    if (!this.user.email) {
+      this.message = 'Veuillez entrer votre adresse email';
+      this.isLoading = false;
       return;
     }
 
-    // Calling the AuthService method to register the user
-    this.authService.forgotPassword(this.user.email).subscribe(
-      (response) => {
-        console.log('mot de passe oublié réussie:', response);
-        // You can add a redirect or a success message here
-        this.onClose();
+    this.authService.forgotPassword(this.user.email).subscribe({
+      next: () => {
+        this.isSuccess = true;
+        this.message = 'Si votre adresse email est correcte, vous recevrez un lien de réinitialisation dans quelques minutes.';
+        this.isLoading = false;
+        // Optionally auto-close after success
+        setTimeout(() => this.onClose(), 3000);
       },
-      (error) => {
-        console.error('Erreur de mot de passe oublié:', error);
-        // Handle the error, show an error message, etc.
+      error: (error) => {
+        this.isSuccess = false;
+        this.message = error.error?.message || 
+                       'Une erreur est survenue lors de l\'envoi du lien de réinitialisation';
+        this.isLoading = false;
       }
-    );
+    });
   }
-
 }

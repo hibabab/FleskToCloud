@@ -5,7 +5,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Ajout de F
 import { AssureRoutingModule } from './assure-routing.module';
 import { AssureComponent } from './assure.component';
 import { AccountComponent } from './account/account.component';
-import { ChangePasswordComponent } from './change-password/change-password.component';
 import { AceuilComponent } from './aceuil/aceuil.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DeviComponent } from './devi/devi.component';
@@ -31,6 +30,8 @@ import { PaymentInitiateVieComponent } from './payment-initiate-vie/payment-init
 import { PaymentSuccessVieComponent } from './payment-success-vie/payment-success-vie.component';
 import { DemandeSouscriptionVieComponent } from './demande-souscription-vie/demande-souscription-vie.component';
 import { HistoriqueContratVieComponent } from './historique-contrat-vie/historique-contrat-vie.component';
+import { ConstatListComponent } from './constat-list/constat-list.component';
+import { CarteGriseComponent } from './carte-grise/carte-grise.component';
 
 
 
@@ -38,7 +39,6 @@ import { HistoriqueContratVieComponent } from './historique-contrat-vie/historiq
   declarations: [
     AssureComponent,
     AccountComponent,
-    ChangePasswordComponent,
     AceuilComponent,
     DashboardComponent,
     DeviComponent,
@@ -60,7 +60,9 @@ import { HistoriqueContratVieComponent } from './historique-contrat-vie/historiq
     PaymentInitiateVieComponent,
     PaymentSuccessVieComponent,
     DemandeSouscriptionVieComponent,
-    HistoriqueContratVieComponent
+    HistoriqueContratVieComponent,
+    ConstatListComponent,
+    CarteGriseComponent,
 
   ],
   imports: [

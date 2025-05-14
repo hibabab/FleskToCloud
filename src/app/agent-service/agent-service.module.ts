@@ -8,7 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { CreationContratComponent } from './creation-contrat/creation-contrat.component';
 import { DashbortComponent } from './dashbort/dashbort.component';
 import { ContratAutoComponent } from './contrat-auto/contrat-auto.component';
-import { CreationCompteComponent } from './creation-compte/creation-compte.component';
 import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
 import { ContratAutoSemestrielComponent } from './contrat-auto-semestriel/contrat-auto-semestriel.component';
 import { ContratListComponent } from './contrat-list/contrat-list.component';
@@ -23,6 +22,7 @@ import { DevisCVieComponent } from './devis-cvie/devis-cvie.component';
 import { ListeAssureVieComponent } from './liste-assure-vie/liste-assure-vie.component';
 import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/historique-contrat-vie-a.component';
 import { ResiliationComponent } from './resiliation/resiliation.component';
+import { AccountComponent } from './account/account.component';
 
 
 
@@ -32,7 +32,6 @@ import { ResiliationComponent } from './resiliation/resiliation.component';
 CreationContratComponent,
 DashbortComponent,
 ContratAutoComponent,
-CreationCompteComponent,
 RenouvellementCAComponent,
 ContratAutoSemestrielComponent,
 ContratListComponent,
@@ -47,6 +46,7 @@ DevisCVieComponent,
 ListeAssureVieComponent,
 HistoriqueContratVieAComponent,
 ResiliationComponent,
+AccountComponent,
 
   ],
   imports: [

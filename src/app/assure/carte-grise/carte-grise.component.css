@@ -1,0 +1,21 @@
+:host {
+    ::ng-deep {
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-in;
+      }
+  
+      .animate-slide-down {
+        animation: slideDown 0.2s ease-out;
+      }
+  
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+  
+      @keyframes slideDown {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    }
+  }

@@ -11,23 +11,7 @@ export class ConstatService {
   private apiUrl = 'http://localhost:3000'; // L'URL de base de l'API
 
   constructor(private http: HttpClient) {}
-
-  createConstat(userId: number, constatDto: any, conducteur1Email: string, conducteur2Email: string): Observable<any> {
-    const body = {
-      constatDto,
-      conducteur1Email,
-      conducteur2Email,
-    };
-
-    return this.http.post(
-      `${this.apiUrl}/constat/create-constat/${userId}`,
-      body
-    ).pipe(
-      tap(() => console.log('✅ Constat créé avec succès')),
-      catchError(this.handleError)
-    );
-  }
-
+  
   getAllConstats(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/constat/get_all_constats`).pipe(
       tap(constats => console.log('📄 Constats chargés:', constats.length)),
@@ -64,14 +48,28 @@ export class ConstatService {
   }
 
   // Mise à jour de la méthode d'upload pour corriger l'URL
-  uploadConstatPDF(constatId: number, file: Blob): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file, 'constat-amiable.pdf');
+ // Mettez à jour la méthode createConstat
+createConstat(immatriculation: string, formData: FormData): Observable<any> {
+  return this.http.post(
+    `${this.apiUrl}/constat/create-constat/${immatriculation}`,
+    formData
+  ).pipe(
+    tap(() => console.log('✅ Constat créé avec succès')),
+    catchError(this.handleError)
+  );
+}
 
-    // Correction de l'URL pour correspondre à l'endpoint de l'API
-    return this.http.post(`${this.apiUrl}/constat/upload-constat-file/${constatId}`, formData).pipe(
-      tap(() => console.log('📤 PDF envoyé avec succès')),
-      catchError(this.handleError)
-    );
-  }
+// Et la méthode uploadConstatPDF
+uploadConstatPDF(constatId: number, file: Blob): Observable<any> {
+  const formData = new FormData();
+  formData.append('file', file, 'constat.pdf');
+  
+  return this.http.post(
+    `${this.apiUrl}/constat/upload-constat-file/${constatId}`,
+    formData
+  ).pipe(
+    tap(() => console.log('📤 PDF envoyé avec succès')),
+    catchError(this.handleError)
+  );
+}
 }

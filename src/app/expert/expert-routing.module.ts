@@ -5,15 +5,21 @@ import { ConstatEnAttenteComponent } from './constat-en-attente/constat-en-atten
 import { ConstatEnCoursComponent } from './constat-en-cours/constat-en-cours.component';
 import { ConstatTermineeComponent } from './constat-terminee/constat-terminee.component';
 import { NotificationComponent } from './notification/notification.component';
+import { AccountComponent } from './account/account.component';
+import { AcceuilComponent } from './acceuil/acceuil.component';
 
 
 const routes: Routes = [
+  { path: '', redirectTo: 'acceuil', pathMatch: 'full' }, // 👈 Route par défaut
   { path: 'dashboard-expert', component: DehasbortExpertComponent },
-  { path: 'constats/en-attente', component: ConstatEnAttenteComponent },  // 👈 Constats en attente
-  { path: 'constats/en-cours', component: ConstatEnCoursComponent },  // 👈 Constats en cours
+  { path: 'constats/en-attente', component: ConstatEnAttenteComponent },
+  { path: 'constats/en-cours', component: ConstatEnCoursComponent },
   { path: 'constats/terminee', component: ConstatTermineeComponent },
-  {path:'notification',component:NotificationComponent}  // 👈 Constats terminés
+  { path: 'notification', component: NotificationComponent },
+  { path: 'account', component: AccountComponent },
+  { path: 'acceuil', component: AcceuilComponent }
 ];
+
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

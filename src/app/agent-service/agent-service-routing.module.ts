@@ -5,7 +5,7 @@ import { CreationContratComponent } from '../contrat/creation-contrat/creation-c
 
 import { DashbortComponent } from './dashbort/dashbort.component';
 import { ContratAutoComponent } from './contrat-auto/contrat-auto.component';
-import { CreationCompteComponent } from './creation-compte/creation-compte.component';
+//import { CreationCompteComponent } from './creation-compte/creation-compte.component';
 import { RenouvellementCAComponent } from './renouvellement-ca/renouvellement-ca.component';
 import { ContratAutoSemestrielComponent } from './contrat-auto-semestriel/contrat-auto-semestriel.component';
 import { ContratListComponent } from './contrat-list/contrat-list.component';
@@ -20,6 +20,7 @@ import { CreationCVieComponent } from './creation-c-vie/creation-c-vie.component
 import { ListeAssureVieComponent } from './liste-assure-vie/liste-assure-vie.component';
 import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/historique-contrat-vie-a.component';
 import { ResiliationComponent } from './resiliation/resiliation.component';
+import { AccountComponent } from './account/account.component';
 
 
 
@@ -33,7 +34,7 @@ const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent 
   { path: 'CA', component: ContratAutoComponent },
   { path: 'historique', component: HistoriqueContratVieAComponent },
   { path: 'listAvie', component: ListeAssureVieComponent },
-  { path: 'compte', component: CreationCompteComponent},
+  //{ path: 'compte', component: CreationCompteComponent},
   { path: 'renouvellementCA', component: RenouvellementCAComponent},
   { path: 'semstrielCA', component: ContratAutoSemestrielComponent},
   { path: 'tousCA', component: ContratListComponent},
@@ -43,7 +44,8 @@ const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent 
   { path: 'liste-auto', component: ListeAutoComponent },
   { path: 'liste-constat', component: ConstatListComponent},
   { path: 'annuler', component: ResiliationComponent},
-   {path:'notification',component:NotificationComponent}
+   {path:'notification',component:NotificationComponent},
+   { path: 'account', component: AccountComponent }
 
 
  ];

@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ExpertconstatService } from '../service/expertconstat.service';
 import { jwtDecode } from 'jwt-decode';
+import { ConstatStatut } from '../enum/constatstatut';
 
 @Component({
   selector: 'app-constat-en-cours',
-  standalone: false,
+  standalone:false,
   templateUrl: './constat-en-cours.component.html',
   styleUrls: ['./constat-en-cours.component.css']
 })
@@ -12,15 +13,37 @@ export class ConstatEnCoursComponent implements OnInit {
   constatsEnCours: any[] = [];
   showModal = false;
   selectedConstat: any = null;
+  
+  // Form Fields
+  descriptionDommage = '';
   montantEstime: number | null = null;
-
-  expertId: number | null = null;
-  userId: number | null = null;
-
-  // Champs supplémentaires
-  descriptionDommage: string = '';
-  commentaire: string = '';
+  commentaire = '';
   fileToUpload: File | null = null;
+  
+  // Validation
+  formErrors = {
+    description: false,
+    montant: false,
+    file: false
+  };
+  
+  touchedFields = {
+    description: false,
+    montant: false,
+    file: false
+  };
+  
+  // Notifications
+  notificationMessage = '';
+  isSuccess = true;
+  showNotification = false;
+  
+  // Loading State
+  isLoading = false;
+  
+  // User Info
+  userId: number | null = null;
+  expertId: number | null = null;
 
   constructor(private expertconstatService: ExpertconstatService) {}
 
@@ -31,66 +54,143 @@ export class ConstatEnCoursComponent implements OnInit {
   private decodeUserIdFromToken(): void {
     const token = this.getCookie('access_token');
     if (token) {
-      const decoded: any = jwtDecode(token);
-      this.userId = Number(decoded.sub);
-      this.getExpertIdAndLoadConstats();
-    } else {
-      console.error('Token non trouvé');
+      try {
+        const decoded: any = jwtDecode(token);
+        this.userId = Number(decoded.sub);
+        this.getExpertId();
+      } catch (error) {
+        this.showErrorNotification('Erreur de décodage du token');
+      }
     }
   }
 
-  private getExpertIdAndLoadConstats(): void {
+  private getExpertId(): void {
     if (!this.userId) return;
-
+    
     this.expertconstatService.getExpertIdByUserId(this.userId).subscribe({
       next: (expertId) => {
         this.expertId = expertId;
         this.loadConstatsEnCours();
       },
       error: (err) => {
-        console.error('Erreur lors de la récupération de l\'ID expert:', err);
+        this.showErrorNotification('Erreur de récupération de l\'expert');
       }
     });
   }
 
-  private loadConstatsEnCours(): void {
-    if (!this.expertId) {
-      console.error('ID expert non trouvé');
-      return;
-    }
-
+  loadConstatsEnCours(): void {
+    if (!this.expertId) return;
+    
     this.expertconstatService.getConstatsByExpertId(this.expertId).subscribe({
       next: (data) => {
-        this.constatsEnCours = data.filter((constat: any) => constat.statut === 'En cours de traitement');
+        this.constatsEnCours = data.filter((c: any) => 
+          c.statut === ConstatStatut.EN_COURS
+        );
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des constats :', error);
+        this.showErrorNotification('Erreur de chargement des constats');
       }
     });
   }
 
-  openModal(constat: any) {
+  openModal(constat: any): void {
     this.selectedConstat = constat;
     this.showModal = true;
   }
 
-  closeModal() {
+  closeModal(): void {
     this.showModal = false;
-    this.selectedConstat = null;
-    this.montantEstime = null;
+    this.resetForm();
+  }
+
+  onFileChange(event: any): void {
+    const file = event.target.files[0];
+    this.fileToUpload = file;
+    this.formErrors.file = !file;
+  }
+
+  private resetForm(): void {
     this.descriptionDommage = '';
+    this.montantEstime = null;
     this.commentaire = '';
     this.fileToUpload = null;
+    this.formErrors = {
+      description: false,
+      montant: false,
+      file: false
+    };
+    this.touchedFields = {
+      description: false,
+      montant: false,
+      file: false
+    };
   }
 
-  onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.fileToUpload = file;
+  validerEstimation(): void {
+    // Mark all fields as touched
+    this.touchedFields = {
+      description: true,
+      montant: true,
+      file: true
+    };
+
+    // Validate form
+    this.formErrors = {
+      description: !this.descriptionDommage,
+      montant: !this.montantEstime || this.montantEstime <= 0,
+      file: !this.fileToUpload
+    };
+
+    if (Object.values(this.formErrors).some(error => error)) {
+      this.showErrorNotification('Veuillez corriger les erreurs du formulaire');
+      return;
     }
+
+    this.isLoading = true;
+    
+    const formData = new FormData();
+    formData.append('constatId', this.selectedConstat.idConstat.toString());
+    formData.append('montant', this.montantEstime!.toString());
+    formData.append('degats', this.descriptionDommage);
+    formData.append('rapport', this.fileToUpload!, this.fileToUpload!.name);
+    
+    if (this.commentaire) {
+      formData.append('commentaire', this.commentaire);
+    }
+
+    this.expertconstatService.estimerConstatParExpert(formData).subscribe({
+      next: () => {
+        this.showSuccessNotification('Estimation envoyée avec succès');
+        this.closeModal();
+        this.loadConstatsEnCours();
+      },
+      error: (err) => {
+        this.showErrorNotification(err.error?.message || 'Erreur lors de l\'envoi');
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
+  // Notification Helpers
+  private showSuccessNotification(message: string): void {
+    this.notificationMessage = message;
+    this.isSuccess = true;
+    this.showNotification = true;
+    setTimeout(() => this.hideNotification(), 5000);
+  }
 
+  private showErrorNotification(message: string): void {
+    this.notificationMessage = message;
+    this.isSuccess = false;
+    this.showNotification = true;
+    setTimeout(() => this.hideNotification(), 5000);
+  }
+
+  hideNotification(): void {
+    this.showNotification = false;
+  }
 
   private getCookie(name: string): string | null {
     const value = `; ${document.cookie}`;
@@ -98,46 +198,4 @@ export class ConstatEnCoursComponent implements OnInit {
     if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
     return null;
   }
- 
-  isLoading: boolean = false;
-  
-  validerEstimation(): void {
-    // Add more detailed validation
-    if (!this.selectedConstat || 
-        !this.selectedConstat.idConstat || 
-        !this.montantEstime || 
-        !this.descriptionDommage || 
-        !this.fileToUpload) {
-      alert('Veuillez remplir tous les champs obligatoires et sélectionner un constat.');
-      return;
-    }
-  
-    this.isLoading = true;
-  
-    const formData = new FormData();
-    formData.append('constatId', this.selectedConstat.idConstat.toString());
-    formData.append('montant', this.montantEstime.toString());
-    formData.append('degats', this.descriptionDommage);
-  
-    if (this.commentaire) {
-      formData.append('commentaire', this.commentaire);
-    }
-  
-    formData.append('rapport', this.fileToUpload, this.fileToUpload.name);
-  
-    this.expertconstatService.estimerConstatParExpert(formData).subscribe({
-      next: () => {
-        alert('Estimation envoyée avec succès.');
-        this.closeModal();
-        this.loadConstatsEnCours();
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Une erreur est survenue lors de l\'envoi de l\'estimation.');
-      },
-      complete: () => {
-        this.isLoading = false;
-      }
-    });
-  }
-}  
+}
