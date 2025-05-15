@@ -25,7 +25,7 @@ export class ContratAuto {
   @Column('varchar')
   packChoisi:string;
   @Column({ type: 'varchar', nullable: true, default: 'valide' })
-  etat?: 'valide' | 'invalide';
+  etat?: 'valide' | 'invalide'| 'résilié';
   @ManyToOne(() => Assure, (assure) => assure.contrats)
   assure: Assure;
 
@@ -35,8 +35,6 @@ export class ContratAuto {
   @OneToOne(() => Vehicule, (vehicule) => vehicule.contratAuto)
   @JoinColumn() 
   vehicule: Vehicule;
-  @OneToOne(() => Payment, payment => payment.contrat, {
-    cascade: true, 
-  })
-  payment?: Payment;
+ @OneToMany(() => Payment, payment => payment.contrat)
+  payment: Payment[];
 }

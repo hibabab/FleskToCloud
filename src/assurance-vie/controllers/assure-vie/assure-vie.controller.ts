@@ -15,4 +15,8 @@ export class AssureVieController {
       }
       return this.assureVieService.getAllAssuresVie();
     }
+    @Get('count')
+async getCount() {
+    return await this.assureVieService.getAssuresVieCount();
+}
 }

@@ -69,4 +69,14 @@ export class AssureService {
   
     return assure;
   }
+  async getAssuresCount(): Promise<number> {
+    try {
+      return await this.assureRepository.count();
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Erreur lors du comptage des assurés',
+        error.message
+      );
+    }
+  }
 }

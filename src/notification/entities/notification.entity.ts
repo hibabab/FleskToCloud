@@ -23,7 +23,7 @@ export class NotificationEntity {
   @CreateDateColumn()
   createdAt: Date;
   @Column({ type: 'varchar', nullable: true })
-  type: 'subscription_request' | 'general' |'vie_subscription_request'|"vie_subscription_rejected"|"vie_subscription_accepted"|"EXPIRATION_CONTRAT"| null; // Nouveau champ
+  type: 'subscription_request' | 'general' |'vie_subscription_request'|"vie_subscription_rejected"|"vie_subscription_accepted"|"EXPIRATION_CONTRAT"| null; 
 
   @Column({ type: 'json', nullable: true })
   metadata: any; // Pour stocker les données du formulaire

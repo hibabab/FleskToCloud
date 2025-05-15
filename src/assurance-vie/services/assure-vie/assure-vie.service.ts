@@ -97,6 +97,12 @@ export class AssureVieService {
           
           });
       }
-   
+      async getAssuresVieCount(): Promise<number> {
+        try {
+            return await this.assureVieRepository.count();
+        } catch (error) {
+            throw new InternalServerErrorException('Erreur lors du comptage des assurés vie');
+        }
+    }
     
 }

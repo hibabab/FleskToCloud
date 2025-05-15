@@ -191,51 +191,94 @@ export class PaymentGatewayController {
   async getPaymentStatus(@Param('contratNum', ParseIntPipe) contratNum: number) {
     try {
       const result = await this.paymentGatewayService.getPaymentByContrat(contratNum);
-
+  
       if (!result.hasPayment) {
         return {
           success: true,
           data: {
             hasPayment: false,
             status: 'NO_PAYMENT',
-            contratNum
+            contratNum,
+            payments: [] // Retourne un tableau vide pour cohérence
           },
           message: 'No payment found for this contract'
         };
       }
-
+  
+      // Cas où il y a des paiements
+      if (result.payments && result.payments.length > 0) {
+        return {
+          success: true,
+          data: {
+            hasPayment: true,
+            payments: result.payments.map(payment => ({
+              paymentId: payment.paymentId,
+              trackingId: payment.trackingId,
+              status: payment.status,
+              amount: payment.amount,
+              paymentDate: payment.paymentDate,
+              // Ajoutez d'autres champs si nécessaire
+            })),
+            contratNum,
+            totalPayments: result.payments.length,
+            lastPaymentStatus: result.payments[result.payments.length - 1].status // Optionnel: statut du dernier paiement
+          },
+          message: 'All payments retrieved successfully'
+        };
+      }
+  
+      // Cas par défaut
       return {
         success: true,
         data: {
-          hasPayment: true,
-          paymentId: result.paymentId,
-          trackingId: result.trackingId,
-          status: result.status,
-          amount: result.amount,
-          paymentDate: result.paymentDate,
-          contratNum
+          hasPayment: false,
+          status: 'NO_PAYMENT',
+          contratNum,
+          payments: []
         },
-        message: 'Payment status retrieved successfully'
+        message: 'No payment details available'
       };
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  @Post('cancel/:contratNum')
-  async cancelPayment(@Param('contratNum', ParseIntPipe) contratNum: number) {
-    try {
-      const result = await this.paymentGatewayService.cancelPayment(contratNum);
+  @Post('cancel/:paymentId')
+async cancelPayment(@Param('paymentId') paymentId: string) {
+  try {
+    const result = await this.paymentGatewayService.cancelPayment(paymentId);
 
-      return {
-        success: true,
-        data: result.data,
-        message: result.message
-      };
-    } catch (error) {
-      this.handleError(error);
+    return {
+      success: result.success,
+      data: {
+        paymentId: result.data.paymentId,
+        trackingId: result.data.trackingId,
+        amount: result.data.amount,
+        status: result.data.status,
+        contratNum: result.data.contratNum,
+        deleted: true
+      },
+      message: result.message,
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw new HttpException({
+        success: false,
+        message: error.message,
+        error: error.getResponse()['error'] || 'PAYMENT_CANCELLATION_ERROR',
+        timestamp: new Date().toISOString()
+      }, error.getStatus());
     }
+
+    throw new HttpException({
+      success: false,
+      message: 'Erreur technique lors de l\'annulation du paiement',
+      error: 'SERVER_ERROR',
+      timestamp: new Date().toISOString()
+    }, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+}
   @Post('cancelP/:contratNum')
   async cancel(@Param('contratNum', ParseIntPipe) contratNum: number) {
     try {

@@ -9,4 +9,8 @@ export class AssureController {
   async getByCin(@Param('cin') cin: number) {
     return this.assureService.getAssureByCin(cin);
   }
+  @Get('count')
+async getAssuresCount(): Promise<number> {
+    return this.assureService.getAssuresCount();
+}
 }

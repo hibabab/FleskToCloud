@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { TemplateGaranties } from 'src/assurance-auto/entities/TemplateGaranties.entity';
@@ -20,113 +20,52 @@ export enum TypeGaranties {
     DOMMAGEETCOLLIDION = 'Dommage et Collision'
   }
   @Injectable()
-  export class TemplateGarantiesService {
-    constructor(
-      @InjectRepository(TemplateGaranties)
-      private readonly templateRepo: Repository<TemplateGaranties>
-    ) {}
-  
-    private roundToThree(value: number): number {
-      return Math.round(value * 1000) / 1000;
-    }
-  
-    async initializeDefaultTemplates(): Promise<{success: boolean, count: number}> {
-      const defaultTemplates = [
-        // Pack1 + Base
-        {
-          type: TypeGaranties.RTI,
-          capital: null,
-          franchise: null,
-          cotisationNette: this.roundToThree(0)
-        },
-        {
-          type: TypeGaranties.DefenseEtRecours,
-          capital: this.roundToThree(1000),
-          franchise: null,
-          cotisationNette: this.roundToThree(50)
-        },
-        {
-          type: TypeGaranties.PersonneTransportees,
-          capital: this.roundToThree(5000),
-          franchise: null,
-          cotisationNette: this.roundToThree(50)
-        },
-        {
-          type: TypeGaranties.AssistanceAutomobile,
-          capital: null,
-          franchise: null,
-          cotisationNette: this.roundToThree(71.5)
-        },
-        {
-          type: TypeGaranties.IndividuelAccidentConducteur,
-          capital: this.roundToThree(20000),
-          franchise: null,
-          cotisationNette: this.roundToThree(25)
-        },
-        // Pack2 + Pack3
-        {
-          type: TypeGaranties.EVENEMENTCLIMATIQUE,
-          capital: null,
-          franchise: null,
-          cotisationNette: this.roundToThree(25)
-        },
-        {
-          type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-          capital: null,
-          franchise: null,
-          cotisationNette: this.roundToThree(25)
-        }
-      ];
-  
-      try {
-        const results = await Promise.all(
-          defaultTemplates.map(template => 
-            this.templateRepo.save(this.templateRepo.create(template)))
-        );
-        return { success: true, count: results.length };
-      } catch (error) {
-        console.error('Error initializing templates:', error);
-        return { success: false, count: 0 };
-      }
-    }
-  
-    async getTemplatesForPack(pack: string): Promise<TemplateGaranties[]> {
-      const packMappings = {
-        Pack1: [
-          TypeGaranties.RTI,
-          TypeGaranties.DefenseEtRecours,
-          TypeGaranties.PersonneTransportees,
-          TypeGaranties.AssistanceAutomobile,
-          TypeGaranties.IndividuelAccidentConducteur
-        ],
-        Pack2: [
-          TypeGaranties.RTI,
-          TypeGaranties.DefenseEtRecours,
-          TypeGaranties.PersonneTransportees,
-          TypeGaranties.AssistanceAutomobile,
-          TypeGaranties.IndividuelAccidentConducteur,
-          TypeGaranties.EVENEMENTCLIMATIQUE,
-          TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE
-        ],
-        Pack3: [
-          TypeGaranties.RTI,
-          TypeGaranties.DefenseEtRecours,
-          TypeGaranties.PersonneTransportees,
-          TypeGaranties.AssistanceAutomobile,
-          TypeGaranties.IndividuelAccidentConducteur,
-          TypeGaranties.EVENEMENTCLIMATIQUE,
-          TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        ]
-      };
-  
-      const types = packMappings[pack] || packMappings.Pack1;
-      return this.templateRepo.find({ 
-        where: { type: In(types) },
-        order: { type: 'ASC' }
-      });
-    }
-  
-    async getAllTemplates(): Promise<TemplateGaranties[]> {
-      return this.templateRepo.find({ order: { type: 'ASC' } });
-    }
+export class TemplateGarantiesService {
+  constructor(
+    @InjectRepository(TemplateGaranties)
+    private readonly templateGarantiesRepository: Repository<TemplateGaranties>,
+  ) {}
+
+  // Initialise les garanties par défaut si la table est vide
+  async initializeDefaultGaranties() {
+    const count = await this.templateGarantiesRepository.count();
+    if (count > 0) return;
+
+    const defaultGaranties = [
+      { type: TypeGaranties.RTI, cotisationNette: 0 },
+      { type: TypeGaranties.DefenseEtRecours, capital: 1000, cotisationNette: 50.0 },
+      { type: TypeGaranties.PersonneTransportees, capital: 5000, cotisationNette: 50.0 },
+      { type: TypeGaranties.AssistanceAutomobile, cotisationNette: 71.5 },
+      { type: TypeGaranties.IndividuelAccidentConducteur, capital: 20000, cotisationNette: 25.0 },
+      { type: TypeGaranties.EVENEMENTCLIMATIQUE, cotisationNette: 25.0 },
+      { type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE, cotisationNette: 25.0 },
+    ];
+
+    await this.templateGarantiesRepository.save(defaultGaranties);
   }
+
+  // Récupère toutes les garanties templates
+  async findAll(): Promise<TemplateGaranties[]> {
+    return this.templateGarantiesRepository.find();
+  }
+
+  async findByType(type: TypeGaranties): Promise<TemplateGaranties | null> {
+    return this.templateGarantiesRepository.findOne({ where: { type } });
+  }
+
+  async updateGarantie(
+    type: TypeGaranties,
+    updateData: Partial<TemplateGaranties>,
+  ): Promise<TemplateGaranties> {
+    await this.templateGarantiesRepository.update({ type }, updateData);
+    const updated = await this.findByType(type);
+    if (!updated) {
+      throw new NotFoundException(`TemplateGaranties with type ${type} not found after update`);
+    }
+    return updated;
+  }
+
+  async resetToDefaults(): Promise<void> {
+    await this.templateGarantiesRepository.clear();
+    await this.initializeDefaultGaranties();
+  }}

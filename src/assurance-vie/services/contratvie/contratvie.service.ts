@@ -29,7 +29,6 @@ export class ContratvieService {
     createContratVieDto: CreateContratVieDto,
     createEmpruntDto: CreateEmpruntDto
   ): Promise<ContratVie> {
-   // Gestion de l'assuré vie
 const assureVieExist = await this.assureVieRepository
 .createQueryBuilder('assureVie')
 .innerJoin('assureVie.user', 'user')

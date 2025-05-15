@@ -402,4 +402,48 @@ async updateEcheances(
       };
     }
   }
+  @Post('resilier/:cin/:imat')
+  async resilierContrat(
+    @Param('cin') cin: string,
+    @Param('imat') imat: string
+  ) {
+    try {
+      const contratResilie = await this.contratAutoService.resilierContrat(cin, imat);
+      return {
+        success: true,
+        message: 'Contrat résilié avec succès',
+        data: contratResilie
+      };
+    } catch (error) {
+      throw new HttpException({
+        success: false,
+        message: error.message || 'Erreur lors de la résiliation du contrat'
+      }, HttpStatus.BAD_REQUEST);
+    }
+  }
+  @Post('check-renewal')
+  async checkOnlineRenewalPossible(
+    @Body() body: { cinAssure: number; matriculeVehicule: string; packChoice: 'same' | 'Pack1' | 'Pack2' | 'Pack3' }
+  ) {
+    try {
+      const { cinAssure, matriculeVehicule, packChoice } = body;
+      
+      const result = await this.contratAutoService.checkOnlineRenewalPossible(
+        cinAssure,
+        matriculeVehicule,
+        packChoice
+      );
+
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
 }

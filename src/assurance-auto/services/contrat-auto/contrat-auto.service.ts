@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AssureDto } from 'src/assurance-auto/dto/assure.dto';
 import { ContratAutoDto } from 'src/assurance-auto/dto/contratauto.dto';
@@ -12,6 +13,7 @@ import { MoreThan, Repository } from 'typeorm';
 
 interface ContratDetails {
   num: string | number;
+  etat:string | number| undefined;
   dateSouscription: Date | string | null;
   dateExpiration: Date | string | null;
  dateEffet: string | Date | null | undefined;
@@ -108,110 +110,103 @@ export class ContratAutoService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+  
+ 
+ async createCA(
+  dtoA: AssureDto, 
+  Cin: number,
+  dtoV: CreateVehiculeDto, 
+  dtoC: ContratAutoDto
+): Promise<ContratAuto | null> {
+  console.log('=== DEBUT createCA ===');
+  console.log('Données reçues:', { dtoA, Cin, dtoV, dtoC });
 
-  async createCA(
-    dtoA: AssureDto, 
-    Cin: number,
-    dtoV: CreateVehiculeDto, 
-    dtoC: ContratAutoDto
-  ): Promise<ContratAuto | null> {
-    console.log('=== DEBUT createCA ===');
-    console.log('Données reçues:', { dtoA, Cin, dtoV, dtoC });
+  // 1. Vérification utilisateur
+  console.log('Recherche de l\'utilisateur avec CIN:', Cin);
+  const user = await this.userRepository.findOne({ where: { Cin } });
+  if (!user) {
+    console.error('Utilisateur non trouvé avec CIN:', Cin);
+    throw new Error('Utilisateur non trouvé. Veuillez créer un compte.');
+  }
+  console.log('Utilisateur trouvé:', user.id);
+
+  // 2. Vérification assure
+  console.log('Recherche de l\'assuré pour user:', user.id);
+  let assure = await this.assureRepository.findOne({ 
+    where: { user: { id: user.id } },
+    relations: ['user']
+  });
   
-    // 1. Vérification utilisateur
-    console.log('Recherche de l\'utilisateur avec CIN:', Cin);
-    let user = await this.userRepository.findOne({ where: { Cin } });
-    if (!user) {
-      console.error('Utilisateur non trouvé avec CIN:', Cin);
-      throw new Error('Utilisateur non trouvé. Veuillez créer un compte.');
-    }
-    console.log('Utilisateur trouvé:', user.id);
-  
-    // 2. Vérification assure
-    console.log('Recherche de l\'assuré pour user:', user.id);
-    let assure = await this.assureRepository.findOne({ where: { user: { id: user.id } } });
-    if (!assure) {
-      console.log('Création d\'un nouvel assuré');
-      assure = this.assureRepository.create({
-        user,
-        bonusMalus: dtoA.bonusMalus,
-      });
-      assure = await this.assureRepository.save(assure);
-      console.log('Nouvel assuré créé:', assure.NumSouscription);
-    } else {
-      console.log('Assuré existant trouvé:', assure.NumSouscription);
-      assure.bonusMalus = dtoA.bonusMalus;
-      assure = await this.assureRepository.save(assure);
-      console.log('BonusMalus mis à jour pour l\'assuré existant');
-    }
-  
-    // 3. Vérification véhicule
-    console.log('Recherche du véhicule avec Imat:', dtoV.Imat);
-    let vehicule = await this.vehiculeRepository.findOne({ where: { Imat: dtoV.Imat } });
-    if (!vehicule) {
-      console.log('Création d\'un nouveau véhicule');
-      vehicule = this.vehiculeRepository.create(dtoV);
-      vehicule = await this.vehiculeRepository.save(vehicule);
-      console.log('Nouveau véhicule créé:', vehicule.id);
-    } else {
-      console.log('Véhicule existant trouvé:', vehicule.id);
-    }
-  
-    // Calcul des dates
-    const today = new Date();
-    const expirationDate = new Date(today);
-    expirationDate.setFullYear(expirationDate.getFullYear() + 1); // Ajoute 1 an
-    
-    // 4. Création contrat avec dates calculées
-    console.log('Création du contrat auto');
-    const contratAuto = this.contratAutoRepository.create({
-      ...dtoC,
-      dateSouscription: today,
-      dateEffet: today,
-      dateExpiration: expirationDate,
-      etat: dtoC.etat || 'valide',
-      assure,
-      vehicule,
+  if (!assure) {
+    console.log('Création d\'un nouvel assuré');
+    assure = this.assureRepository.create({
+      user,
+      bonusMalus: dtoA.bonusMalus,
     });
-    
-    console.log('Contrat auto préparé:', contratAuto);
-    console.log('Dates calculées - Effet:', today, 'Expiration:', expirationDate);
-    
-    console.log('Sauvegarde du contrat auto');
-    const savedContratAuto = await this.contratAutoRepository.save(contratAuto);
-    console.log('Contrat auto sauvegardé:', savedContratAuto.num);
-    
-    if (dtoC.garanties && dtoC.garanties.length > 0) {
-      console.log('Traitement des garanties - nombre:', dtoC.garanties.length);
-      const garanties = dtoC.garanties.map((g) => {
-        console.log('Création garantie:', g.type);
-        return this.garantiesRepository.create({
-          ...g,
-          contratAuto: savedContratAuto,
-        });
-      });
-      await this.garantiesRepository.save(garanties);
-      console.log('Garanties sauvegardées');
-    } else {
-      console.log('Aucune garantie à traiter');
-    }
+  } else {
+    console.log('Mise à jour de l\'assuré existant:', assure.NumSouscription);
+    assure.bonusMalus = dtoA.bonusMalus;
+  }
+  assure = await this.assureRepository.save(assure);
+  console.log('Assuré sauvegardé:', assure.NumSouscription);
+
+  // 3. Vérification véhicule
+  console.log('Recherche du véhicule avec Imat:', dtoV.Imat);
+  let vehicule = await this.vehiculeRepository.findOne({ where: { Imat: dtoV.Imat } });
   
-    console.log('=== FIN createCA - Succès ===');
-   
-    return await this.contratAutoRepository.findOne({
-      where: { num: savedContratAuto.num },
-      relations: {
-        assure: {
-          user: {
-            adresse: true,
-          },
-        },
-        vehicule: true, 
-        garanties: true, 
-      },
-    });
+  if (!vehicule) {
+    console.log('Création d\'un nouveau véhicule');
+    vehicule = this.vehiculeRepository.create(dtoV);
+  }
+  vehicule = await this.vehiculeRepository.save(vehicule);
+  console.log('Véhicule sauvegardé:', vehicule.id);
+
+  // Calcul des dates
+  const today = new Date();
+  const expirationDate = new Date(today);
+  expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+
+  // Création du contrat
+  let contratAuto = this.contratAutoRepository.create({
+    ...dtoC,
+    dateSouscription: today,
+    dateEffet: today,
+    dateExpiration: expirationDate,
+    etat: dtoC.etat || 'valide',
+    assure,
+    vehicule
+  });
+
+  // Sauvegarde du contrat
+  const savedContratAuto = await this.contratAutoRepository.save(contratAuto);
+  console.log('Contrat sauvegardé:', savedContratAuto.num);
+
+  // Gestion des garanties
+  if (dtoC.garanties && dtoC.garanties.length > 0) {
+    console.log('Traitement des garanties - nombre:', dtoC.garanties.length);
+    const garanties = dtoC.garanties.map(g => this.garantiesRepository.create({
+      ...g,
+      contratAuto: savedContratAuto
+    }));
+    await this.garantiesRepository.save(garanties);
+    console.log('Garanties sauvegardées');
   }
 
+  console.log('=== FIN createCA - Succès ===');
+ 
+  return this.contratAutoRepository.findOne({
+    where: { num: savedContratAuto.num },
+    relations: {
+      assure: {
+        user: {
+          adresse: true,
+        },
+      },
+      vehicule: true,
+      garanties: true
+    },
+  });
+}
   async getAllContratAuto(): Promise<ContratAuto[]> {
     return await this.contratAutoRepository.find({
       relations: ['assure', 'assure.user', 'vehicule', 'garanties'],
@@ -340,7 +335,68 @@ export class ContratAutoService {
   
     return { contrat: contratFinal };
   }
+  async checkOnlineRenewalPossible(
+  cinAssure: number, 
+  matriculeVehicule: string, 
+  packChoice: 'same' | 'Pack1' | 'Pack2' | 'Pack3'
+): Promise<{ possible: boolean }> {
+  // Récupérer l'assuré
+  const assure = await this.assureRepository.findOne({ 
+    where: { user: { Cin: cinAssure } },
+    relations: ['user', 'user.adresse']
+  });
   
+  if (!assure) {
+    throw new Error('Assuré non trouvé');
+  }
+
+  // Récupérer le véhicule
+  const vehicule = await this.vehiculeRepository.findOne({ 
+    where: { Imat: matriculeVehicule }
+  });
+
+  if (!vehicule) {
+    throw new Error('Véhicule non trouvé');
+  }
+
+  // Récupérer le contrat existant
+  const contratExistant = await this.contratAutoRepository.findOne({
+    where: {
+      vehicule: { id: vehicule.id }
+    },
+    relations: {
+      garanties: true,
+      assure: {
+        user: {
+          adresse: true
+        }
+      },
+      vehicule: true
+    }
+  });
+
+  if (!contratExistant) {
+    throw new Error('Aucun contrat existant trouvé pour ce véhicule');
+  }
+
+  // Vérifier les conditions de renouvellement
+  let possible = true;
+
+  // Si le contrat actuel est Pack2 ou Pack3
+  if (contratExistant.packChoisi === 'Pack2' || contratExistant.packChoisi === 'Pack3') {
+    // Si le choix est de garder le même pack ou de passer à Pack2/Pack3
+    if (packChoice === 'same' || packChoice === 'Pack2' || packChoice === 'Pack3') {
+      possible = false;
+    }
+  }
+
+  // Autres vérifications possibles (état du contrat, date d'expiration, etc.)
+  if (contratExistant.etat !== 'valide') {
+    possible = false;
+  }
+
+  return { possible };
+}
   private calculateVehicleAge(dpmc: Date | string | null): number {
     if (!dpmc) return 0;
     
@@ -838,6 +894,7 @@ async getContratsByUserCin(Cin: number): Promise<any[]> {
     num: contrat.num,  
     dateSouscription: contrat.dateSouscription,
     dateExpiration: contrat.dateExpiration,
+    etat:contrat.etat,
     vehicule: {
       marque: contrat.vehicule.marque,
       model: contrat.vehicule.model,
@@ -870,6 +927,7 @@ async getContratDetailsByNum(numContrat: number): Promise<FullContratResponse> {
       dateSouscription: contrat.dateSouscription,
       dateExpiration: contrat.dateExpiration,
       dateEffet:contrat.dateEffet,
+      etat:contrat.etat,
       cotisationNette: contrat.cotisationNette || 0,
       cotisationTotale: contrat.cotisationTotale || 0,
       packChoisi: contrat.packChoisi || 'Non spécifié'
@@ -976,5 +1034,56 @@ async updateContratStatus(numContrat: number, nouveauStatus: 'valide' | 'invalid
 
   // 4. Retourner le contrat mis à jour avec toutes ses relations
   return updatedContrat;
+}
+async resilierContrat(Cin: string, Imat: string): Promise<ContratAuto> {
+  console.log(`=== DEBUT resilierContrat - CIN: ${Cin}, Imat: ${Imat} ===`);
+  
+  // 1. Recherche du contrat auto correspondant
+  const contrat = await this.contratAutoRepository.findOne({
+    where: {
+      assure: { user: { Cin: parseInt(Cin) } },
+      vehicule: { Imat }
+    },
+    relations: ['assure', 'vehicule', 'garanties']
+  });
+
+  if (!contrat) {
+    console.error('Contrat non trouvé ou déjà résilié');
+    throw new Error('Aucun contrat valide trouvé pour ces informations');
+  }
+
+  console.log(`Contrat trouvé: ${contrat.num}, état actuel: ${contrat.etat}`);
+
+  // 2. Mise à jour de l'état du contrat
+  contrat.etat = 'résilié';
+  console.log(`Mise à jour du contrat - nouvel état: ${contrat.etat}`);
+
+  // 3. Sauvegarde des modifications
+  const contratResilie = await this.contratAutoRepository.save(contrat);
+  
+  console.log('=== FIN resilierContrat - Succès ===');
+  return contratResilie;
+}
+async cleanupInvalidContracts(): Promise<{ deletedCount: number }> {
+  try {
+    const result = await this.contratAutoRepository
+      .createQueryBuilder()
+      .delete()
+      .from(ContratAuto)
+      .where("etat != :etat", { etat: 'valide' })
+      .execute();
+
+    const deletedCount = result.affected || 0;
+    console.log(`Suppression de ${deletedCount} contrats non valides effectuée`);
+    return { deletedCount };
+  } catch (error) {
+    console.error('Erreur lors de la suppression des contrats non valides:', error);
+    throw error;
+  }
+}
+@Cron('0 0 0 1 1 */2') 
+async scheduledCleanup() {
+  console.log('Début du nettoyage automatique des contrats non valides...');
+  await this.cleanupInvalidContracts();
 }
 }
