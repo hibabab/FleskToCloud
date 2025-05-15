@@ -9,6 +9,7 @@ import { AgentServiceFormComponent } from './agent-service-form/agent-service-fo
 import { ListExpertComponent } from './expert-list/expert-list.component';
 import { ListAgentServiceComponent } from './list-agent-service/list-agent-service.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { PublierComponent } from './publier/publier.component';
 
 
 const routes: Routes = [ { path: '', component: DehasbortComponent } ,
@@ -16,6 +17,7 @@ const routes: Routes = [ { path: '', component: DehasbortComponent } ,
   { path: 'listUser', component: UserListComponent },
   { path: 'Expert', component: ExpertFormComponent },
   { path: 'mdp', component: ChangePasswordComponent },
+   { path: 'publier', component: PublierComponent },
   {
     path: 'agent-service',
     component: AgentServiceFormComponent

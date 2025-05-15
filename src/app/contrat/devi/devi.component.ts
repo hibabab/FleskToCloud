@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -23,7 +24,9 @@ export enum TypeGaranties {
   templateUrl: './devi.component.html',
   styleUrls: ['./devi.component.css']
 })
-export class DeviComponent {
+export class DeviComponent implements OnInit {
+  private apiUrl = 'http://localhost:3000/template-garanties';
+  garantiesFixes: any[] = [];
   etape: number = 1;
   formulaireEtape1: FormGroup;
   formulaireEtape2: FormGroup;
@@ -33,7 +36,7 @@ export class DeviComponent {
     'Pack Essentille', 'Tous les risques', 'Pack dommage et Collision'];
   cotisationNette: number = 0;
   cotisationTotale: number = 0;
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,private http: HttpClient ) {
     this.formulaireEtape1 = this.fb.group({
       type: ['', Validators.required],
       valeurNeuf: ['', Validators.required],
@@ -59,14 +62,44 @@ export class DeviComponent {
       CIN:['', Validators.required]
     });
   }
-   validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
-        const pattern = /^\d{1,4}TU\d{1,3}$/i;
+  ngOnInit(): void {
+    this.loadGarantiesFixes();
+  }
 
-        if (control.value && !pattern.test(control.value)) {
-          return { 'invalidImmatriculation': true };
-        }
-        return null;
-    }
+  loadGarantiesFixes(): void {
+    this.http.get<any[]>(this.apiUrl).subscribe(
+      (garanties) => {
+        this.garantiesFixes = garanties;
+      },
+      (error) => {
+        console.error('Erreur lors du chargement des garanties fixes', error);
+        this.garantiesFixes = this.getDefaultGaranties();
+      }
+    );
+  }
+  private getDefaultGaranties(): any[] {
+    return [
+      { type: TypeGaranties.RTI, cotisationNette: 0 },
+      { type: TypeGaranties.DefenseEtRecours, capital: 1000, cotisationNette: 50.0 },
+      { type: TypeGaranties.PersonneTransportees, capital: 5000, cotisationNette: 50.0 },
+      { type: TypeGaranties.AssistanceAutomobile, cotisationNette: 71.5 },
+      { type: TypeGaranties.IndividuelAccidentConducteur, capital: 20000, cotisationNette: 25.0 },
+      { type: TypeGaranties.EVENEMENTCLIMATIQUE, cotisationNette: 25.0 },
+      { type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE, cotisationNette: 25.0 }
+    ];
+  }
+  getGarantieFixByType(type: TypeGaranties): any {
+    return this.garantiesFixes.find(g => g.type === type);
+  }
+
+   validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
+      const pattern = /^\d{1,4}TU\d{1,3}$/i;
+
+      if (control.value && !pattern.test(control.value)) {
+        return { 'invalidImmatriculation': true };
+      }
+      return null;
+  }
   calculateResponsabiliteCivile(type: string, bonusMalus: number, puissance: number): number {
     let cotisation = 0;
     if (type === 'Tourisme') {
@@ -189,20 +222,20 @@ export class DeviComponent {
     const valeurNeuf = formulaireEtape1.valeurNeuf;
     const puissance = formulaireEtape1.puissance;
     const responsabiliteCivile = this.calculateResponsabiliteCivile(formulaireEtape1.type, bonusMalus,puissance);
+    const rti = this.getGarantieFixByType(TypeGaranties.RTI);
+    const defenseRecours = this.getGarantieFixByType(TypeGaranties.DefenseEtRecours);
+    const personneTransportees = this.getGarantieFixByType(TypeGaranties.PersonneTransportees);
+    const assistanceAuto = this.getGarantieFixByType(TypeGaranties.AssistanceAutomobile);
+    const iac = this.getGarantieFixByType(TypeGaranties.IndividuelAccidentConducteur);
+    const evenementClimatique = this.getGarantieFixByType(TypeGaranties.EVENEMENTCLIMATIQUE);
+    const grevesEmeutes = this.getGarantieFixByType(TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE);
     if (packChoisi === 'Pack Essentille') {
       garanties.push({
         type: TypeGaranties.ResponsabiliteCivile,
         cotisationNette: responsabiliteCivile
       });
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
+      if (rti) garanties.push(rti);
+      if (defenseRecours) garanties.push(defenseRecours);
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
@@ -211,135 +244,78 @@ export class DeviComponent {
       garanties.push({
         type: TypeGaranties.Vol,
         capital: valeurNeuf,
-        cotisationNette: Math.round((valeurNeuf / 336.446) * 1000) / 1000
+        cotisationNette:  Math.round((valeurNeuf / 336.446)* 1000) / 1000
       });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
+      if (personneTransportees) garanties.push(personneTransportees);
       garanties.push({
         type: TypeGaranties.BrisDeGlaces,
         capital: valeurNeuf <= 30000 ? 500 : 600,
         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
       });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
+      if (assistanceAuto) garanties.push(assistanceAuto);
+      if (iac) garanties.push(iac);
+
     } else if (packChoisi === 'Pack dommage et Collision') {
       garanties.push({
         type: TypeGaranties.ResponsabiliteCivile,
         cotisationNette: responsabiliteCivile
       });
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
+
+        if (rti) garanties.push(rti);
+      if (defenseRecours) garanties.push(defenseRecours);
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
-        cotisationNette: Math.round((valeurNeuf / 220.115) * 1000) / 1000
+        cotisationNette:Math.round(( valeurNeuf / 220.115)* 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.Vol,
         capital: valeurNeuf,
-        cotisationNette: Math.round((valeurNeuf / 336.446) * 1000) / 1000
+        cotisationNette:Math.round(( valeurNeuf / 336.446)* 1000) / 1000
       });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
+      if (personneTransportees) garanties.push(personneTransportees);
       garanties.push({
         type: TypeGaranties.BrisDeGlaces,
         capital: valeurNeuf <= 30000 ? 500 : 600,
         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
       });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: 25.0
-      });
+      if (assistanceAuto) garanties.push(assistanceAuto);
+      if (iac) garanties.push(iac);
+      if (evenementClimatique) garanties.push(evenementClimatique);
+      if (grevesEmeutes) garanties.push(grevesEmeutes);
       garanties.push({
         type: TypeGaranties.DOMMAGEETCOLLIDION,
         capital: valeurNeuf,
         cotisationNette: valeurNeuf * 0.05
       });
     } else if (packChoisi === 'Tous les risques') {
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
+      if (rti) garanties.push(rti);
+      if (defenseRecours) garanties.push(defenseRecours);
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
-        cotisationNette: Math.round((valeurNeuf / 220.115) * 1000) / 1000
+        cotisationNette:Math.round(( valeurNeuf / 220.115)* 1000) / 1000
       });
       garanties.push({
         type: TypeGaranties.Vol,
         capital: valeurNeuf,
-        cotisationNette: Math.round((valeurNeuf / 336.446) * 1000) / 1000
+        cotisationNette:Math.round(( valeurNeuf / 336.446)* 1000) / 1000
       });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
+      if (personneTransportees) garanties.push(personneTransportees);
       garanties.push({
         type: TypeGaranties.BrisDeGlaces,
         capital: valeurNeuf <= 30000 ? 500 : 600,
         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
       });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: 25.0
-      });
+      if (assistanceAuto) garanties.push(assistanceAuto);
+      if (iac) garanties.push(iac);
+      if (evenementClimatique) garanties.push(evenementClimatique);
+      if (grevesEmeutes) garanties.push(grevesEmeutes);
       garanties.push({
         type: TypeGaranties.Tierce,
         capital: valeurNeuf,
         franchise: 0.2,
-        cotisationNette: valeurNeuf * 0.2
+        cotisationNette: valeurNeuf * 0.02
       });
       garanties.push({
         type: TypeGaranties.ResponsabiliteCivile,
@@ -436,100 +412,88 @@ export class DeviComponent {
     };
 
     console.log('Données complètes du formulaire:', formulaireComplet);
+    const doc = new jsPDF();
+    doc.setFontSize(18);
 
-   const doc = new jsPDF();
-   doc.setFontSize(18);
+    this.loadImageAsBase64('assets/images/logoFC.png').then((logoBase64) => {
+      let yOffset = 10; // Position initiale
 
-   this.loadImageAsBase64('assets/images/logoFC.png').then((logoBase64) => {
-     let yOffset = 10; // Position verticale initiale
+      // Ajouter l'image en haut à gauche
+      doc.addImage(logoBase64, 'PNG', 10, yOffset, 40, 40);
+      doc.text('Devi Flesk Cover', 75, 20);
 
-     // Ajouter l'image en haut à gauche
-     doc.addImage(logoBase64, 'PNG', 10, yOffset, 50, 50);
-     yOffset += 60; // Décalage après l'image
+      // Infos assurées en haut à droite
+      doc.setFontSize(10);
+      yOffset = 15;
+      const infoX = 140;
+      doc.text(`Nom: ${formulaireComplet.nom}`, infoX, yOffset);
+      doc.text(`Prénom: ${formulaireComplet.prenom}`, infoX, yOffset + 5);
+      doc.text(`Bonus-Malus: ${formulaireComplet.bonusMalus}`, infoX, yOffset + 10);
+      doc.text(`CIN: ${formulaireComplet.CIN}`, infoX, yOffset + 15);
+      doc.text(`Téléphone: ${formulaireComplet.tel}`, infoX, yOffset + 20);
 
-     // Titre du document
-     doc.text('Devi Flesk Cover', 70, 30);
-     yOffset += 10;
+      yOffset += 30;
 
-     // Informations de l'assuré en haut à droite
-     doc.setFontSize(10); // Taille de police plus petite
-     doc.text(`Nom: ${formulaireComplet.nom}`, 150, 20);
-     doc.text(`Prénom: ${formulaireComplet.prenom}`, 150, 25);
-     doc.text(`Bonus-Malus: ${formulaireComplet.bonusMalus}`, 150, 30);
-     doc.text(`CIN: ${formulaireComplet.CIN}`, 150, 35);
-     doc.text(`Téléphone: ${formulaireComplet.tel}`, 150, 40);
+      // Ligne horizontale
+      doc.setLineWidth(0.5);
+      doc.line(10, yOffset, 200, yOffset);
+      yOffset += 8;
 
-     // Ligne horizontale
-     doc.setLineWidth(0.5);
-     doc.line(10, yOffset, 200, yOffset);
-     yOffset += 10;
+      // Infos véhicule
+      doc.setFontSize(12);
+      doc.text('Informations du véhicule', 10, yOffset);
+      yOffset += 6;
 
-     // Informations du véhicule
-     doc.setFontSize(14);
-     doc.text('Informations de véhicule:', 10, yOffset);
-     yOffset += 10;
+      doc.setFontSize(10);
+      doc.text(`Type: ${formulaireComplet.type}`, 10, yOffset);
+      doc.text(`Puissance: ${formulaireComplet.puissance} CV`, 100, yOffset);
+      yOffset += 5;
 
-     // Réduire la taille de la police pour les détails
-     doc.setFontSize(10);
+      doc.text(`Âge: ${ageVehicule} ans`, 10, yOffset);
+      doc.text(`Matricule: ${formulaireComplet.Imat}`, 100, yOffset);
+      yOffset += 10;
 
-     // Ligne 1 : Type de véhicule et Puissance
-     doc.text(`Type: ${formulaireComplet.type}`, 10, yOffset);
-     doc.text(`Puissance: ${formulaireComplet.puissance} chevaux`, 100, yOffset);
-     yOffset += 10;
+      doc.line(10, yOffset, 200, yOffset);
+      yOffset += 8;
 
-     // Ligne 2 : Âge du véhicule et Matricule
-     doc.text(`Âge: ${ageVehicule} ans`, 10, yOffset);
-     doc.text(`Matricule: ${formulaireComplet.Imat}`, 100, yOffset);
-     yOffset += 15;
+      // Garanties et coûts
+      doc.setFontSize(12);
+      doc.text('Garanties et coûts', 10, yOffset);
+      yOffset += 6;
 
-     // Ligne horizontale
-     doc.setLineWidth(0.5);
-     doc.line(10, yOffset, 200, yOffset);
-     yOffset += 10;
+      doc.text(`Pack choisi: ${formulaireComplet.packChoisi}`, 10, yOffset);
+      yOffset += 8;
 
-     // Garanties et coûts
-     doc.setFontSize(14);
-     doc.text('Garanties et coûts:', 10, yOffset);
-     yOffset += 10;
-     doc.setFontSize(12);
-     doc.text(`Pack Choisi: ${formulaireComplet.packChoisi}`, 10, yOffset);
-     yOffset += 15;
+      autoTable(doc, {
+        startY: yOffset,
+        head: [['Garantie', 'Coût']],
+        body: formulaireComplet.garanties.map((g: { type: any; cotisationNette: any; }) => [g.type, `${g.cotisationNette}DT`]),
+        styles: { fontSize: 10 },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { left: 10, right: 10 }
+      });
 
-     // Ajouter les garanties dans un tableau avec lignes alternées
-     autoTable(doc, {
-       startY: yOffset,
-       head: [['Garantie', 'Coût']],
-       body: formulaireComplet.garanties.map((garantie: { type: string, cotisationNette: number }) => [
-         garantie.type, `${garantie.cotisationNette}DT`
-       ]),
-       styles: {
-         fillColor: [255, 255, 255], // Couleur de fond par défaut (blanc)
-         textColor: [0, 0, 0], // Couleur du texte par défaut (noir)
-       },
-       alternateRowStyles: {
-         fillColor: [240, 240, 240], // Couleur de fond pour les lignes paires (gris clair)
-       },
-     });
+      yOffset = (doc as any).lastAutoTable.finalY + 8;
 
-     // Cotisation totale en rouge et en gras
-     yOffset = (doc as any).lastAutoTable.finalY + 10; // Position après le tableau
-     doc.setFontSize(12);
-     doc.setTextColor(255, 0, 0); // Rouge
-     doc.setFont('helvetica', 'bold'); // Texte en gras
-     doc.text(`Cotisation Totale: ${formulaireComplet.cotisationTotale.toFixed(2)}DT`, 10, yOffset);
-     doc.setTextColor(0, 0, 0); // Réinitialiser la couleur du texte
-     doc.setFont('helvetica', 'normal'); // Réinitialiser la police
+      // Cotisation totale
+      doc.setFontSize(12);
+      doc.setTextColor(255, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Cotisation Totale: ${formulaireComplet.cotisationTotale.toFixed(2)}DT`, 10, yOffset);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'normal');
+      yOffset += 8;
 
-     // Section "Pour nous contacter"
-     doc.setFontSize(12);
-     doc.text('Pour nous contacter :', 10, yOffset + 20);
-     doc.text('Email: fleskcover@gmail.com', 10, yOffset + 25);
-     doc.text('Téléphone: 24051646', 10, yOffset + 30);
+      // Contact
+      doc.text('Pour nous contacter :', 10, yOffset);
+      doc.text('Email: fleskcover@gmail.com', 10, yOffset + 5);
+      doc.text('Téléphone: 24051646', 10, yOffset + 10);
 
-     // Enregistrer le fichier PDF généré
-     const pdfOutput = doc.output('blob');
-     const fileURL = URL.createObjectURL(pdfOutput);
-      // Afficher le PDF dans le navigateur
-         window.open(fileURL, '_blank');
-       });
-     } }
+      // Générer le PDF
+      const pdfOutput = doc.output('blob');
+      const fileURL = URL.createObjectURL(pdfOutput);
+      window.open(fileURL, '_blank');
+    });
+
+  } }
+

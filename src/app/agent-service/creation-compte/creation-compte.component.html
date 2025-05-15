@@ -1,0 +1,393 @@
+<div class="flex">
+  <app-dashbort></app-dashbort>
+
+  <div class="flex-1 mt-20 ml-0 mr-70">
+<section class="min-h-screen flex items-center justify-center p-4">
+  <div class="relative bg-white flex flex-col items-center rounded-2xl shadow-teal-100 shadow-lg max-w-4xl p-5 w-full h-auto md:h-auto">
+
+    <!-- En-tête -->
+    <div class="flex flex-col items-center mb-10 text-2xl font-semibold text-teal-800">
+      <i class="fas fa-umbrella w-8 h-8 mr-1 text-teal-800"></i>
+      <p>Flesk Cover</p>
+      <h2 class="font-semibold text-xl text-gray-700 mt-2">Bienvenue chez Flesk Cover</h2>
+      <p class="text-gray-500 text-sm text-center">Gérez vos contrats d'assurance auto et vie, constats et paiements en toute facilité</p>
+    </div>
+
+    <!-- Messages généraux -->
+    <div *ngIf="successMessage" class="w-full md:w-7/8 mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+      {{successMessage}}
+    </div>
+    <div *ngIf="errors.general" class="w-full md:w-7/8 mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+      {{errors.general}}
+    </div>
+
+    <!-- Formulaire -->
+    <div class="w-full md:w-7/8 space-x-0 md:space-x-8 px-4 md:px-16">
+      <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" class="space-y-5 mt-6">
+
+        <!-- Nom et Prénom -->
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div class="flex-1">
+            <label for="nom" class="block mb-2 text-sm font-medium text-gray-700">Nom <span class="text-teal-800">*</span></label>
+            <input type="text" name="nom" id="nom" [(ngModel)]="user.nom" #nom="ngModel"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                   placeholder="Entrez votre nom" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="nom.touched && nom.invalid">
+              <div *ngIf="nom.errors?.['required']">Le nom est requis.</div>
+            </div>
+          </div>
+
+          <div class="flex-1">
+            <label for="prenom" class="block mb-2 text-sm font-medium text-gray-700">Prénom <span class="text-teal-800">*</span></label>
+            <input type="text" name="prenom" id="prenom" [(ngModel)]="user.prenom" #prenom="ngModel"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                   placeholder="Entrez votre prénom" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="prenom.touched && prenom.invalid">
+              <div *ngIf="prenom.errors?.['required']">Le prénom est requis.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CIN et Date de naissance -->
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div class="flex-1">
+            <label for="cin" class="block mb-2 text-sm font-medium text-gray-700">CIN <span class="text-teal-800">*</span></label>
+            <input type="number" name="cin" id="cin" [(ngModel)]="user.Cin" #cin="ngModel"
+                   (input)="validateField('cin', user.Cin)"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                   placeholder="Entrez votre CIN" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="errors.cin">
+              {{errors.cin}}
+            </div>
+            <div class="text-red-500 text-sm mt-1" *ngIf="cin.touched && cin.invalid">
+              <div *ngIf="cin.errors?.['required']">Le CIN est requis.</div>
+            </div>
+          </div>
+
+          <div class="flex-1">
+            <label for="dateNaissance" class="block mb-2 text-sm font-medium text-gray-700">Date de naissance <span class="text-teal-800">*</span></label>
+            <input type="date" name="dateNaissance" id="dateNaissance" [(ngModel)]="user.date_naissance" #dateNaissance="ngModel"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                   required (change)="validateAge()" />
+            <div class="text-red-500 text-sm mt-1" *ngIf="errors.age">
+              {{errors.age}}
+            </div>
+            <div class="text-red-500 text-sm mt-1" *ngIf="dateNaissance.touched && dateNaissance.invalid">
+              <div *ngIf="dateNaissance.errors?.['required']">La date de naissance est requise.</div>
+            </div>
+          </div>
+        </div>
+
+       <!-- Email et Téléphone -->
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div class="flex-1">
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email <span class="text-teal-800">*</span></label>
+            <input type="email" name="email" id="email" [(ngModel)]="user.email" #email="ngModel"
+                  (input)="validateField('email', user.email)"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                  placeholder="Entrez votre email" required email [ngClass]="{'border-red-500': errors.email}" />
+            <div class="text-red-500 text-sm mt-1" *ngIf="errors.email">
+              {{errors.email}}
+            </div>
+            <div class="text-red-500 text-sm mt-1" *ngIf="email.touched && email.invalid && !errors.email">
+              <div *ngIf="email.errors?.['required']">L'email est requis.</div>
+              <div *ngIf="email.errors?.['email']">Veuillez entrer un email valide.</div>
+            </div>
+          </div>
+
+          <div class="flex-1">
+            <label for="telephone" class="block mb-2 text-sm font-medium text-gray-700">Téléphone <span class="text-teal-800">*</span></label>
+            <input type="text" name="telephone" id="telephone" [(ngModel)]="user.telephone" #telephone="ngModel"
+                  (input)="validateField('telephone', user.telephone)"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                  placeholder="Entrez votre numéro" required [ngClass]="{'border-red-500': errors.phone}" />
+            <div class="text-red-500 text-sm mt-1" *ngIf="errors.phone">
+              {{errors.phone}}
+            </div>
+            <div class="text-red-500 text-sm mt-1" *ngIf="telephone.touched && telephone.invalid && !errors.phone">
+              <div *ngIf="telephone.errors?.['required']">Le numéro est requis.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mot de passe et Confirmation -->
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div class="flex-1">
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Mot de passe <span class="text-teal-800">*</span></label>
+            <input type="password" name="password" id="password" [(ngModel)]="user.password" #password="ngModel"
+                   (input)="validateField('password', user.password)"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                   placeholder="Au moins 8 caractères" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="errors.password">
+              {{errors.password}}
+            </div>
+            <div class="text-red-500 text-sm mt-1" *ngIf="password.touched && password.invalid">
+              <div *ngIf="password.errors?.['required']">Le mot de passe est requis.</div>
+            </div>
+          </div>
+
+          <div class="flex-1">
+            <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-700">Confirmation <span class="text-teal-800">*</span></label>
+            <input type="password" name="confirmPassword" id="confirmPassword" [(ngModel)]="confirmPassword" #confirmPasswordModel="ngModel"
+                   (input)="validateField('confirmPassword', confirmPassword)"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                   placeholder="Confirmez le mot de passe" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="confirmPasswordModel.touched && confirmPasswordModel.invalid">
+              <div *ngIf="confirmPasswordModel.errors?.['required']">La confirmation est requise.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <!-- Gouvernorat -->
+          <div class="flex-1">
+            <label for="gouvernat" class="block mb-2 text-sm font-medium text-gray-700">
+              Gouvernorat <span class="text-teal-800" aria-hidden="true">*</span>
+              <span class="sr-only">obligatoire</span>
+            </label>
+
+            <select name="gouvernat" id="gouvernat" [(ngModel)]="user.adresse.gouvernat" #gouvernat="ngModel"
+                (change)="onGouvernoratChange()"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                required
+                aria-required="true"
+                [attr.aria-invalid]="gouvernat.invalid && gouvernat.touched || null">
+              <option value="" disabled selected>Choisissez votre gouvernorat</option>
+              <option *ngFor="let gov of gouvernorats" [value]="gov">{{ gov }}</option>
+            </select>
+
+            <div class="text-red-500 text-sm mt-1" *ngIf="gouvernat.touched && gouvernat.invalid">
+              <div *ngIf="gouvernat.errors?.['required']">Le gouvernorat est requis.</div>
+            </div>
+          </div>
+
+          <!-- Ville -->
+          <div class="flex-1">
+            <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">
+              Ville <span class="text-teal-800" aria-hidden="true">*</span>
+              <span class="sr-only">obligatoire</span>
+            </label>
+            <select name="ville" id="ville" [(ngModel)]="user.adresse.ville" #ville="ngModel"
+                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                required
+                aria-required="true"
+                [attr.aria-invalid]="ville.invalid && ville.touched || null"
+                [disabled]="!user.adresse.gouvernat">
+              <option value="" disabled selected>Choisissez une ville</option>
+              <option *ngFor="let v of villes" [value]="v">{{ v }}</option>
+            </select>
+
+            <div class="text-red-500 text-sm mt-1" *ngIf="ville.touched && ville.invalid">
+              <div *ngIf="ville.errors?.['required']">La ville est requise.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adresse -->
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div class="flex-1">
+            <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-teal-800">*</span></label>
+            <input type="text" name="rue" id="rue" [(ngModel)]="user.adresse.rue" #rue="ngModel"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                  placeholder="Entrez votre rue" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="rue.touched && rue.invalid">
+              <div *ngIf="rue.errors?.['required']">La rue est requise.</div>
+            </div>
+          </div>
+
+          <div class="flex-1">
+            <label for="numMaison" class="block mb-2 text-sm font-medium text-gray-700">Numéro de maison</label>
+            <input type="number" name="numMaison" id="numMaison" [(ngModel)]="user.adresse.numMaison"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                  placeholder="Entrez le numéro de maison" />
+          </div>
+        </div>
+
+        <!-- Pays et Code postal -->
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          <div class="flex-1">
+            <label for="pays" class="block mb-2 text-sm font-medium text-gray-700">Pays <span class="text-teal-800">*</span></label>
+            <input type="text" name="pays" id="pays" [(ngModel)]="user.adresse.pays" #pays="ngModel"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                  placeholder="Entrez votre pays" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="pays.touched && pays.invalid">
+              <div *ngIf="pays.errors?.['required']">Le pays est requis.</div>
+            </div>
+          </div>
+
+          <div class="flex-1">
+            <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-teal-800">*</span></label>
+            <input type="number" name="codePostal" id="codePostal" [(ngModel)]="user.adresse.codePostal" #codePostal="ngModel"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                  placeholder="Entrez votre code postal" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="codePostal.touched && codePostal.invalid">
+              <div *ngIf="codePostal.errors?.['required']">Le code postal est requis.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAPTCHA -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <label class="block mb-2 text-sm font-medium text-gray-700">Vérification de sécurité <span class="text-teal-800">*</span></label>
+
+          <div class="flex items-center space-x-4">
+            <div class="bg-white p-3 rounded border border-gray-300 text-xl font-bold tracking-widest text-gray-700 select-none">
+              {{captchaCode}}
+            </div>
+            <button type="button" (click)="regenerateCaptcha()"
+                    class="p-2 text-teal-800 hover:text-teal-600"
+                    aria-label="Régénérer le captcha">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+
+          <div class="mt-2">
+            <input type="text" name="captchaInput" id="captchaInput" [(ngModel)]="captchaInput" #captchaInputModel="ngModel"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:border-teal-600"
+                   placeholder="Entrez le code affiché ci-dessus" required />
+            <div class="text-red-500 text-sm mt-1" *ngIf="captchaError">
+              {{captchaError}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Acceptation des politiques -->
+        <div class="mt-4">
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input type="checkbox" id="acceptPolicy" name="acceptPolicy" [(ngModel)]="acceptPolicy" #acceptPolicyModel="ngModel"
+                     class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-teal-300" required />
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="acceptPolicy" class="font-light text-gray-600">
+                J'accepte la <a href="#" (click)="openPolicyModal($event)" class="text-teal-800 hover:underline">politique de confidentialité</a> et les <a href="#" (click)="openTermsModal($event)" class="text-teal-800 hover:underline">conditions d'utilisation</a> de Flesk Cover <span class="text-teal-800">*</span>
+              </label>
+              <div class="text-red-500 text-sm mt-1" *ngIf="acceptPolicyModel.touched && acceptPolicyModel.invalid">
+                <div *ngIf="acceptPolicyModel.errors?.['required']">Vous devez accepter les politiques pour continuer.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mentions et Bouton -->
+        <div class="mt-4 text-sm text-gray-600">
+          <p><span class="text-teal-800">*</span> Champs obligatoires</p>
+        </div>
+
+        <button type="submit" [disabled]="!isFormValid(registerForm) || isLoading || !acceptPolicy || !isCaptchaValid()"
+                class="w-full py-2 px-4 bg-teal-800 text-white rounded-lg mt-5 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800 disabled:opacity-50">
+          <span *ngIf="!isLoading">S'inscrire</span>
+          <span *ngIf="isLoading" class="flex items-center justify-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Enregistrement...
+          </span>
+        </button>
+
+        <p class="text-sm font-light text-gray-500 mt-4 text-center">
+          Vous avez déjà un compte ?
+          <a routerLink="/espace-client/login" class="font-medium text-teal-800 hover:underline">Se connecter</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Politique de Confidentialité -->
+<div *ngIf="showPolicyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-teal-800">Politique de Confidentialité</h3>
+        <button (click)="closePolicyModal()" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="prose max-w-none">
+        <h4 class="text-lg font-medium text-gray-800 mt-4">Protection des Données Personnelles</h4>
+        <p>Chez Flesk Cover, nous accordons une importance capitale à la protection de vos données personnelles. Conformément au Règlement Général sur la Protection des Données (RGPD) et aux lois locales applicables, nous nous engageons à :</p>
+
+        <ul class="list-disc pl-6 mt-2 space-y-1">
+          <li>Collecter uniquement les données nécessaires à la gestion de vos contrats d'assurance</li>
+          <li>Stocker vos informations personnelles de manière sécurisée avec un chiffrement de bout en bout</li>
+          <li>Ne jamais vendre ou partager vos données à des tiers sans votre consentement explicite</li>
+          <li>Vous permettre d'accéder, de modifier ou de supprimer vos données personnelles à tout moment</li>
+          <li>Mettre en place des protocoles stricts d'authentification à deux facteurs pour protéger votre compte</li>
+          <li>Effectuer des audits réguliers de sécurité pour garantir l'intégrité de nos systèmes</li>
+        </ul>
+
+        <h4 class="text-lg font-medium text-gray-800 mt-4">Données Sensibles et Documents</h4>
+        <p>En tant que plateforme de gestion d'assurance, nous traitons des données sensibles telles que :</p>
+
+        <ul class="list-disc pl-6 mt-2 space-y-1">
+          <li>Vos informations d'identité et coordonnées personnelles</li>
+          <li>Des documents officiels (permis de conduire, certificats d'immatriculation)</li>
+          <li>Des informations sur vos véhicules et biens assurés</li>
+          <li>Des informations médicales pour les assurances vie et santé</li>
+          <li>Des données de paiement pour le règlement des primes</li>
+        </ul>
+
+        <p>Ces données bénéficient d'une protection renforcée et sont stockées dans des systèmes conformes aux normes ISO 27001 en matière de sécurité de l'information.</p>
+
+        <h4 class="text-lg font-medium text-gray-800 mt-4">Sécurité des Transactions</h4>
+        <p>Toutes les transactions financières sur notre plateforme sont sécurisées par :</p>
+
+        <ul class="list-disc pl-6 mt-2 space-y-1">
+          <li>Des protocoles SSL/TLS pour le chiffrement des communications</li>
+          <li>Des passerelles de paiement certifiées PCI DSS</li>
+          <li>Des systèmes de détection de fraude en temps réel</li>
+          <li>Des notifications automatiques pour toute activité inhabituelle</li>
+        </ul>
+      </div>
+
+      <div class="mt-6 text-right">
+        <button (click)="closePolicyModal()" class="py-2 px-4 bg-teal-800 text-white rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800">
+          J'ai compris
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Conditions d'Utilisation -->
+<div *ngIf="showTermsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-teal-800">Conditions d'Utilisation</h3>
+        <button (click)="closeTermsModal()" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="prose max-w-none">
+        <h4 class="text-lg font-medium text-gray-800 mt-4">Utilisation de la Plateforme</h4>
+        <p>En utilisant la plateforme Flesk Cover, vous acceptez de :</p>
+
+        <ul class="list-disc pl-6 mt-2 space-y-1">
+          <li>Fournir des informations exactes et complètes lors de la création de votre compte</li>
+          <li>Mettre à jour vos informations personnelles en cas de changement</li>
+          <li>Préserver la confidentialité de vos identifiants de connexion</li>
+          <li>Ne pas utiliser la plateforme à des fins frauduleuses ou illégales</li>
+          <li>Ne pas tenter de contourner les mesures de sécurité de la plateforme</li>
+        </ul>
+
+        <h4 class="text-lg font-medium text-gray-800 mt-4">Responsabilités</h4>
+        <p>En tant qu'utilisateur de notre service :</p>
+
+        <ul class="list-disc pl-6 mt-2 space-y-1">
+          <li>Vous êtes responsable de l'exactitude des informations fournies pour vos contrats d'assurance</li>
+          <li>Vous devez signaler immédiatement toute activité suspecte sur votre compte</li>
+          <li>Vous acceptez que les documents numériques générés par la plateforme aient la même valeur légale que leurs équivalents papier</li>
+          <li>Vous vous engagez à respecter les délais de déclaration des sinistres conformément à vos contrats</li>
+        </ul>
+
+        <h4 class="text-lg font-medium text-gray-800 mt-4">Accès et Disponibilité</h4>
+        <p>Flesk Cover s'engage à :</p>
+
+        <ul class="list-disc pl-6 mt-2 space-y-1">
+          <li>Assurer la disponibilité de la plateforme 24/7, sauf pendant les périodes de maintenance planifiées</li>
+          <li>Vous notifier à l'avance des interruptions de service

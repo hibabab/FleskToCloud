@@ -52,13 +52,21 @@
             <label for="cin" class="block mb-2 text-sm font-medium text-gray-700">CIN <span class="text-red-500">*</span></label>
             <input
               id="cin"
-              type="number"
+              type="text"
               formControlName="cin"
               class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              [class.border-red-500]="cinExists || (agentServiceForm.get('cin')?.invalid && agentServiceForm.get('cin')?.touched)"
               placeholder="Entrez le CIN"
             >
-            <div *ngIf="agentServiceForm.get('cin')?.invalid && agentServiceForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
+            <div *ngIf="cinChecking" class="text-blue-500 text-xs mt-1">Vérification du CIN en cours...</div>
+            <div *ngIf="agentServiceForm.get('cin')?.hasError('required') && agentServiceForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
               Le CIN est requis.
+            </div>
+            <div *ngIf="agentServiceForm.get('cin')?.hasError('pattern') && agentServiceForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
+              Le CIN doit comporter exactement 8 chiffres.
+            </div>
+            <div *ngIf="cinExists" class="text-red-500 text-xs mt-1">
+              Ce CIN est déjà utilisé.
             </div>
           </div>
 
@@ -72,7 +80,12 @@
               class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
             >
             <div *ngIf="agentServiceForm.get('dateNaissance')?.invalid && agentServiceForm.get('dateNaissance')?.touched" class="text-red-500 text-xs mt-1">
-              La date de naissance est requise.
+              <div *ngIf="agentServiceForm.get('dateNaissance')?.errors?.['required']">
+                La date de naissance est requise.
+              </div>
+              <div *ngIf="agentServiceForm.get('dateNaissance')?.errors?.['invalidDateNaissance']">
+                La date de naissance doit être entre 1970 et 2000.
+              </div>
             </div>
           </div>
         </div>
@@ -103,23 +116,25 @@
           </div>
 
           <!-- Email -->
-          <div>
+        <div>
             <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
-                <i class="fas fa-envelope"></i>
-              </span>
-              <input
-                id="email"
-                type="email"
-                formControlName="email"
-                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 pl-10 transition-all hover:border-teal-600"
-                placeholder="exemple@domaine.com"
-              >
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              [class.border-red-500]="emailExists || (agentServiceForm.get('email')?.invalid && agentServiceForm.get('email')?.touched)"
+              placeholder="Entrez l'email"
+            >
+            <div *ngIf="emailChecking" class="text-blue-500 text-xs mt-1">Vérification de l'email en cours...</div>
+            <div *ngIf="agentServiceForm.get('email')?.hasError('required') && agentServiceForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
+              L'email est requis.
             </div>
-            <div *ngIf="agentServiceForm.get('email')?.invalid && agentServiceForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
-              <span *ngIf="agentServiceForm.get('email')?.errors?.['required']">L'email est requis.</span>
-              <span *ngIf="agentServiceForm.get('email')?.errors?.['email']">Veuillez entrer un email valide.</span>
+            <div *ngIf="agentServiceForm.get('email')?.hasError('email') && agentServiceForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
+              Veuillez entrer un email valide.
+            </div>
+            <div *ngIf="emailExists" class="text-red-500 text-xs mt-1">
+              Cet email est déjà utilisé.
             </div>
           </div>
         </div>
@@ -215,6 +230,9 @@
             <div *ngIf="agentServiceForm.get('dateEmbauche')?.invalid && agentServiceForm.get('dateEmbauche')?.touched" class="text-red-500 text-xs mt-1">
               La date d'embauche est requise.
             </div>
+            <div *ngIf="agentServiceForm.get('dateEmbauche')?.errors?.['invalidDateDebutTravail']">
+                 La date d'embauche doit être entre 1985 et aujourd'hui.
+              </div>
           </div>
 
           <!-- Spécialité (modifiée avec les nouvelles options) -->
@@ -239,8 +257,7 @@
         </div>
       </div>
 
-      <!-- Identifiants de connexion -->
-      <div class="mb-6">
+        <div class="mb-6">
         <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Identifiants de connexion</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Mot de passe -->
@@ -249,20 +266,27 @@
             <div class="relative">
               <input
                 id="password"
-                type="password"
+                [type]="showPassword ? 'text' : 'password'"
                 formControlName="password"
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600 pr-10"
                 placeholder="••••••••"
               >
-              <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800">
-                <i class="fas fa-eye"></i>
+              <button
+                type="button"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800"
+                (click)="showPassword = !showPassword"
+              >
+                <i class="fas" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
               </button>
             </div>
             <div *ngIf="agentServiceForm.get('password')?.invalid && agentServiceForm.get('password')?.touched" class="text-red-500 text-xs mt-1">
               <div *ngIf="agentServiceForm.get('password')?.errors?.['required']">Le mot de passe est requis.</div>
-              <div *ngIf="agentServiceForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères.</div>
+              <div *ngIf="agentServiceForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 8 caractères.</div>
+              <div *ngIf="agentServiceForm.get('password')?.errors?.['pattern']">
+                Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.
+              </div>
             </div>
-            <p class="text-xs text-gray-500 mt-1">Le mot de passe doit contenir au moins 6 caractères.</p>
+            <p class="text-xs text-gray-500 mt-1">Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.</p>
           </div>
 
           <!-- Confirmation de mot de passe -->
@@ -271,13 +295,17 @@
             <div class="relative">
               <input
                 id="confirmPassword"
-                type="password"
+                [type]="showConfirmPassword ? 'text' : 'password'"
                 formControlName="confirmPassword"
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600 pr-10"
                 placeholder="••••••••"
               >
-              <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800">
-                <i class="fas fa-eye"></i>
+              <button
+                type="button"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800"
+                (click)="showConfirmPassword = !showConfirmPassword"
+              >
+                <i class="fas" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
               </button>
             </div>
             <div *ngIf="agentServiceForm.get('confirmPassword')?.invalid && agentServiceForm.get('confirmPassword')?.touched" class="text-red-500 text-xs mt-1">
@@ -287,6 +315,7 @@
           </div>
         </div>
       </div>
+
 
       <!-- Boutons de soumission -->
       <div class="flex justify-end gap-4 mt-8">

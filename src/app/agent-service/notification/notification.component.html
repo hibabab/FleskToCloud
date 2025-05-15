@@ -214,89 +214,101 @@
   </div>
 </ng-container>
         <!-- Contenu spécifique pour les demandes de souscription -->
-        <ng-container *ngIf="selectedNotification.type === 'subscription_request'">
-          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h3 class="text-lg font-semibold mb-3 text-gray-800">Détails de la demande</h3>
+        <!-- Contenu spécifique pour les demandes de souscription -->
+<ng-container *ngIf="selectedNotification.type === 'subscription_request'">
+  <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+    <h3 class="text-lg font-semibold mb-3 text-gray-800">Détails de la demande</h3>
 
-            <div class="mb-4">
-              <p class="text-gray-700 mb-2"><span class="font-semibold">Demandeur:</span> {{ selectedNotification.user?.email || 'Information non disponible' }}</p>
-            </div>
+    <div class="mb-4">
+      <p class="text-gray-700 mb-2"><span class="font-semibold">Demandeur:</span> {{ selectedNotification.user?.email || 'Information non disponible' }}</p>
+    </div>
 
-            <div *ngIf="formattedMetadata" class="space-y-4">
-              <!-- Section assurance -->
-              <div *ngIf="formattedMetadata['assure']" class="border-b border-gray-200 pb-4">
-                <h4 class="font-semibold text-gray-700 mb-2">Informations de l'assuré:</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4">
-                  <div *ngFor="let key of getObjectKeys(formattedMetadata['assure'])" class="space-y-1">
-                    <span class="text-gray-600 font-medium capitalize">{{ key }}:</span>
-                    <span class="text-gray-800 block">{{ formattedMetadata['assure'][key] }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Section véhicule -->
-              <div *ngIf="formattedMetadata['vehicule']" class="border-b border-gray-200 pb-4">
-                <h4 class="font-semibold text-gray-700 mb-2">Informations du véhicule:</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4">
-                  <div *ngFor="let key of getObjectKeys(formattedMetadata['vehicule'])" class="space-y-1">
-                    <span class="text-gray-600 font-medium capitalize">{{ key }}:</span>
-                    <span class="text-gray-800 block">{{ formattedMetadata['vehicule'][key] }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Section contrat -->
-              <div *ngIf="formattedMetadata['contrat']">
-                <h4 class="font-semibold text-gray-700 mb-2">Informations du contrat:</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4">
-                  <div *ngFor="let key of getObjectKeys(formattedMetadata['contrat'])" class="space-y-1">
-                    <span class="text-gray-600 font-medium capitalize">{{ key }}:</span>
-                    <span class="text-gray-800 block">{{ formattedMetadata['contrat'][key] }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div *ngIf="formattedMetadata" class="space-y-4">
+      <!-- Section assurance -->
+      <div *ngIf="formattedMetadata['assure']" class="border-b border-gray-200 pb-4">
+        <h4 class="font-semibold text-gray-700 mb-2">Informations de l'assuré:</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4">
+          <div *ngFor="let key of getObjectKeys(formattedMetadata['assure'])" class="space-y-1">
+            <span class="text-gray-600 font-medium capitalize">{{ key }}:</span>
+            <span class="text-gray-800 block">{{ formattedMetadata['assure'][key] }}</span>
           </div>
+        </div>
+      </div>
 
-          <div class="flex gap-4 mt-6" *ngIf="selectedNotification.status === 'pending'">
-            <button
-              (click)="processRequest('accept')"
-              class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors flex items-center"
-            >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              Accepter
-            </button>
-            <button
-              (click)="processRequest('reject')"
-              class="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors flex items-center"
-            >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-              Refuser
-            </button>
+      <!-- Section véhicule -->
+      <div *ngIf="formattedMetadata['vehicule']" class="border-b border-gray-200 pb-4">
+        <h4 class="font-semibold text-gray-700 mb-2">Informations du véhicule:</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4">
+          <div *ngFor="let key of getObjectKeys(formattedMetadata['vehicule'])" class="space-y-1">
+            <span class="text-gray-600 font-medium capitalize">{{ key }}:</span>
+            <span class="text-gray-800 block">{{ formattedMetadata['vehicule'][key] }}</span>
           </div>
+        </div>
+      </div>
 
-          <div *ngIf="selectedNotification.status !== 'pending'" class="mt-6 p-4 rounded-lg"
-               [ngClass]="{
-                 'bg-green-50 text-green-800': selectedNotification.status === 'accepted',
-                 'bg-red-50 text-red-800': selectedNotification.status === 'rejected'
-               }">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path *ngIf="selectedNotification.status === 'accepted'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                <path *ngIf="selectedNotification.status === 'rejected'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-              <p class="font-medium">
-                Demande {{ selectedNotification.status === 'accepted' ? 'acceptée' : 'refusée' }}
-
-                <span *ngIf="selectedNotification.processedByAgent">par {{ selectedNotification.processedByAgent?.email || 'un agent' }}</span>
-              </p>
-            </div>
+      <!-- Nouvelle section carte grise -->
+      <div *ngIf="formattedMetadata['carteGrise']" class="border-b border-gray-200 pb-4">
+        <h4 class="font-semibold text-gray-700 mb-2">Informations de la carte grise:</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4">
+          <div *ngFor="let key of getObjectKeys(formattedMetadata['carteGrise'])" class="space-y-1">
+            <span class="text-gray-600 font-medium capitalize">{{ key }}:</span>
+            <span class="text-gray-800 block">{{ formattedMetadata['carteGrise'][key] }}</span>
           </div>
-        </ng-container>
+        </div>
+      </div>
+
+      <!-- Section contrat -->
+      <div *ngIf="formattedMetadata['contrat']">
+        <h4 class="font-semibold text-gray-700 mb-2">Informations du contrat:</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4">
+          <div *ngFor="let key of getObjectKeys(formattedMetadata['contrat'])" class="space-y-1">
+            <span class="text-gray-600 font-medium capitalize">{{ key }}:</span>
+            <span class="text-gray-800 block">{{ formattedMetadata['contrat'][key] }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-4 mt-6" *ngIf="selectedNotification.status === 'pending'">
+    <button
+      (click)="processRequest('accept')"
+      class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors flex items-center"
+    >
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+      Accepter
+    </button>
+    <button
+      (click)="processRequest('reject')"
+      class="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors flex items-center"
+    >
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+      Refuser
+    </button>
+  </div>
+
+  <div *ngIf="selectedNotification.status !== 'pending'" class="mt-6 p-4 rounded-lg"
+       [ngClass]="{
+         'bg-green-50 text-green-800': selectedNotification.status === 'accepted',
+         'bg-red-50 text-red-800': selectedNotification.status === 'rejected'
+       }">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path *ngIf="selectedNotification.status === 'accepted'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        <path *ngIf="selectedNotification.status === 'rejected'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+      <p class="font-medium">
+        Demande {{ selectedNotification.status === 'accepted' ? 'acceptée' : 'refusée' }}
+
+        <span *ngIf="selectedNotification.processedByAgent">par {{ selectedNotification.processedByAgent?.email || 'un agent' }}</span>
+      </p>
+    </div>
+  </div>
+</ng-container>
 <ng-container *ngIf="selectedNotification && selectedNotification.message && selectedNotification.message.includes('Paiement confirmé')">
   <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
 

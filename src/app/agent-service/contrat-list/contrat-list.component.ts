@@ -39,6 +39,7 @@ export class ContratListComponent {
             ? response.data.map((item: any) => ({
                 contrat: {
                   num: item.num,
+                  etat: item.etat,
                   dateSouscription: item.dateSouscription,
                   dateExpiration: item.dateExpiration
                 },

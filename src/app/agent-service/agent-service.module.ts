@@ -23,6 +23,7 @@ import { ListeAssureVieComponent } from './liste-assure-vie/liste-assure-vie.com
 import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/historique-contrat-vie-a.component';
 import { ResiliationComponent } from './resiliation/resiliation.component';
 import { AccountComponent } from './account/account.component';
+import { CreationCompteComponent } from './creation-compte/creation-compte.component';
 
 
 
@@ -47,6 +48,7 @@ ListeAssureVieComponent,
 HistoriqueContratVieAComponent,
 ResiliationComponent,
 AccountComponent,
+CreationCompteComponent,
 
   ],
   imports: [

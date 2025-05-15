@@ -4,10 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { jwtDecode } from 'jwt-decode';
 import { NotificationService } from '../../agent-service/Services/notification.service';
 import { Router } from '@angular/router';
+import { DocService } from '../services/doc-service.service';
+
 
 @Component({
   selector: 'app-creation-contrat',
-  standalone:false,
+  standalone: false,
   templateUrl: './creation-contrat.component.html',
   styleUrls: ['./creation-contrat.component.css']
 })
@@ -17,9 +19,16 @@ export class CreationContratComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  loadingMessage = '';
+  currentStep = 1;
   currentYear = new Date().getFullYear();
   minDate = new Date(1980, 0, 1).toISOString().split('T')[0];
   maxDate = new Date().toISOString().split('T')[0];
+
+  // Variables pour la gestion de la carte grise
+  selectedFile: File | null = null;
+  analysisResults: any = null;
+  displayAnalysisResults: any[] = [];
 
   puissanceOptions: number[] = [4, 5, 6, 7, 8, 9, 10, 11, 12];
 
@@ -27,9 +36,10 @@ export class CreationContratComponent implements OnInit {
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private docService: DocService
   ) {
-    this.insuranceForm = this.fb.group({
+     this.insuranceForm = this.fb.group({
       assure: this.fb.group({
         bonusMalus: [null, [Validators.required, Validators.min(0), Validators.max(200)]]
       }),
@@ -72,16 +82,111 @@ export class CreationContratComponent implements OnInit {
       })
     });
   }
-  validateImmatriculation(control: AbstractControl ): {[key: string]: any} | null {
+
+  ngOnInit(): void {
+    this.loadUserDataFromToken();
+  }
+
+  // Gestion des étapes
+  goToNextStep(): void {
+    if (this.currentStep === 1 && this.analysisResults) {
+      this.populateFormWithAnalysis();
+      this.currentStep = 2;
+    }
+  }
+
+  goToPreviousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  // Gestion de la carte grise
+  onFileSelect(event: any): void {
+    this.selectedFile = event.target.files[0];
+    this.resetAnalysisState();
+  }
+
+  handleFileDrop(event: DragEvent): void {
+    event.preventDefault();
+    const files = event.dataTransfer?.files;
+
+    if (files && files.length > 0) {
+      this.selectedFile = files[0];
+      this.resetAnalysisState();
+    }
+  }
+
+  async processDocument(): Promise<void> {
+    if (!this.selectedFile) {
+      this.errorMessage = 'Veuillez sélectionner un fichier';
+      return;
+    }
+
+    this.isLoading = true;
+    this.loadingMessage = 'Analyse de la carte grise en cours...';
+    this.errorMessage = '';
+
+    try {
+      const formData = new FormData();
+      formData.append('file', this.selectedFile);
+
+      const config = {
+        country: 'tunisia',
+        docType: 'Carte grise',
+        detectFields: false
+      };
+
+      this.analysisResults = await this.docService.processDocument(
+        formData,
+        config.country,
+        config.docType,
+        config.detectFields
+      ).toPromise();
+
+
+    } catch (error) {
+      this.errorMessage = 'Erreur lors de l\'analyse du document. Veuillez vérifier que le document est lisible.';
+      console.error('Erreur détaillée:', error);
+    } finally {
+      this.isLoading = false;
+      this.loadingMessage = '';
+    }
+  }
+
+
+
+  private populateFormWithAnalysis(): void {
+    if (!this.analysisResults) return;
+
+    this.insuranceForm.patchValue({
+      vehicule: {
+        type: this.analysisResults.type || '',
+        marque: this.analysisResults.marque || '',
+        model: this.analysisResults.model || '',
+        Imat: this.analysisResults.Imat || '',
+        energie: this.analysisResults.energie || '',
+        DPMC: this.analysisResults.DPMC || '',
+        cylindree: this.analysisResults.cylindree || null,
+        puissance: this.analysisResults.puissance || null
+      }
+    });
+  }
+
+  private resetAnalysisState(): void {
+    this.errorMessage = '';
+    this.analysisResults = null;
+    this.displayAnalysisResults = [];
+  }
+
+  // Validation des champs
+  validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
     const pattern = /^\d{1,4}TU\d{1,3}$/i;
 
     if (control.value && !pattern.test(control.value)) {
       return { 'invalidImmatriculation': true };
     }
     return null;
-}
-  ngOnInit(): void {
-    this.loadUserDataFromToken();
   }
 
   validateDate(control: AbstractControl): {[key: string]: boolean} | null {
@@ -127,6 +232,7 @@ export class CreationContratComponent implements OnInit {
     this.insuranceForm.get('vehicule.numChassis')?.setValue(value);
   }
 
+  // Gestion des données utilisateur
   private getCookie(name: string): string | null {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -173,6 +279,7 @@ export class CreationContratComponent implements OnInit {
     });
   }
 
+  // Préparation et soumission du formulaire
   prepareFormData(): any {
     const formValue = this.insuranceForm.value;
 
@@ -198,7 +305,14 @@ export class CreationContratComponent implements OnInit {
         chargeUtil: formValue.vehicule.chargeUtil ? Number(formValue.vehicule.chargeUtil) : null,
         valeurNeuf: Number(formValue.vehicule.valeurNeuf),
         poidsVide: Number(formValue.vehicule.poidsVide),
+      },
 
+      carteGrise : {
+
+        ...this.analysisResults,
+        dateAnalyse: new Date().toISOString(),
+        fichierOriginal: this.selectedFile?.name || 'inconnu',
+        estAnalyseAutomatique: true
       }
     };
   }
@@ -226,14 +340,12 @@ export class CreationContratComponent implements OnInit {
           'Votre demande de contrat d\'assurance a été soumise et est en attente de traitement.'
         ).subscribe({
           next: () => {
-            // Redirection après 2 secondes (pour laisser le temps de voir le message de succès)
             setTimeout(() => {
               this.router.navigate(['/dashboard-assure/interface']);
             }, 2000);
           },
           error: (err) => {
             console.error('Erreur notification:', err);
-            // Redirection même si la notification échoue
             this.router.navigate(['/dashboard-assure/interface']);
           }
         });
@@ -246,9 +358,7 @@ export class CreationContratComponent implements OnInit {
       }
     });
   }
-
-
-  markAllAsTouched(): void {
+ markAllAsTouched(): void {
     Object.values(this.insuranceForm.controls).forEach(control => {
       control.markAsTouched();
     });

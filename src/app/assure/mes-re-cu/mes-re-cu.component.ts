@@ -18,10 +18,9 @@ interface Payment {
   trackingId: string;
   status: string;
   amount: number;
-  paymentDate?: Date;
+  paymentDate?:Date;
   contrat: {
     num: number;
-    // autres propriétés du contrat...
   };
 }
 
@@ -49,8 +48,17 @@ interface PaymentResponse {
     paymentId?: string;
     trackingId?: string;
     amount?: number;
-    paymentDate?: Date;
+    paymentDate?: string;
     contratNum?: number;
+    payments?: Array<{
+      paymentId: string;
+      trackingId?: string;
+      status?: string;
+      amount?: number;
+      paymentDate?: string;
+    }>;
+    totalPayments?: number;
+    lastPaymentStatus?: string;
   };
   message?: string;
 }
@@ -281,6 +289,7 @@ export class MesReCuComponent implements OnInit {
   }
 
   fetchAutoPayment(): void {
+    this.isLoading = true;
     this.http.get<PaymentResponse>(
       `http://localhost:3000/payments/status/${this.num}`
     ).pipe(
@@ -288,29 +297,33 @@ export class MesReCuComponent implements OnInit {
     ).subscribe({
       next: (response) => {
         if (response.success) {
-          if (response.data.hasPayment && response.data.paymentId) {
-            this.payments = [{
-              id: Number(response.data.paymentId),
-              paymentId: response.data.paymentId,
-              trackingId: response.data.trackingId || '',
-              status: response.data.status || 'unknown',
-              amount: response.data.amount || 0,
-              paymentDate: response.data.paymentDate,
+          if (response.data.hasPayment && response.data.payments && response.data.payments.length > 0) {
+            // Traitement de plusieurs paiements
+            this.payments = response.data.payments.map(payment => ({
+              id: Number(payment.paymentId),
+              paymentId: payment.paymentId,
+              trackingId: payment.trackingId || '',
+              status: payment.status || 'unknown',
+              amount: payment.amount || 0,
+              paymentDate: payment.paymentDate ? new Date(payment.paymentDate) : undefined,
               contrat: {
                 num: this.num || 0
               }
-            }];
+            }));
           } else {
+            // Aucun paiement trouvé
             this.payments = [];
             this.successMessage = 'Aucun paiement trouvé pour ce contrat auto';
           }
         } else {
           this.errorMessage = response.message || 'Erreur lors de la récupération du statut de paiement';
         }
+        this.hasSearched = true;
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Erreur lors de la récupération du statut de paiement';
         console.error('Erreur:', err);
+        this.hasSearched = true;
       }
     });
   }
@@ -330,7 +343,7 @@ export class MesReCuComponent implements OnInit {
               trackingId: response.data.trackingId || '',
               status: response.data.status || 'unknown',
               amount: response.data.amount || 0,
-              paymentDate: response.data.paymentDate,
+              paymentDate: response.data.paymentDate ? new Date(response.data.paymentDate) : undefined,
               contrat: {
                 num: this.num || 0
               }

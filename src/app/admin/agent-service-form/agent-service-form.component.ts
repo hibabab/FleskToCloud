@@ -155,6 +155,14 @@ export class AgentServiceFormComponent implements OnInit {
     'Zaghouan Ville': '1100', 'Bir Mcherga': '1111', 'El Fahs': '1120', 'Nadhour': '1131',
     'Saouaf': '1141', 'Zriba': '1151'
   };
+   emailExists = false;
+  cinExists = false;
+  emailChecking = false;
+  cinChecking = false;
+  invalidDateNaissance=false;
+  invalidDateDebutTravai=false;
+  showPassword = false;
+  showConfirmPassword = false;
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -166,10 +174,19 @@ export class AgentServiceFormComponent implements OnInit {
       // Informations de l'utilisateur
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
-      cin: ['', Validators.required],
-      telephone: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      dateNaissance: ['', Validators.required],
+      cin: ['', [
+        Validators.required,
+        Validators.pattern(/^\d{8}$/)
+      ], [this.cinAsyncValidator.bind(this)]],
+      telephone:  ['', [
+    Validators.required,
+    Validators.pattern(/^[2-5,9]\d{7}$/)
+  ]],
+      email: ['',
+        [Validators.required, Validators.email],
+        [this.emailAsyncValidator.bind(this)]
+      ],
+      dateNaissance:['', [Validators.required, this.dateNaissanceValidator()]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
       // Adresse
@@ -179,7 +196,7 @@ export class AgentServiceFormComponent implements OnInit {
       codePostal: ['', Validators.required],
       // Informations spécifiques à l'agent de service
       specialite: ['', Validators.required],
-      dateEmbauche: ['', Validators.required]
+      dateEmbauche: ['', [Validators.required,this.dateDebutTravailValidator()]]
     }, { validators: this.passwordMatchValidator });
      // Watch for gouvernat changes to update villes
      this.agentServiceForm.get('gouvernat')?.valueChanges.subscribe(gouvernat => {
@@ -223,10 +240,10 @@ export class AgentServiceFormComponent implements OnInit {
     const userData = {
       nom: this.agentServiceForm.value.nom,
       prenom: this.agentServiceForm.value.prenom,
-      Cin: this.agentServiceForm.value.cin,
+      Cin: Number(this.agentServiceForm.value.cin),
       telephone: this.agentServiceForm.value.telephone,
       email: this.agentServiceForm.value.email,
-      date_naissance: this.agentServiceForm.value.dateNaissance,
+      date_naissance: new Date(this.agentServiceForm.value.dateNaissance),
       password: this.agentServiceForm.value.password,
       role:"agent service",
       adresse: {
@@ -266,5 +283,83 @@ export class AgentServiceFormComponent implements OnInit {
         window.alert("verifier vos information ");
       },
     );
+  }
+   dateNaissanceValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const value = new Date(control.value);
+    const minDate = new Date('1970-01-01');
+    const maxDate = new Date('2000-12-31');
+    if (value < minDate || value > maxDate) {
+      return { invalidDateNaissance: true };
+    }
+    return null;
+  };
+}
+
+// Validator pour dateDebutTravail : min 1985, max aujourd’hui
+dateDebutTravailValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const value = new Date(control.value);
+    const minDate = new Date('1985-01-01');
+    const today = new Date();
+    if (value < minDate || value > today) {
+      return { invalidDateDebutTravail: true };
+    }
+    return null;
+  };
+}
+emailAsyncValidator(control: AbstractControl) {
+    return new Promise<ValidationErrors | null>((resolve) => {
+      const email = control.value;
+      if (!email || control.errors) {
+        return resolve(null);
+      }
+
+      this.emailChecking = true;
+      this.http.get<{ exists: boolean }>(`http://localhost:3000/auth/check-email/${email}`)
+        .subscribe({
+          next: (response) => {
+            this.emailChecking = false;
+            this.emailExists = response.exists;
+            if (response.exists) {
+              resolve({ emailExists: true });
+            } else {
+              resolve(null);
+            }
+          },
+          error: () => {
+            this.emailChecking = false;
+            resolve(null);
+          }
+        });
+    });
+  }
+
+  // Validateur asynchrone pour le CIN
+  cinAsyncValidator(control: AbstractControl) {
+    return new Promise<ValidationErrors | null>((resolve) => {
+      const cin = control.value;
+      if (!cin || control.errors) {
+        return resolve(null);
+      }
+
+      this.cinChecking = true;
+      this.http.get<{ exists: boolean }>(`http://localhost:3000/auth/check-cin/${cin}`)
+        .subscribe({
+          next: (response) => {
+            this.cinChecking = false;
+            this.cinExists = response.exists;
+            if (response.exists) {
+              resolve({ cinExists: true });
+            } else {
+              resolve(null);
+            }
+          },
+          error: () => {
+            this.cinChecking = false;
+            resolve(null);
+          }
+        });
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { DocService } from '../services/carte-grise-service.service';
+import { DocService } from '../services/doc-service.service';
+
 
 @Component({
   selector: 'app-carte-grise',
@@ -32,7 +33,7 @@ export class CarteGriseComponent {
   handleFileDrop(event: DragEvent): void {
     event.preventDefault();
     const files = event.dataTransfer?.files;
-    
+
     if (files && files.length > 0) {
       this.selectedFile = files[0];
       this.resetState();
@@ -51,7 +52,7 @@ export class CarteGriseComponent {
     try {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
-      
+
       this.results = await this.docService.processDocument(
         formData,
         this.fixedConfig.country,

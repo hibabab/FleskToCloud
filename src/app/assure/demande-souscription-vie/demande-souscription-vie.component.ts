@@ -89,7 +89,7 @@ garanties = {
       console.error('Erreur de décodage:', error);
     }
   }
- 
+
   fetchUserData(userId: number): void {
     this.http.get<any>(`http://localhost:3000/auth/users/${userId}`).subscribe({
       next: (user) => {

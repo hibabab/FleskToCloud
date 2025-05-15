@@ -155,7 +155,14 @@ export class ExpertFormComponent {
     'Zaghouan Ville': '1100', 'Bir Mcherga': '1111', 'El Fahs': '1120', 'Nadhour': '1131',
     'Saouaf': '1141', 'Zriba': '1151'
   };
-
+ emailExists = false;
+  cinExists = false;
+  emailChecking = false;
+  cinChecking = false;
+  invalidDateNaissance=false;
+  invalidDateDebutTravai=false;
+  showPassword = false;
+  showConfirmPassword = false;
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -165,10 +172,19 @@ export class ExpertFormComponent {
       // Informations personnelles
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
-      cin: ['', Validators.required],
-      telephone: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      dateNaissance: ['', Validators.required],
+cin: ['', [
+        Validators.required,
+        Validators.pattern(/^\d{8}$/)
+      ], [this.cinAsyncValidator.bind(this)]],
+      telephone:  ['', [
+    Validators.required,
+    Validators.pattern(/^[2-5,9]\d{7}$/)
+  ]],
+      email: ['',
+        [Validators.required, Validators.email],
+        [this.emailAsyncValidator.bind(this)]
+      ],
+      dateNaissance:['', [Validators.required, this.dateNaissanceValidator()]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
 
@@ -179,7 +195,7 @@ export class ExpertFormComponent {
       codePostal: ['', Validators.required],
 
       // Informations professionnelles
-      dateDebutTravail: ['', Validators.required],
+      dateDebutTravail:['', [Validators.required, this.dateDebutTravailValidator()]],
       specialite: ['', Validators.required],
     }, { validators: this.passwordMatchValidator });
 
@@ -210,12 +226,93 @@ export class ExpertFormComponent {
     }
   };
 
+
+// Validator pour dateNaissance : entre 1970 et 2000
+ dateNaissanceValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const value = new Date(control.value);
+    const minDate = new Date('1970-01-01');
+    const maxDate = new Date('2000-12-31');
+    if (value < minDate || value > maxDate) {
+      return { invalidDateNaissance: true };
+    }
+    return null;
+  };
+}
+
+// Validator pour dateDebutTravail : min 1985, max aujourd’hui
+dateDebutTravailValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const value = new Date(control.value);
+    const minDate = new Date('1985-01-01');
+    const today = new Date();
+    if (value < minDate || value > today) {
+      return { invalidDateDebutTravail: true };
+    }
+    return null;
+  };
+}
+
   calculateNbAnneeExperience(dateDebutTravail: string): number {
     const currentDate = new Date();
     const startDate = new Date(dateDebutTravail);
     const diffInMilliseconds = currentDate.getTime() - startDate.getTime();
     const diffInYears = diffInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
     return Math.floor(diffInYears);
+  }
+emailAsyncValidator(control: AbstractControl) {
+    return new Promise<ValidationErrors | null>((resolve) => {
+      const email = control.value;
+      if (!email || control.errors) {
+        return resolve(null);
+      }
+
+      this.emailChecking = true;
+      this.http.get<{ exists: boolean }>(`http://localhost:3000/auth/check-email/${email}`)
+        .subscribe({
+          next: (response) => {
+            this.emailChecking = false;
+            this.emailExists = response.exists;
+            if (response.exists) {
+              resolve({ emailExists: true });
+            } else {
+              resolve(null);
+            }
+          },
+          error: () => {
+            this.emailChecking = false;
+            resolve(null);
+          }
+        });
+    });
+  }
+
+  // Validateur asynchrone pour le CIN
+  cinAsyncValidator(control: AbstractControl) {
+    return new Promise<ValidationErrors | null>((resolve) => {
+      const cin = control.value;
+      if (!cin || control.errors) {
+        return resolve(null);
+      }
+
+      this.cinChecking = true;
+      this.http.get<{ exists: boolean }>(`http://localhost:3000/auth/check-cin/${cin}`)
+        .subscribe({
+          next: (response) => {
+            this.cinChecking = false;
+            this.cinExists = response.exists;
+            if (response.exists) {
+              resolve({ cinExists: true });
+            } else {
+              resolve(null);
+            }
+          },
+          error: () => {
+            this.cinChecking = false;
+            resolve(null);
+          }
+        });
+    });
   }
 
   onSubmit(): void {
@@ -227,14 +324,15 @@ export class ExpertFormComponent {
       }
       return;
     }
-
+    this.expertForm.value.Cin = Number(this.expertForm.value.Cin);
+    this.expertForm.value.date_naissance = new Date(this.expertForm.value.date_naissance);
     const userData = {
       nom: this.expertForm.value.nom,
       prenom: this.expertForm.value.prenom,
-      Cin: this.expertForm.value.cin,
+      Cin: Number(this.expertForm.value.cin),
       telephone: this.expertForm.value.telephone,
       email: this.expertForm.value.email,
-      date_naissance: this.expertForm.value.dateNaissance,
+      date_naissance:new Date( this.expertForm.value.dateNaissance),
       password: this.expertForm.value.password,
       role: "expert",
       adresse: {
@@ -245,7 +343,7 @@ export class ExpertFormComponent {
         pays: 'Tunisie',
       },
     };
-
+ console.log('Données envoyées:',userData);
     this.http.post('http://localhost:3000/auth/register', userData).subscribe(
       (userResponse: any) => {
         const dateDebutTravail = this.expertForm.value.dateDebutTravail;

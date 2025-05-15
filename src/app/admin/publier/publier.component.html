@@ -1,0 +1,70 @@
+<div class="flex">
+  <app-dehasbort/>
+
+  <div class="flex-1 mt-20 ml-10">
+    <!-- Titre de la section -->
+    <div class="max-w-3xl mx-auto mb-8">
+      <h2 class="text-2xl font-bold text-teal-800">Envoyer une notification aux agents</h2>
+      <p class="text-gray-600">Rédigez un message qui sera envoyé à tous les agents de service</p>
+    </div>
+
+    <!-- Carte de publication style Facebook -->
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md border border-gray-200">
+      <!-- En-tête -->
+      <div class="p-4 border-b border-gray-200 flex items-center">
+        <div class="bg-teal-100 p-2 rounded-full">
+          <i class="fas fa-bell text-teal-600 text-xl"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="font-semibold text-gray-800">Notification Admin</h3>
+          <p class="text-xs text-gray-500">Message à tous les agents</p>
+        </div>
+      </div>
+
+      <!-- Zone de texte -->
+      <div class="p-4">
+        <textarea
+          [(ngModel)]="notificationMessage"
+          placeholder="Quel message souhaitez-vous envoyer à tous les agents ?"
+          class="w-full h-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Options d'envoi -->
+      <div class="p-4 border-t border-gray-200 flex justify-between items-center">
+        <div class="flex space-x-2">
+
+
+        </div>
+        <button
+          (click)="sendNotificationToAgents()"
+          [disabled]="!notificationMessage"
+          class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:bg-teal-300 disabled:cursor-not-allowed transition-colors"
+        >
+          <i class="fas fa-paper-plane mr-2"></i> Notifier
+        </button>
+      </div>
+    </div>
+<!-- Ajoutez ceci juste après le titre de la section -->
+<div class="max-w-3xl mx-auto relative">
+  <!-- Toast de succès -->
+  <div *ngIf="showSuccess"
+       class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded shadow-lg animate-fade-in-out">
+    <div class="flex items-center">
+      <i class="fas fa-check-circle mr-2"></i>
+      <p>{{ successMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Toast d'erreur -->
+  <div *ngIf="showError"
+       class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded shadow-lg animate-fade-in-out">
+    <div class="flex items-center">
+      <i class="fas fa-exclamation-circle mr-2"></i>
+      <p>{{ errorMessage }}</p>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>

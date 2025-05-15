@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import {  PaymentService } from '../../services/payment.service';
+import { PaymentService } from '../../services/payment.service';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../agent-service/Services/notification.service';
 
@@ -15,6 +15,15 @@ interface PaymentData {
   deleted?: boolean;
   hasPayment?: boolean;
   paymentDate?: string;
+  // Nouvelle propriété pour indiquer si un paiement est récent ou ancien
+  isRecentPayment?: boolean;
+  payments?: Array<{
+    paymentId: string;
+    trackingId: string;
+    status: string;
+    amount: number;
+    paymentDate: string;
+  }>;
 }
 
 interface PaymentResponse {
@@ -23,8 +32,6 @@ interface PaymentResponse {
   message?: string;
   timestamp?: string;
 }
-
-
 
 @Component({
   selector: 'app-payment-initiate',
@@ -79,6 +86,19 @@ export class PaymentInitiateComponent implements OnInit {
     }
   }
 
+  // Vérifier si un paiement date d'aujourd'hui
+  isPaymentFromToday(paymentDate: string): boolean {
+    if (!paymentDate) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Début de la journée
+
+    const pDate = new Date(paymentDate);
+    pDate.setHours(0, 0, 0, 0);
+
+    return pDate.getTime() === today.getTime();
+  }
+
   initiatePayment(): void {
     this.loading = true;
     this.error = null;
@@ -110,6 +130,9 @@ export class PaymentInitiateComponent implements OnInit {
           } else if (err.error?.message === 'Un paiement existe déjà pour ce contrat') {
             this.getExistingPayment();
             return;
+          } else if (err.error?.message === 'Ce contrat a déjà été payé aujourd\'hui') {
+            // Nouveau message d'erreur spécifique pour paiement le même jour
+            this.error = 'Ce contrat a déjà été payé aujourd\'hui. Veuillez réessayer demain.';
           } else {
             this.error = err.error?.message || 'Erreur de validation des données';
           }
@@ -134,12 +157,37 @@ export class PaymentInitiateComponent implements OnInit {
             if (response.data?.hasPayment) {
               this.paymentData = response.data;
 
+              // Vérifier si les paiements sont récents (d'aujourd'hui) ou anciens (avant renouvellement)
               if (response.data.status === 'PAID') {
-                this.error = 'Ce contrat a déjà été payé.';
+                // S'il y a plusieurs paiements, vérifier si le plus récent date d'aujourd'hui
+                if (response.data.payments && response.data.payments.length > 0) {
+                  // Trier par date de paiement (plus récent d'abord)
+                  const sortedPayments = [...response.data.payments].sort((a, b) =>
+                    new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+                  );
 
-                // Mettre à jour le statut du contrat et notifier l'agent
-             
-
+                  // Vérifier si le paiement le plus récent date d'aujourd'hui
+                  const latestPayment = sortedPayments[0];
+                  if (this.isPaymentFromToday(latestPayment.paymentDate)) {
+                    this.error = 'Ce contrat a déjà été payé aujourd\'hui.';
+                  } else {
+                    // Si le dernier paiement n'est pas d'aujourd'hui, on peut initier un nouveau paiement
+                    console.log('Paiements antérieurs trouvés, mais pas d\'aujourd\'hui. Initiation d\'un nouveau paiement.');
+                    this.initiatePayment();
+                  }
+                } else if (response.data.paymentDate) {
+                  // S'il y a seulement un objet paiement
+                  if (this.isPaymentFromToday(response.data.paymentDate)) {
+                    this.error = 'Ce contrat a déjà été payé aujourd\'hui.';
+                  } else {
+                    // Si le paiement n'est pas d'aujourd'hui, on peut initier un nouveau paiement
+                    console.log('Paiement antérieur trouvé, mais pas d\'aujourd\'hui. Initiation d\'un nouveau paiement.');
+                    this.initiatePayment();
+                  }
+                } else {
+                  // Si on ne peut pas déterminer la date, message par défaut
+                  this.error = 'Ce contrat a déjà été payé.';
+                }
               } else if (response.data.status === 'FAILED') {
                 this.error = 'Le paiement précédent a échoué. Vous pouvez réessayer.';
                 this.initiatePayment();
@@ -170,7 +218,29 @@ export class PaymentInitiateComponent implements OnInit {
             this.paymentData = response.data;
 
             if (response.data.status === 'PAID') {
-              this.error = 'Ce contrat a déjà été payé.';
+              // Même logique que dans checkPaymentStatus pour vérifier si le paiement est récent
+              if (response.data.payments && response.data.payments.length > 0) {
+                const sortedPayments = [...response.data.payments].sort((a, b) =>
+                  new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()
+                );
+
+                const latestPayment = sortedPayments[0];
+                if (this.isPaymentFromToday(latestPayment.paymentDate)) {
+                  this.error = 'Ce contrat a déjà été payé aujourd\'hui.';
+                } else {
+                  console.log('Paiements antérieurs trouvés, mais pas d\'aujourd\'hui. Initiation d\'un nouveau paiement.');
+                  this.initiatePayment();
+                }
+              } else if (response.data.paymentDate) {
+                if (this.isPaymentFromToday(response.data.paymentDate)) {
+                  this.error = 'Ce contrat a déjà été payé aujourd\'hui.';
+                } else {
+                  console.log('Paiement antérieur trouvé, mais pas d\'aujourd\'hui. Initiation d\'un nouveau paiement.');
+                  this.initiatePayment();
+                }
+              } else {
+                this.error = 'Ce contrat a déjà été payé.';
+              }
             } else if (response.data.status === 'FAILED' || response.data.deleted) {
               // Pour les paiements en erreur ou supprimés, on propose de réessayer
               this.error = 'Le paiement précédent a échoué. Réessayez de payer.';
@@ -219,9 +289,14 @@ export class PaymentInitiateComponent implements OnInit {
             console.log('Aucun paiement à annuler, tentative de création directe');
             this.initiatePayment();
           } else if (err.status === 400 && err.error?.message?.includes('déjà effectué')) {
-            // Si paiement déjà effectué
-            this.error = 'Ce contrat a déjà été payé et ne peut être annulé.';
-            this.loading = false;
+            // Si paiement déjà effectué, vérifier la date
+            if (err.error?.data?.paymentDate && !this.isPaymentFromToday(err.error.data.paymentDate)) {
+              console.log('Paiement ancien détecté, tentative de création d\'un nouveau paiement');
+              this.initiatePayment();
+            } else {
+              this.error = 'Ce contrat a déjà été payé aujourd\'hui et ne peut être annulé.';
+              this.loading = false;
+            }
           } else {
             this.error = err.error?.message || 'Impossible de supprimer le paiement existant';
             this.loading = false;
@@ -233,5 +308,4 @@ export class PaymentInitiateComponent implements OnInit {
   toggleDebugInfo(): void {
     this.showDebugInfo = !this.showDebugInfo;
   }
-
 }

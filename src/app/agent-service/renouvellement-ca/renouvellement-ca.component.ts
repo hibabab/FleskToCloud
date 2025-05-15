@@ -266,38 +266,28 @@ export class RenouvellementCAComponent {
     // Stocker les données du contrat pour utilisation ultérieure
     this.contractData = contractData;
     this.contratNum = contratNum;
-console.log(contratNum);
-    this.paymentService.cancel(contratNum)
-      .pipe(finalize(() => {
-        console.log('Finalisation de la demande d\'annulation');
-      }))
-      .subscribe({
-        next: (response) => {
-          console.log('Paiement précédent annulé avec succès:', response);
-          setTimeout(() => {
-            this.processPayment(contratNum, contractData);
-            const updateUrl = `http://localhost:3000/contrat-auto-geteway/contrat/${contratNum}/status`;
+    console.log(contratNum);
 
-            // Mettre à jour le statut du contrat via HTTP
-            const updateResponse: any = this.http.patch(updateUrl, {
-              status: 'valide'
-            }).toPromise();
+    // Suppression directe de l'appel à cancel et passage direct au traitement du paiement
+    this.processPayment(contratNum, contractData);
 
-            if (updateResponse && updateResponse.success) {
-              console.log('Statut du contrat mis à jour avec succès');}
-          }, 1000);
-        },
-        error: (err) => {
-          console.error('Erreur lors de la suppression du paiement:', err);
-          if (err.status === 404) {
-            console.log('Aucun paiement à annuler, tentative de création directe');
-            this.processPayment(contratNum, contractData);
-          } else {
-            this.error = err.error?.message || 'Impossible de supprimer le paiement existant';
-            this.loading = false;
-            this.isLoading = false;
-          }
+    const updateUrl = `http://localhost:3000/contrat-auto-geteway/contrat/${contratNum}/status`;
+
+    // Mettre à jour le statut du contrat via HTTP
+    this.http.patch(updateUrl, {
+      status: 'valide'
+    }).toPromise()
+      .then(updateResponse => {
+        if (updateResponse) {
+          console.log('Statut du contrat mis à jour avec succès');
         }
+      })
+      .catch(err => {
+        console.error('Erreur lors de la mise à jour du statut:', err);
+      })
+      .finally(() => {
+        this.loading = false;
+        this.isLoading = false;
       });
   }
 

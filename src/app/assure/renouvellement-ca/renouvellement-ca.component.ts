@@ -273,7 +273,27 @@ export class RenouvellementCAComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+const checkRenewalData = {
+      cinAssure: this.userCin,
+      matriculeVehicule: this.renewalForm.get('Imat')?.value,
+      packChoice: packChoice
+    };
 
+    try {
+      const checkResponse = await this.http.post<{ possible: boolean }>(
+        'http://localhost:3000/contrat-auto-geteway/check-renewal',
+        checkRenewalData
+      ).toPromise();
+
+      if (!checkResponse?.possible) {
+        this.errorMessage = 'Le renouvellement en ligne n\'est pas possible avec les options sélectionnées.';
+        return;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification du renouvellement:', error);
+      this.errorMessage = 'Erreur lors de la vérification des conditions de renouvellement.';
+      return;
+    }
     this.http.post<{success: boolean, data: any, message: string}>(
       'http://localhost:3000/contrat-auto-geteway/renouveler-contrat',
       requestData
@@ -286,26 +306,8 @@ export class RenouvellementCAComponent implements OnInit {
           this.successMessage = 'Contrat renouvelé avec succès!';
           await this.generateContratPDF(response.data);
           this.contratNum = response.data.contrat.id;
+         this. continuePayment()
 
-          this.paymentService.cancel(contratNum)
-            .pipe(finalize(() => {
-              console.log('Finalisation de la demande d\'annulation');
-            }))
-            .subscribe({
-              next: (response) => {
-                console.log('Paiement précédent annulé avec succès:', response);
-                setTimeout(() => {
-                  this.continuePayment();
-                }, 1000);
-              },
-              error: (err) => {
-                console.error('Erreur lors de la suppression du paiement:', err);
-                if (err.status === 404) {
-                  console.log('Aucun paiement à annuler, tentative de création directe');
-                  this.continuePayment();
-                }
-              }
-            });
         } else {
           this.errorMessage = response.message || 'Erreur lors du renouvellement';
         }

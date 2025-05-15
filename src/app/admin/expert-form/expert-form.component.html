@@ -52,13 +52,21 @@
             <label for="cin" class="block mb-2 text-sm font-medium text-gray-700">CIN <span class="text-red-500">*</span></label>
             <input
               id="cin"
-              type="number"
+              type="text"
               formControlName="cin"
               class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              [class.border-red-500]="cinExists || (expertForm.get('cin')?.invalid && expertForm.get('cin')?.touched)"
               placeholder="Entrez le CIN"
             >
-            <div *ngIf="expertForm.get('cin')?.invalid && expertForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
+            <div *ngIf="cinChecking" class="text-blue-500 text-xs mt-1">Vérification du CIN en cours...</div>
+            <div *ngIf="expertForm.get('cin')?.hasError('required') && expertForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
               Le CIN est requis.
+            </div>
+            <div *ngIf="expertForm.get('cin')?.hasError('pattern') && expertForm.get('cin')?.touched" class="text-red-500 text-xs mt-1">
+              Le CIN doit comporter exactement 8 chiffres.
+            </div>
+            <div *ngIf="cinExists" class="text-red-500 text-xs mt-1">
+              Ce CIN est déjà utilisé.
             </div>
           </div>
 
@@ -72,7 +80,12 @@
               class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
             >
             <div *ngIf="expertForm.get('dateNaissance')?.invalid && expertForm.get('dateNaissance')?.touched" class="text-red-500 text-xs mt-1">
-              La date de naissance est requise.
+              <div *ngIf="expertForm.get('dateNaissance')?.errors?.['required']">
+                La date de naissance est requise.
+              </div>
+              <div *ngIf="expertForm.get('dateNaissance')?.errors?.['invalidDateNaissance']">
+                La date de naissance doit être entre 1970 et 2000.
+              </div>
             </div>
           </div>
         </div>
@@ -105,84 +118,91 @@
               type="email"
               formControlName="email"
               class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
-              placeholder="exemple@domaine.com"
+              [class.border-red-500]="emailExists || (expertForm.get('email')?.invalid && expertForm.get('email')?.touched)"
+              placeholder="Entrez l'email"
             >
-            <div *ngIf="expertForm.get('email')?.invalid && expertForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
-              <span *ngIf="expertForm.get('email')?.errors?.['required']">L'email est requis.</span>
-              <span *ngIf="expertForm.get('email')?.errors?.['email']">Veuillez entrer un email valide.</span>
+            <div *ngIf="emailChecking" class="text-blue-500 text-xs mt-1">Vérification de l'email en cours...</div>
+            <div *ngIf="expertForm.get('email')?.hasError('required') && expertForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
+              L'email est requis.
+            </div>
+            <div *ngIf="expertForm.get('email')?.hasError('email') && expertForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
+              Veuillez entrer un email valide.
+            </div>
+            <div *ngIf="emailExists" class="text-red-500 text-xs mt-1">
+              Cet email est déjà utilisé.
             </div>
           </div>
         </div>
       </div>
 
-     <!-- Adresse -->
-     <div class="mb-6">
-      <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Adresse</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Rue -->
-        <div>
-          <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-red-500">*</span></label>
-          <input
-            id="rue"
-            type="text"
-            formControlName="rue"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
-            placeholder="Entrez la rue"
-          >
-          <div *ngIf="expertForm.get('rue')?.invalid && expertForm.get('rue')?.touched" class="text-red-500 text-xs mt-1">
-            La rue est requise.
+      <!-- Adresse -->
+      <div class="mb-6">
+        <h2 class="text-lg font-medium text-teal-800 mb-4 pb-2 border-b border-gray-200">Adresse</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Rue -->
+          <div>
+            <label for="rue" class="block mb-2 text-sm font-medium text-gray-700">Rue <span class="text-red-500">*</span></label>
+            <input
+              id="rue"
+              type="text"
+              formControlName="rue"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              placeholder="Entrez la rue"
+            >
+            <div *ngIf="expertForm.get('rue')?.invalid && expertForm.get('rue')?.touched" class="text-red-500 text-xs mt-1">
+              La rue est requise.
+            </div>
           </div>
-        </div>
 
-        <!-- Gouvernorat -->
-        <div>
-          <label for="gouvernat" class="block mb-2 text-sm font-medium text-gray-700">Gouvernorat <span class="text-red-500">*</span></label>
-          <select
-            id="gouvernat"
-            formControlName="gouvernat"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
-          >
-            <option value="" disabled selected>Sélectionnez un gouvernorat</option>
-            <option *ngFor="let g of gouvernorats" [value]="g">{{ g }}</option>
-          </select>
-          <div *ngIf="expertForm.get('gouvernat')?.invalid && expertForm.get('gouvernat')?.touched" class="text-red-500 text-xs mt-1">
-            Le gouvernorat est requis.
+          <!-- Gouvernorat -->
+          <div>
+            <label for="gouvernat" class="block mb-2 text-sm font-medium text-gray-700">Gouvernorat <span class="text-red-500">*</span></label>
+            <select
+              id="gouvernat"
+              formControlName="gouvernat"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+            >
+              <option value="" disabled selected>Sélectionnez un gouvernorat</option>
+              <option *ngFor="let g of gouvernorats" [value]="g">{{ g }}</option>
+            </select>
+            <div *ngIf="expertForm.get('gouvernat')?.invalid && expertForm.get('gouvernat')?.touched" class="text-red-500 text-xs mt-1">
+              Le gouvernorat est requis.
+            </div>
           </div>
-        </div>
 
-        <!-- Ville -->
-        <div>
-          <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
-          <select
-            id="ville"
-            formControlName="ville"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
-            [disabled]="!expertForm.get('gouvernat')?.value"
-          >
-            <option value="" disabled selected>Sélectionnez une ville</option>
-            <option *ngFor="let v of villes" [value]="v">{{ v }}</option>
-          </select>
-          <div *ngIf="expertForm.get('ville')?.invalid && expertForm.get('ville')?.touched" class="text-red-500 text-xs mt-1">
-            La ville est requise.
+          <!-- Ville -->
+          <div>
+            <label for="ville" class="block mb-2 text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
+            <select
+              id="ville"
+              formControlName="ville"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              [disabled]="!expertForm.get('gouvernat')?.value"
+            >
+              <option value="" disabled selected>Sélectionnez une ville</option>
+              <option *ngFor="let v of villes" [value]="v">{{ v }}</option>
+            </select>
+            <div *ngIf="expertForm.get('ville')?.invalid && expertForm.get('ville')?.touched" class="text-red-500 text-xs mt-1">
+              La ville est requise.
+            </div>
           </div>
-        </div>
 
-        <!-- Code postal -->
-        <div>
-          <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-red-500">*</span></label>
-          <input
-            id="codePostal"
-            type="text"
-            formControlName="codePostal"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
-            readonly
-          >
-          <div *ngIf="expertForm.get('codePostal')?.invalid && expertForm.get('codePostal')?.touched" class="text-red-500 text-xs mt-1">
-            Le code postal est requis.
+          <!-- Code postal -->
+          <div>
+            <label for="codePostal" class="block mb-2 text-sm font-medium text-gray-700">Code postal <span class="text-red-500">*</span></label>
+            <input
+              id="codePostal"
+              type="text"
+              formControlName="codePostal"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
+              readonly
+            >
+            <div *ngIf="expertForm.get('codePostal')?.invalid && expertForm.get('codePostal')?.touched" class="text-red-500 text-xs mt-1">
+              Le code postal est requis.
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
       <!-- Informations professionnelles -->
       <div class="mb-6">
@@ -198,12 +218,15 @@
               class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600"
             >
             <div *ngIf="expertForm.get('dateDebutTravail')?.invalid && expertForm.get('dateDebutTravail')?.touched" class="text-red-500 text-xs mt-1">
-              La date d'inscription est requise.
+              <div *ngIf="expertForm.get('dateDebutTravail')?.errors?.['required']">
+                La date d'inscription est requise.
+              </div>
+              <div *ngIf="expertForm.get('dateDebutTravail')?.errors?.['invalidDateDebutTravail']">
+                La date de début de travail doit être entre 1985 et aujourd'hui.
+              </div>
             </div>
           </div>
-
-          <!-- Spécialité -->
-          <div>
+            <div>
             <label for="specialite" class="block mb-2 text-sm font-medium text-gray-700">Spécialité <span class="text-red-500">*</span></label>
             <select
               id="specialite"
@@ -245,13 +268,17 @@
             <div class="relative">
               <input
                 id="password"
-                type="password"
+                [type]="showPassword ? 'text' : 'password'"
                 formControlName="password"
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600 pr-10"
                 placeholder="••••••••"
               >
-              <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800">
-                <i class="fas fa-eye"></i>
+              <button
+                type="button"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800"
+                (click)="showPassword = !showPassword"
+              >
+                <i class="fas" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
               </button>
             </div>
             <div *ngIf="expertForm.get('password')?.invalid && expertForm.get('password')?.touched" class="text-red-500 text-xs mt-1">
@@ -270,13 +297,17 @@
             <div class="relative">
               <input
                 id="confirmPassword"
-                type="password"
+                [type]="showConfirmPassword ? 'text' : 'password'"
                 formControlName="confirmPassword"
                 class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2.5 transition-all hover:border-teal-600 pr-10"
                 placeholder="••••••••"
               >
-              <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800">
-                <i class="fas fa-eye"></i>
+              <button
+                type="button"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-teal-800"
+                (click)="showConfirmPassword = !showConfirmPassword"
+              >
+                <i class="fas" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
               </button>
             </div>
             <div *ngIf="expertForm.get('confirmPassword')?.invalid && expertForm.get('confirmPassword')?.touched" class="text-red-500 text-xs mt-1">
@@ -297,7 +328,7 @@
         </button>
         <button
           type="submit"
-          [disabled]="expertForm.invalid"
+          [disabled]="expertForm.invalid || emailExists || cinExists"
           class="py-2.5 px-6 bg-teal-800 text-white rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
         >
           <i class="fas fa-user-plus mr-2"></i>

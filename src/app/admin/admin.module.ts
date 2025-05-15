@@ -13,6 +13,7 @@ import { AgentServiceFormComponent } from './agent-service-form/agent-service-fo
 import {  ListExpertComponent } from './expert-list/expert-list.component';
 import { ListAgentServiceComponent } from './list-agent-service/list-agent-service.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
+import { PublierComponent } from './publier/publier.component';
 
 
 @NgModule({
@@ -26,6 +27,7 @@ import { ChangePasswordComponent } from './change-password/change-password.compo
     ListExpertComponent,
     ListAgentServiceComponent,
     ChangePasswordComponent,
+    PublierComponent,
   ],
   imports: [
     FormsModule,

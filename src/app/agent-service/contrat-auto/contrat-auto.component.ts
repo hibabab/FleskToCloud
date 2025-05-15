@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators }
 import { Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { ContratAutoService } from '../../assure/services/contratauto.service';
 export enum TypeGaranties {
   ResponsabiliteCivile = 'ResponsabiliteCivile',
   RTI = 'RTI',
@@ -44,7 +45,9 @@ interface ContratAutoDto {
   templateUrl: './contrat-auto.component.html',
   styleUrls: ['./contrat-auto.component.css']
 })
-export class ContratAutoComponent  {
+export class ContratAutoComponent  implements OnInit {
+  private apiUrl = 'http://localhost:3000/template-garanties';
+  garantiesFixes: any[] = [];
   currentStep = 1;
   Cin = '';
   cinError = '';
@@ -55,6 +58,7 @@ export class ContratAutoComponent  {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
+     private contratService: ContratAutoService,
     private router: Router
   ) {
     this.insuranceForm = this.fb.group({
@@ -85,21 +89,35 @@ export class ContratAutoComponent  {
   validationErrors: string[] = [];
 
 
-  // private loadTemplateGaranties(): void {
-  //   this.http.get<any[]>('http://localhost:3000/contrat-auto-geteway/template-garanties')
-  //     .subscribe({
-  //       next: (garanties) => {
-  //         this.templateGaranties = garanties.map(g => ({
-  //           ...g,
-  //           capital: g.capital ? this.roundToThreeDecimals(g.capital) : undefined,
-  //           cotisationNette: g.cotisationNette ? this.roundToThreeDecimals(g.cotisationNette) : undefined
-  //         }));
-  //       },
-  //       error: (err) => {
-  //         console.error('Erreur lors du chargement des garanties fixes:', err);
-  //       }
-  //     });
-  // }
+   ngOnInit(): void {
+      this.loadGarantiesFixes();
+    }
+
+    loadGarantiesFixes(): void {
+      this.http.get<any[]>(this.apiUrl).subscribe(
+        (garanties) => {
+          this.garantiesFixes = garanties;
+        },
+        (error) => {
+          console.error('Erreur lors du chargement des garanties fixes', error);
+          this.garantiesFixes = this.getDefaultGaranties();
+        }
+      );
+    }
+    private getDefaultGaranties(): any[] {
+      return [
+        { type: TypeGaranties.RTI, cotisationNette: 0 },
+        { type: TypeGaranties.DefenseEtRecours, capital: 1000, cotisationNette: 50.0 },
+        { type: TypeGaranties.PersonneTransportees, capital: 5000, cotisationNette: 50.0 },
+        { type: TypeGaranties.AssistanceAutomobile, cotisationNette: 71.5 },
+        { type: TypeGaranties.IndividuelAccidentConducteur, capital: 20000, cotisationNette: 25.0 },
+        { type: TypeGaranties.EVENEMENTCLIMATIQUE, cotisationNette: 25.0 },
+        { type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE, cotisationNette: 25.0 }
+      ];
+    }
+    getGarantieFixByType(type: TypeGaranties): any {
+      return this.garantiesFixes.find(g => g.type === type);
+    }
 
   private roundToThreeDecimals(value: number): number {
     return parseFloat(value.toFixed(3));
@@ -280,220 +298,114 @@ verifyCin(): void {
     return this.templateGaranties.find(g => g.type === type) || {};
   }
 
-  calculateGaranties(packChoisi: string, vehiculeData: any, bonusMalus: number): any[] {
-    const garanties = [];
-    const valeurNeuf = this.roundToThreeDecimals(vehiculeData.valeurNeuf);
-    const puissance = vehiculeData.puissance;
-    const responsabiliteCivile = this.calculateResponsabiliteCivile(vehiculeData.type, bonusMalus, puissance);
+  calculateGaranties(packChoisi: string, formulaireEtape1: any, bonusMalus: number): any[] {
+     const garanties: any[] = [];
+     const valeurNeuf = formulaireEtape1.valeurNeuf;
+     const puissance = formulaireEtape1.puissance;
+     const responsabiliteCivile = this.calculateResponsabiliteCivile(formulaireEtape1.type, bonusMalus,puissance);
+     const rti = this.getGarantieFixByType(TypeGaranties.RTI);
+     const defenseRecours = this.getGarantieFixByType(TypeGaranties.DefenseEtRecours);
+     const personneTransportees = this.getGarantieFixByType(TypeGaranties.PersonneTransportees);
+     const assistanceAuto = this.getGarantieFixByType(TypeGaranties.AssistanceAutomobile);
+     const iac = this.getGarantieFixByType(TypeGaranties.IndividuelAccidentConducteur);
+     const evenementClimatique = this.getGarantieFixByType(TypeGaranties.EVENEMENTCLIMATIQUE);
+     const grevesEmeutes = this.getGarantieFixByType(TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE);
+     if (packChoisi === 'Pack1') {
+       garanties.push({
+         type: TypeGaranties.ResponsabiliteCivile,
+         cotisationNette: responsabiliteCivile
+       });
+       if (rti) garanties.push(rti);
+       if (defenseRecours) garanties.push(defenseRecours);
+       garanties.push({
+         type: TypeGaranties.Incendie,
+         capital: valeurNeuf,
+         cotisationNette: Math.round((valeurNeuf / 220.115) * 1000) / 1000
+       });
+       garanties.push({
+         type: TypeGaranties.Vol,
+         capital: valeurNeuf,
+         cotisationNette:  Math.round((valeurNeuf / 336.446)* 1000) / 1000
+       });
+       if (personneTransportees) garanties.push(personneTransportees);
+       garanties.push({
+         type: TypeGaranties.BrisDeGlaces,
+         capital: valeurNeuf <= 30000 ? 500 : 600,
+         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
+       });
+       if (assistanceAuto) garanties.push(assistanceAuto);
+       if (iac) garanties.push(iac);
 
-    if (packChoisi === 'Pack1') {
-      garanties.push({
-        type: TypeGaranties.ResponsabiliteCivile,
-        cotisationNette: responsabiliteCivile
-      });
+     } else if (packChoisi === 'Pack2') {
+       garanties.push({
+         type: TypeGaranties.ResponsabiliteCivile,
+         cotisationNette: responsabiliteCivile
+       });
 
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0.000
-      });
+         if (rti) garanties.push(rti);
+       if (defenseRecours) garanties.push(defenseRecours);
+       garanties.push({
+         type: TypeGaranties.Incendie,
+         capital: valeurNeuf,
+         cotisationNette:Math.round(( valeurNeuf / 220.115)* 1000) / 1000
+       });
+       garanties.push({
+         type: TypeGaranties.Vol,
+         capital: valeurNeuf,
+         cotisationNette:Math.round(( valeurNeuf / 336.446)* 1000) / 1000
+       });
+       if (personneTransportees) garanties.push(personneTransportees);
+       garanties.push({
+         type: TypeGaranties.BrisDeGlaces,
+         capital: valeurNeuf <= 30000 ? 500 : 600,
+         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
+       });
+       if (assistanceAuto) garanties.push(assistanceAuto);
+       if (iac) garanties.push(iac);
+       if (evenementClimatique) garanties.push(evenementClimatique);
+       if (grevesEmeutes) garanties.push(grevesEmeutes);
+       garanties.push({
+         type: TypeGaranties.DOMMAGEETCOLLIDION,
+         capital: valeurNeuf,
+         cotisationNette: valeurNeuf * 0.05
+       });
+     } else if (packChoisi === 'Pack3') {
+       if (rti) garanties.push(rti);
+       if (defenseRecours) garanties.push(defenseRecours);
+       garanties.push({
+         type: TypeGaranties.Incendie,
+         capital: valeurNeuf,
+         cotisationNette:Math.round(( valeurNeuf / 220.115)* 1000) / 1000
+       });
+       garanties.push({
+         type: TypeGaranties.Vol,
+         capital: valeurNeuf,
+         cotisationNette:Math.round(( valeurNeuf / 336.446)* 1000) / 1000
+       });
+       if (personneTransportees) garanties.push(personneTransportees);
+       garanties.push({
+         type: TypeGaranties.BrisDeGlaces,
+         capital: valeurNeuf <= 30000 ? 500 : 600,
+         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
+       });
+       if (assistanceAuto) garanties.push(assistanceAuto);
+       if (iac) garanties.push(iac);
+       if (evenementClimatique) garanties.push(evenementClimatique);
+       if (grevesEmeutes) garanties.push(grevesEmeutes);
+       garanties.push({
+         type: TypeGaranties.Tierce,
+         capital: valeurNeuf,
+         franchise: 0.2,
+         cotisationNette: valeurNeuf * 0.02
+       });
+       garanties.push({
+         type: TypeGaranties.ResponsabiliteCivile,
+         cotisationNette: responsabiliteCivile
+       });
+     }
 
-      const defenseEtRecours = this.getGarantieFromTemplate(TypeGaranties.DefenseEtRecours);
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: defenseEtRecours.capital || 1000.000,
-        cotisationNette: defenseEtRecours.cotisationNette || 50.000
-      });
-
-      garanties.push({
-        type: TypeGaranties.Incendie,
-        capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf / 220.115)
-      });
-
-      garanties.push({
-        type: TypeGaranties.Vol,
-        capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf / 336.446)
-      });
-
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000.000,
-        cotisationNette: 50.000
-      });
-
-      const brisGlacesCapital = this.roundToThreeDecimals(valeurNeuf <= 30000 ? 500.000 : 600.000);
-      garanties.push({
-        type: TypeGaranties.BrisDeGlaces,
-        capital: brisGlacesCapital,
-        cotisationNette: this.roundToThreeDecimals(brisGlacesCapital * 0.075)
-      });
-
-      const assistanceAuto = this.getGarantieFromTemplate(TypeGaranties.AssistanceAutomobile);
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: assistanceAuto.cotisationNette || 71.500
-      });
-
-      const accidentConducteur = this.getGarantieFromTemplate(TypeGaranties.IndividuelAccidentConducteur);
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: accidentConducteur.capital || 20000.000,
-        cotisationNette: accidentConducteur.cotisationNette || 25.000
-      });
-    }
-    else if (packChoisi === 'Pack2') {
-      garanties.push({
-        type: TypeGaranties.ResponsabiliteCivile,
-        cotisationNette: responsabiliteCivile
-      });
-
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0.000
-      });
-
-      const defenseEtRecours = this.getGarantieFromTemplate(TypeGaranties.DefenseEtRecours);
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: defenseEtRecours.capital || 1000.000,
-        cotisationNette: defenseEtRecours.cotisationNette || 50.000
-      });
-
-      garanties.push({
-        type: TypeGaranties.Incendie,
-        capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf / 220.115)
-      });
-
-      garanties.push({
-        type: TypeGaranties.Vol,
-        capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf / 336.446)
-      });
-
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000.000,
-        cotisationNette: 50.000
-      });
-
-      const brisGlacesCapital = this.roundToThreeDecimals(valeurNeuf <= 30000 ? 500.000 : 600.000);
-      garanties.push({
-        type: TypeGaranties.BrisDeGlaces,
-        capital: brisGlacesCapital,
-        cotisationNette: this.roundToThreeDecimals(brisGlacesCapital * 0.075)
-      });
-
-      const assistanceAuto = this.getGarantieFromTemplate(TypeGaranties.AssistanceAutomobile);
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: assistanceAuto.cotisationNette || 71.500
-      });
-
-      const accidentConducteur = this.getGarantieFromTemplate(TypeGaranties.IndividuelAccidentConducteur);
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: accidentConducteur.capital || 20000.000,
-        cotisationNette: accidentConducteur.cotisationNette || 25.000
-      });
-
-      const evenementClimatique = this.getGarantieFromTemplate(TypeGaranties.EVENEMENTCLIMATIQUE);
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: evenementClimatique.cotisationNette || 25.000
-      });
-
-      const grevesEmeutes = this.getGarantieFromTemplate(TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE);
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: grevesEmeutes.cotisationNette || 25.000
-      });
-
-      garanties.push({
-        type: TypeGaranties.DOMMAGEETCOLLIDION,
-        capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf * 0.05)
-      });
-    }
-    else if (packChoisi === 'Pack3') {
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0.000
-      });
-
-      const defenseEtRecours = this.getGarantieFromTemplate(TypeGaranties.DefenseEtRecours);
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: defenseEtRecours.capital || 1000.000,
-        cotisationNette: defenseEtRecours.cotisationNette || 50.000
-      });
-
-      garanties.push({
-        type: TypeGaranties.Incendie,
-        capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf / 220.115)
-      });
-
-      garanties.push({
-        type: TypeGaranties.Vol,
-        capital: valeurNeuf,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf / 336.446)
-      });
-
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000.000,
-        cotisationNette: 50.000
-      });
-
-      const brisGlacesCapital = this.roundToThreeDecimals(valeurNeuf <= 30000 ? 500.000 : 600.000);
-      garanties.push({
-        type: TypeGaranties.BrisDeGlaces,
-        capital: brisGlacesCapital,
-        cotisationNette: this.roundToThreeDecimals(brisGlacesCapital * 0.075)
-      });
-
-      const assistanceAuto = this.getGarantieFromTemplate(TypeGaranties.AssistanceAutomobile);
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: assistanceAuto.cotisationNette || 71.500
-      });
-
-      const accidentConducteur = this.getGarantieFromTemplate(TypeGaranties.IndividuelAccidentConducteur);
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: accidentConducteur.capital || 20000.000,
-        cotisationNette: accidentConducteur.cotisationNette || 25.000
-      });
-
-      const evenementClimatique = this.getGarantieFromTemplate(TypeGaranties.EVENEMENTCLIMATIQUE);
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: evenementClimatique.cotisationNette || 25.000
-      });
-
-      const grevesEmeutes = this.getGarantieFromTemplate(TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE);
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: grevesEmeutes.cotisationNette || 25.000
-      });
-
-      garanties.push({
-        type: TypeGaranties.Tierce,
-        capital: valeurNeuf,
-        franchise: 0.200,
-        cotisationNette: this.roundToThreeDecimals(valeurNeuf * 0.02)
-      });
-
-      garanties.push({
-        type: TypeGaranties.ResponsabiliteCivile,
-        cotisationNette: responsabiliteCivile
-      });
-    }
-
-    return garanties;
-  }
+     return garanties;
+   }
 
   prepareContratData(): any {
     const formValue = this.insuranceForm.value;

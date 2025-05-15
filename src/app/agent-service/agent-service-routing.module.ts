@@ -21,6 +21,7 @@ import { ListeAssureVieComponent } from './liste-assure-vie/liste-assure-vie.com
 import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/historique-contrat-vie-a.component';
 import { ResiliationComponent } from './resiliation/resiliation.component';
 import { AccountComponent } from './account/account.component';
+import { CreationCompteComponent } from './creation-compte/creation-compte.component';
 
 
 
@@ -34,7 +35,7 @@ const routes: Routes = [ { path: 'dashbort-agent', component: DashbortComponent 
   { path: 'CA', component: ContratAutoComponent },
   { path: 'historique', component: HistoriqueContratVieAComponent },
   { path: 'listAvie', component: ListeAssureVieComponent },
-  //{ path: 'compte', component: CreationCompteComponent},
+ { path: 'compte', component: CreationCompteComponent},
   { path: 'renouvellementCA', component: RenouvellementCAComponent},
   { path: 'semstrielCA', component: ContratAutoSemestrielComponent},
   { path: 'tousCA', component: ContratListComponent},

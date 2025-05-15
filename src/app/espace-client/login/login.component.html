@@ -1,102 +1,285 @@
-<section class="min-h-screen flex items-center justify-center p-4">
-  <!-- Conteneur principal -->
-  <div class="relative bg-white flex flex-col md:flex-row rounded-2xl shadow-lg max-w-4xl p-5 items-center w-full h-auto md:h-[85vh]">
-    <!-- Partie gauche : Formulaire -->
-    <div class="w-full md:w-1/2 px-4 md:px-16">
-      <!-- Logo et titre -->
-      <a routerLink="/" class="flex items-center mb-10 text-2xl font-semibold text-teal-800">
-        <i class="fas fa-umbrella w-8 h-8 mr-2 text-teal-800"></i>
-        Flesk Cover
-      </a>
-      <h2 class="font-semibold text-xl text-gray-700">Bienvenue chez Flesk Cover</h2>
-      <p class="text-gray-500 text-sm">Gérez vos contrats d'assurance auto et vie, constats et paiements en toute facilité</p>
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body >
+ <!-- Logo -->
 
-      <!-- Messages d'état -->
-      <div *ngIf="successMessage" class="mt-4 p-3 bg-green-100 text-green-700 rounded-lg">
-        {{ successMessage }}
-      </div>
-      <div *ngIf="errorMessage" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg">
-        {{ errorMessage }}
+
+ <div class="  w-full flex flex-col">
+  <!-- Première barre de navigation -->
+  <nav class="w-full bg-gradient-to-r from-teal-900 to-teal-700 text-white p-3 flex items-center justify-between">
+    <!-- Onglets -->
+    <div class="flex space-x-1 ml-20 items-center">
+      <!-- Icône d'étoile blanche -->
+      <i class="fas fa-star text-white w-6 h-4"></i>
+      <p class=" text-white text-lg font-semibold">Roulez sereinement, vivez pleinement</p>
+      <i class="fas fa-star text-white w-6 h-4"></i>
+    </div>
+
+
+
+    <!-- Recherche et Menu -->
+    <div class="flex items-center mr-25 space-x-8">
+
+
+        <!-- Menu déroulant -->
+        <div class="relative group">
+          <button [routerLink]="['/accueil', 'about']" class="font-semibold">
+            Qui nous sommes ?
+          </button>
+
+
+        </div>
+
+        <a [routerLink]="['/espace-client/login']" class="bg-teal-500 text-white font-bold px-4 py-2 rounded-lg">
+          Connexion
+        </a>
+
+
+    </div>
+</nav>
+  <!-- Ligne de séparation entre les deux menus -->
+  <div class="hidden  border-t  border-gray-300 mx-10"></div>
+  <nav class="bg-gray-100 shadow-md p-4">
+    <div class="container mx-auto flex items-center justify-between"> <!-- Ajustement avec justify-between pour espacer -->
+      <!-- Logo -->
+      <div class="flex items-center gap-4 cursor-pointer" [routerLink]="['/accueil']">
+        <img src="\assets\images\logoFC.png" alt="STAR Assurances" class="h-20 w-auto" />
       </div>
 
-      <!-- Formulaire de connexion -->
-      <form #loginForm="ngForm" (ngSubmit)="onSubmit()" class="space-y-5 mt-6">
+
+    <!-- Menu -->
+    <ul class="flex space-x-6 text-gray-500 mt-2">
+      <!-- Menu Item: Assurance Vie Emprunteur -->
+
+
+      <!-- Menu Item: Ma voiture -->
+      <li class="relative group">
+        <a href="#" class="text-teal-800 font-semibold hover:text-teal-600 transition-colors px-2 py-1 rounded">Ma voiture</a>
+
+        <!-- Dropdown Menu for Ma voiture -->
+        <div class="absolute left-0 mt-2 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="p-6 bg-white shadow-lg rounded-lg w-[750px]">
+            <div class="flex items-center">
+              <div class="flex-1 pr-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de voiture -->
+                  <i class="fas fa-car w-6 h-6 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">
+                    <a [routerLink]="['/accueil/auto']" class="hover:underline">Nos produits</a>
+                  </h2>
+                </div>
+                <p class="text-sm text-gray-600">La solution d'assurance auto idéale pour une sécurité optimale !</p>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Démarches -->
+              <div class="flex-1 px-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de voiture -->
+                  <i class="fas fa-car-crash w-5 h-5 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">Démarches</h2>
+                </div>
+                <p class="text-sm text-gray-600">Constat amiable d'accident automobile</p>
+                <a href="#" class="text-teal-600 hover:text-teal-800 text-sm font-medium mt-2 inline-block">
+                  En savoir plus
+                  <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Devis - Améliorée et plus claire -->
+              <div class="flex-1 pl-6">
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-3">
+                    <!-- Icône de calculatrice -->
+                    <i class="fas fa-calculator w-6 h-6 text-teal-800"></i>
+                    <h2 class="text-lg font-semibold text-teal-800">Devis auto</h2>
+                  </div>
+                  <p class="text-sm text-gray-600 mb-3">Calculez le prix de votre assurance auto en quelques clics</p>
+                  <a [routerLink]="['/contrat', 'devi']" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded-md transition-colors inline-flex items-center justify-center">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Demander un devis
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="relative group">
+        <a href="#" class="text-teal-800 font-semibold hover:text-teal-600 transition-colors px-2 py-1 rounded">Assurance Emprunteur</a>
+
+        <!-- Dropdown Menu for Assurance Vie Emprunteur -->
+        <div class="absolute left-0 mt-2 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="p-6 bg-white shadow-lg rounded-lg w-[750px]">
+            <div class="flex items-center">
+              <div class="flex-1 pr-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône de protection -->
+                  <i class="fas fa-shield-alt w-6 h-6 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">
+                    <a [routerLink]="['/accueil/vie-emprunteur']" class="hover:underline">Nos garanties</a>
+                  </h2>
+                </div>
+                <p class="text-sm text-gray-600">Protégez votre crédit et vos proches avec notre assurance emprunteur</p>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Avantages -->
+              <div class="flex-1 px-6">
+                <div class="flex items-center gap-2 mb-3">
+                  <!-- Icône d'avantages -->
+                  <i class="fas fa-star w-5 h-5 text-teal-800"></i>
+                  <h2 class="text-lg font-semibold text-teal-800">Avantages</h2>
+                </div>
+                <ul class="text-sm text-gray-600 list-disc pl-5">
+                  <li>Couverture décès et invalidité</li>
+                  <li>Tarifs compétitifs</li>
+                  <li>Protection de vos proches</li>
+                </ul>
+              </div>
+
+              <!-- Ligne verticale -->
+              <div class="border-r-2 border-gray-300 h-24"></div>
+
+              <!-- Section Devis - Améliorée et plus claire -->
+              <div class="flex-1 pl-6">
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-2 mb-3">
+                    <!-- Icône de calculatrice -->
+                    <i class="fas fa-calculator w-6 h-6 text-teal-800"></i>
+                    <h2 class="text-lg font-semibold text-teal-800">Devis en ligne</h2>
+                  </div>
+                  <p class="text-sm text-gray-600 mb-3">Obtenez votre tarif personnalisé en 2 minutes</p>
+                  <a
+                  [routerLink]="['/accueil', 'devisvie']" class="bg-teal-600 hover:bg-teal-700 text-white font-medium px-4 py-2 rounded-md transition-colors inline-flex items-center justify-center">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Obtenir un devis
+                  </a>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+      <!-- Contact Info -->
+      <div class="flex items-center space-x-6 mr-10 text-gray-500">
+        <!-- Téléphone -->
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-phone-alt text-teal-800"></i>
+          <span class="text-sm text-gray-700">+216 25 206 488</span>
+        </div>
+
         <!-- Email -->
-        <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            [(ngModel)]="user.email"
-            #email="ngModel"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:shadow-lg"
-            placeholder="Entrez votre email"
-            required
-            email
-            [disabled]="isLoading"
-          />
-          <div class="text-red-500 text-sm mt-1" *ngIf="email.touched && email.invalid">
-            <div *ngIf="email.errors?.['required']">L'email est requis.</div>
-            <div *ngIf="email.errors?.['email']">Veuillez saisir un email valide.</div>
-          </div>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-envelope text-teal-800"></i>
+          <span class="text-sm text-gray-700">contact&#64;fleskcover.com</span>
         </div>
-
-        <!-- Mot de passe -->
-        <div>
-          <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Mot de passe</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            [(ngModel)]="user.password"
-            #password="ngModel"
-            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2"
-            placeholder="Au moins 8 caractères"
-            required
-            minlength="8"
-            [disabled]="isLoading"
-          />
-          <div class="text-red-500 text-sm mt-1" *ngIf="password.touched && password.invalid">
-            <div *ngIf="password.errors?.['required']">Le mot de passe est requis.</div>
-            <div *ngIf="password.errors?.['minlength']">Le mot de passe doit contenir au moins 8 caractères.</div>
-          </div>
-        </div>
-
-        <!-- Options supplémentaires -->
-        <div class="flex items-center justify-between">
-          <a routerLink="/espace-client/forgot-password" class="text-sm font-medium text-teal-800 hover:underline">Mot de passe oublié ?</a>
-        </div>
-
-        <!-- Bouton de connexion -->
-        <button
-          type="submit"
-          [disabled]="loginForm.invalid || isLoading"
-          class="w-full text-white bg-teal-800 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          <span *ngIf="!isLoading">Se connecter</span>
-          <span *ngIf="isLoading">
-            <i class="fas fa-spinner fa-spin mr-2"></i> Connexion en cours...
-          </span>
-        </button>
-
-        <!-- Lien inscription -->
-        <p class="text-sm font-light text-gray-500 mt-4">
-          Pas encore de compte ? <a routerLink="/espace-client/register" class="font-medium text-teal-800 hover:underline">Créer un compte</a>
-        </p>
-      </form>
-    </div>
-
-    <!-- Partie droite : Image -->
-    <div class="relative hidden md:block md:w-1/2 h-full">
-      <div class="absolute inset-0 bg-gradient-to-t from-teal-800 to-transparent opacity-75 rounded-2xl"></div>
-      <img src="assets/images/image_assurance.jpg" alt="Image Assurance" class="object-cover w-full h-full rounded-2xl">
-      <div class="absolute bottom-0 left-0 p-6 text-white">
-        <h2 class="text-2xl font-bold">Roulez sereinement, vivez pleinement</h2>
-        <p class="mt-2 text-sm">
-          La protection de vos biens et de vos proches en toute sérénité. Gérez vos assurances en toute simplicité avec Flesk Cover.
-        </p>
       </div>
     </div>
-  </div>
-</section>
+  </nav>
+
+<section class="min-h-screen flex items-center justify-center p-4">
+    <!-- Conteneur principal -->
+    <div class="relative bg-white flex flex-col md:flex-row rounded-2xl shadow-lg max-w-4xl p-5 items-center w-full h-auto md:h-[85vh]">
+      <!-- Partie gauche : Formulaire -->
+      <div class="w-full md:w-1/2 px-4 md:px-16">
+        <!-- Logo et titre -->
+        <a routerLink="/" class="flex items-center mb-10 text-2xl font-semibold text-teal-800">
+          <i class="fas fa-umbrella w-8 h-8 mr-2 text-teal-800"></i>
+          Flesk Cover
+        </a>
+        <h2 class="font-semibold text-xl text-gray-700">Bienvenue chez Flesk Cover</h2>
+        <p class="text-gray-500 text-sm">Gérez vos contrats d'assurance auto et vie, constats et paiements en toute  facilité</p>
+
+        <!-- Formulaire de connexion -->
+        <form #loginForm="ngForm" (ngSubmit)="onSubmit()" class="space-y-5 mt-6">
+          <!-- Email -->
+          <div>
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              [(ngModel)]="user.email"
+              #email="ngModel"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2 hover:shadow-lg"
+              placeholder="Entrez votre email"
+              required
+            />
+            <div class="text-red-500 text-sm mt-1" *ngIf="email.touched && email.invalid">
+              <div *ngIf="email.errors?.['required']">L'email est requis.</div>
+              <div *ngIf="email.errors?.['pattern']">Veuillez saisir un email valide.</div>
+            </div>
+          </div>
+
+          <!-- Mot de passe -->
+          <div>
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Mot de passe</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              [(ngModel)]="user.password"
+              #password="ngModel"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-teal-800 focus:border-teal-800 block w-full p-2"
+              placeholder="Au moins 8 caractères"
+              required
+            />
+            <div class="text-red-500 text-sm mt-1" *ngIf="password.touched && password.invalid">
+              <div *ngIf="password.errors?.['required']">Le mot de passe est requis.</div>
+              <div *ngIf="password.errors?.['minlength']">Le mot de passe doit contenir au moins 8 caractères.</div>
+            </div>
+          </div>
+
+          <!-- Options supplémentaires -->
+          <div class="flex items-center justify-between">
+
+            <a routerLink="/espace-client/forgot-password" class="text-sm font-medium text-teal-800 hover:underline">Mot de passe oublié ?</a>
+          </div>
+
+          <!-- Bouton de connexion -->
+          <button
+            type="submit"
+            [disabled]="loginForm.invalid"
+            class="w-full text-white bg-teal-800 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            Se connecter
+          </button>
+
+          <!-- Lien inscription -->
+          <p class="text-sm font-light text-gray-500 mt-4">
+            Pas encore de compte ? <a routerLink="/espace-client/register" class="font-medium text-teal-800 hover:underline">Créer un compte</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Partie droite : Image -->
+      <div class="relative hidden md:block md:w-1/2 h-full">
+        <div class="absolute inset-0 bg-gradient-to-t from-teal-800 to-transparent opacity-75 rounded-2xl"></div>
+        <img src="assets/images/image_assurance.jpg" alt="Image Assurance" class="object-cover w-full h-full rounded-2xl">
+        <div class="absolute bottom-0 left-0 p-6 text-white">
+          <h2 class="text-2xl font-bold">Roulez sereinement, vivez pleinement</h2>
+          <p class="mt-2 text-sm">
+            La protection de vos biens et de vos proches en toute sérénité. Gérez vos assurances en toute simplicité avec Flesk Cover.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>

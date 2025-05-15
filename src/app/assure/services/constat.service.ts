@@ -11,7 +11,7 @@ export class ConstatService {
   private apiUrl = 'http://localhost:3000'; // L'URL de base de l'API
 
   constructor(private http: HttpClient) {}
-  
+
   getAllConstats(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/constat/get_all_constats`).pipe(
       tap(constats => console.log('📄 Constats chargés:', constats.length)),
@@ -63,7 +63,7 @@ createConstat(immatriculation: string, formData: FormData): Observable<any> {
 uploadConstatPDF(constatId: number, file: Blob): Observable<any> {
   const formData = new FormData();
   formData.append('file', file, 'constat.pdf');
-  
+
   return this.http.post(
     `${this.apiUrl}/constat/upload-constat-file/${constatId}`,
     formData

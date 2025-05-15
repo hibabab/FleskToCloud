@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -23,8 +24,9 @@ export enum TypeGaranties {
   templateUrl: './devis-ca.component.html',
   styleUrl: './devis-ca.component.css'
 })
-export class DevisCAComponent {
-
+export class DevisCAComponent implements OnInit {
+  private apiUrl = 'http://localhost:3000/template-garanties';
+  garantiesFixes: any[] = [];
   etape: number = 1;
   formulaireEtape1: FormGroup;
   formulaireEtape2: FormGroup;
@@ -34,7 +36,7 @@ export class DevisCAComponent {
     'Pack Essentille', 'Tous les risques', 'Pack dommage et Collision'];
   cotisationNette: number = 0;
   cotisationTotale: number = 0;
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder,private http: HttpClient ) {
     this.formulaireEtape1 = this.fb.group({
       type: ['', Validators.required],
       valeurNeuf: ['', Validators.required],
@@ -56,10 +58,46 @@ export class DevisCAComponent {
       prenom: ['', Validators.required],
       adresse: ['', Validators.required],
       codePostal: ['', Validators.required],
-      tel: ['', Validators.required],
-      CIN:['', Validators.required]
+      tel: ['', [
+    Validators.required,
+    Validators.pattern(/^[2-5,9]\d{7}$/)
+  ]],
+  CIN: ['', [
+    Validators.required,
+    Validators.pattern(/^\d{8}$/)
+  ]]
     });
   }
+  ngOnInit(): void {
+    this.loadGarantiesFixes();
+  }
+
+  loadGarantiesFixes(): void {
+    this.http.get<any[]>(this.apiUrl).subscribe(
+      (garanties) => {
+        this.garantiesFixes = garanties;
+      },
+      (error) => {
+        console.error('Erreur lors du chargement des garanties fixes', error);
+        this.garantiesFixes = this.getDefaultGaranties();
+      }
+    );
+  }
+  private getDefaultGaranties(): any[] {
+    return [
+      { type: TypeGaranties.RTI, cotisationNette: 0 },
+      { type: TypeGaranties.DefenseEtRecours, capital: 1000, cotisationNette: 50.0 },
+      { type: TypeGaranties.PersonneTransportees, capital: 5000, cotisationNette: 50.0 },
+      { type: TypeGaranties.AssistanceAutomobile, cotisationNette: 71.5 },
+      { type: TypeGaranties.IndividuelAccidentConducteur, capital: 20000, cotisationNette: 25.0 },
+      { type: TypeGaranties.EVENEMENTCLIMATIQUE, cotisationNette: 25.0 },
+      { type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE, cotisationNette: 25.0 }
+    ];
+  }
+  getGarantieFixByType(type: TypeGaranties): any {
+    return this.garantiesFixes.find(g => g.type === type);
+  }
+
    validateImmatriculation(control: AbstractControl): {[key: string]: any} | null {
       const pattern = /^\d{1,4}TU\d{1,3}$/i;
 
@@ -190,20 +228,20 @@ export class DevisCAComponent {
     const valeurNeuf = formulaireEtape1.valeurNeuf;
     const puissance = formulaireEtape1.puissance;
     const responsabiliteCivile = this.calculateResponsabiliteCivile(formulaireEtape1.type, bonusMalus,puissance);
+    const rti = this.getGarantieFixByType(TypeGaranties.RTI);
+    const defenseRecours = this.getGarantieFixByType(TypeGaranties.DefenseEtRecours);
+    const personneTransportees = this.getGarantieFixByType(TypeGaranties.PersonneTransportees);
+    const assistanceAuto = this.getGarantieFixByType(TypeGaranties.AssistanceAutomobile);
+    const iac = this.getGarantieFixByType(TypeGaranties.IndividuelAccidentConducteur);
+    const evenementClimatique = this.getGarantieFixByType(TypeGaranties.EVENEMENTCLIMATIQUE);
+    const grevesEmeutes = this.getGarantieFixByType(TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE);
     if (packChoisi === 'Pack Essentille') {
       garanties.push({
         type: TypeGaranties.ResponsabiliteCivile,
         cotisationNette: responsabiliteCivile
       });
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
+      if (rti) garanties.push(rti);
+      if (defenseRecours) garanties.push(defenseRecours);
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
@@ -214,39 +252,23 @@ export class DevisCAComponent {
         capital: valeurNeuf,
         cotisationNette:  Math.round((valeurNeuf / 336.446)* 1000) / 1000
       });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
+      if (personneTransportees) garanties.push(personneTransportees);
       garanties.push({
         type: TypeGaranties.BrisDeGlaces,
         capital: valeurNeuf <= 30000 ? 500 : 600,
         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
       });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
+      if (assistanceAuto) garanties.push(assistanceAuto);
+      if (iac) garanties.push(iac);
+
     } else if (packChoisi === 'Pack dommage et Collision') {
       garanties.push({
         type: TypeGaranties.ResponsabiliteCivile,
         cotisationNette: responsabiliteCivile
       });
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
+
+        if (rti) garanties.push(rti);
+      if (defenseRecours) garanties.push(defenseRecours);
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
@@ -257,48 +279,24 @@ export class DevisCAComponent {
         capital: valeurNeuf,
         cotisationNette:Math.round(( valeurNeuf / 336.446)* 1000) / 1000
       });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
+      if (personneTransportees) garanties.push(personneTransportees);
       garanties.push({
         type: TypeGaranties.BrisDeGlaces,
         capital: valeurNeuf <= 30000 ? 500 : 600,
         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
       });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: 25.0
-      });
+      if (assistanceAuto) garanties.push(assistanceAuto);
+      if (iac) garanties.push(iac);
+      if (evenementClimatique) garanties.push(evenementClimatique);
+      if (grevesEmeutes) garanties.push(grevesEmeutes);
       garanties.push({
         type: TypeGaranties.DOMMAGEETCOLLIDION,
         capital: valeurNeuf,
         cotisationNette: valeurNeuf * 0.05
       });
     } else if (packChoisi === 'Tous les risques') {
-      garanties.push({
-        type: TypeGaranties.RTI,
-        cotisationNette: 0
-      });
-      garanties.push({
-        type: TypeGaranties.DefenseEtRecours,
-        capital: 1000,
-        cotisationNette: 50.0
-      });
+      if (rti) garanties.push(rti);
+      if (defenseRecours) garanties.push(defenseRecours);
       garanties.push({
         type: TypeGaranties.Incendie,
         capital: valeurNeuf,
@@ -309,33 +307,16 @@ export class DevisCAComponent {
         capital: valeurNeuf,
         cotisationNette:Math.round(( valeurNeuf / 336.446)* 1000) / 1000
       });
-      garanties.push({
-        type: TypeGaranties.PersonneTransportees,
-        capital: 5000,
-        cotisationNette: 50.0
-      });
+      if (personneTransportees) garanties.push(personneTransportees);
       garanties.push({
         type: TypeGaranties.BrisDeGlaces,
         capital: valeurNeuf <= 30000 ? 500 : 600,
         cotisationNette: (valeurNeuf <= 30000 ? 500 : 600) / 100 * 7.5
       });
-      garanties.push({
-        type: TypeGaranties.AssistanceAutomobile,
-        cotisationNette: 71.5
-      });
-      garanties.push({
-        type: TypeGaranties.IndividuelAccidentConducteur,
-        capital: 20000,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.EVENEMENTCLIMATIQUE,
-        cotisationNette: 25.0
-      });
-      garanties.push({
-        type: TypeGaranties.GREVESEMEUTESETMOUVEMENTPOPULAIRE,
-        cotisationNette: 25.0
-      });
+      if (assistanceAuto) garanties.push(assistanceAuto);
+      if (iac) garanties.push(iac);
+      if (evenementClimatique) garanties.push(evenementClimatique);
+      if (grevesEmeutes) garanties.push(grevesEmeutes);
       garanties.push({
         type: TypeGaranties.Tierce,
         capital: valeurNeuf,

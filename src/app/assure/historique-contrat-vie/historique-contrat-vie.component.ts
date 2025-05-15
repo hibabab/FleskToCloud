@@ -73,7 +73,7 @@ export class HistoriqueContratVieComponent implements OnInit {
 
 
   searchContrats(): void {
-   
+
     this.isLoading = true;
     this.errorMessage = '';
     this.contrats = [];

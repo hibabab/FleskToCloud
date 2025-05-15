@@ -525,7 +525,7 @@ export class PaymentSuccessVieComponent implements OnInit, OnDestroy {
       const notificationResult = await firstValueFrom(
         this.notificationService.notifyAllUsers(
           message,
-          'pending' 
+          'pending'
         )
       );
 

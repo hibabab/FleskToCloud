@@ -42,8 +42,8 @@ export class UserService {
     });
 
     return this.http.put(
-      `${this.apiUrl1}/${id}/update`, 
-      userData, 
+      `${this.apiUrl1}/${id}/update`,
+      userData,
       { headers }
     );
   }
