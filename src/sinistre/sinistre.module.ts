@@ -26,10 +26,11 @@ import { ContratAuto } from 'src/assurance-auto/entities/ContratAuto.entity';
 import { NotificationEntity } from 'src/notification/entities/notification.entity';
 import { MailConstatService } from './services/mailconstat.service';
 import { ConstatController } from './Controller/sinistre.controller';
-import { UserService } from 'src/auth/services/user/user.service';
+
 import { SmsService } from 'src/notification/services/sms/sms.service';
 
 import { PhotoJustificatif } from './entities/photo.entity';
+import { UserService } from 'src/gestion-utilisateur/services/user/user.service';
 
 @Module({
   imports: [

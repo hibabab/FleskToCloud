@@ -36,6 +36,8 @@ export class constat {
 
   @Column({ type: 'boolean', default: false })
   degatMateriels: boolean;
+  @Column({ nullable: true })
+  circonstance: string;
 
   @OneToMany(() => Temoin, (temoin) => temoin.constat, { nullable: true })
   temoins?: Temoin[];

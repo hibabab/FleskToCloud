@@ -31,15 +31,17 @@ export class ConstatDto {
   blessees: boolean; // 📌 Y a-t-il des blessés ?
 
   @IsBoolean()
-  degatMateriels: boolean; // 📌 Y a-t-il des dégâts matériels ?
-
+  degatMateriels: boolean;
+  // 📌 Y a-t-il des dégâts matériels ?
+  @IsString()
+  circonstance: string;
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => TemoinDto)
   temoins: TemoinDto[];
   @IsOptional()
   @IsString()
-  fichier?: string;
+  pathurl?: string; // 🚨 Changement de 'fichier' à 'pathurl'
   @IsOptional() // 📌 Conducteur peut être null
   @ValidateNested()
   @Type(() => ConducteurDto)

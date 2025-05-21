@@ -54,6 +54,7 @@ export class ConstatService {
   ): Promise<constat> {
     try {
       // Find vehicle by immatriculation
+       console.log('pathurl dans DTO:', constatDto.pathurl);
       const vehicule =
         await this.VehiculeService.findByImmatriculation(immatriculation);
 
@@ -90,18 +91,18 @@ export class ConstatService {
 
       // Exclude photos from the DTO to avoid type issues
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { photos: _, ...constatData } = constatDto;
+     const { photos: _, ...constatDataWithPathUrl } = constatDto;
 
-      // Create new constat with all relationships
-      const newConstat = this.constatRepository.create({
-        ...constatData, // Spread remaining DTO data without photos
-        lieu,
-        conducteur,
-        temoins,
-        vehicule,
-        photos: photoEntities, // Assign photo entities
-      });
-
+// Création avec assignation explicite
+const newConstat = this.constatRepository.create({
+  ...constatDataWithPathUrl, // Contiendra pathurl
+  lieu,
+  conducteur,
+  temoins,
+  vehicule,
+  photos: photoEntities,
+  pathurl: constatDto.pathurl, // Assignation EXPLICITE
+});
       // Save the constat (cascades to save photos)
       const savedConstat = await this.constatRepository.save(newConstat);
 
@@ -337,7 +338,7 @@ export class ConstatService {
       );
     }
   }
-private async getConstatAvecRelations(id: number): Promise<constat> {
+async getConstatAvecRelations(id: number): Promise<constat> {
   const constat = await this.constatRepository.findOne({
     where: { idConstat: id },
     relations: [
@@ -348,6 +349,9 @@ private async getConstatAvecRelations(id: number): Promise<constat> {
       'expert',
       'expert.user',
       'agentService',
+      'temoins',
+      'photos',
+      'conducteur',
       'agentService.user',
     ],
   });

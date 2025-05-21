@@ -12,9 +12,10 @@ import { User } from './entities/user.entity';
 import { ResetToken } from './entities/ResetToken.entity';
 import { Adresse } from './entities/adresse.entity';
 import { Admin } from '../gestion-utilisateur/entities/admin.entity';
-import { UserService } from './services/user/user.service';
-import { UserGatewayController } from './controllers/user/user.controller';
+import { UserService } from 'src/gestion-utilisateur/services/user/user.service';
+
 import { RefreshToken } from './entities/refresh-token.entity';
+import { UserGatewayController } from 'src/gestion-utilisateur/controllers/user/user.controller';
 
 @Module({
   imports: [

@@ -41,12 +41,13 @@ export class VehiculeService {
     }
   }
 
-  // ➕ Ajouter un constat à un véhicule
+  // 🔗 Ajouter un constat à un véhicule
   async ajouterConstatAuVehicule(
     vehiculeId: number,
     constatId: number,
   ): Promise<Vehicule> {
     try {
+      // Rechercher le véhicule avec ses constats
       const vehicule = await this.vehiculeRepository.findOne({
         where: { id: vehiculeId },
         relations: ['constats'],
@@ -58,35 +59,37 @@ export class VehiculeService {
         );
       }
 
-      const cst = await this.constatRepository.findOne({
+      // Rechercher le constat
+      const constat = await this.constatRepository.findOne({
         where: { idConstat: constatId },
       });
 
-      if (!cst) {
+      if (!constat) {
         throw new NotFoundException(
           `Constat avec l'ID ${constatId} non trouvé`,
         );
       }
 
-      // Lier le constat au véhicule
-      cst.vehicule = vehicule;
-
-      // Sauvegarder la mise à jour du constat
-      await this.constatRepository.save(cst);
-
-      // Recharger le véhicule mis à jour avec les constats
-      const updatedVehicule = await this.vehiculeRepository.findOne({
-        where: { id: vehiculeId },
-        relations: ['constats'],
-      });
-
-      if (!updatedVehicule) {
-        throw new NotFoundException(
-          `Véhicule avec l'ID ${vehiculeId} non trouvé après mise à jour.`,
-        );
+      // Initialiser le tableau si nécessaire
+      if (!vehicule.constats) {
+        vehicule.constats = [];
       }
 
-      return updatedVehicule;
+      // Ajouter le constat s’il n’est pas déjà présent
+      const constatExists = vehicule.constats.some(
+        (existingConstat) => existingConstat.idConstat === constatId,
+      );
+
+      if (!constatExists) {
+        vehicule.constats.push(constat);
+      }
+
+      // Définir le véhicule dans le constat (relation bidirectionnelle)
+      constat.vehicule = vehicule;
+      await this.constatRepository.save(constat);
+
+      // Sauvegarder le véhicule mis à jour
+      return await this.vehiculeRepository.save(vehicule);
     } catch (error) {
       console.error(
         "❌ Erreur lors de l'ajout du constat au véhicule :",
