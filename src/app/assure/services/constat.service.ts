@@ -47,8 +47,6 @@ export class ConstatService {
     return throwError(() => new Error(errorMessage));
   }
 
-  // Mise à jour de la méthode d'upload pour corriger l'URL
- // Mettez à jour la méthode createConstat
 createConstat(immatriculation: string, formData: FormData): Observable<any> {
   return this.http.post(
     `${this.apiUrl}/constat/create-constat/${immatriculation}`,
@@ -58,18 +56,7 @@ createConstat(immatriculation: string, formData: FormData): Observable<any> {
     catchError(this.handleError)
   );
 }
-
-// Et la méthode uploadConstatPDF
-uploadConstatPDF(constatId: number, file: Blob): Observable<any> {
-  const formData = new FormData();
-  formData.append('file', file, 'constat.pdf');
-
-  return this.http.post(
-    `${this.apiUrl}/constat/upload-constat-file/${constatId}`,
-    formData
-  ).pipe(
-    tap(() => console.log('📤 PDF envoyé avec succès')),
-    catchError(this.handleError)
-  );
-}
+getConstatDetails(constatId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/constat/${constatId}`);
+  }
 }

@@ -32,6 +32,7 @@ import { DemandeSouscriptionVieComponent } from './demande-souscription-vie/dema
 import { HistoriqueContratVieComponent } from './historique-contrat-vie/historique-contrat-vie.component';
 import { ConstatListComponent } from './constat-list/constat-list.component';
 import { CarteGriseComponent } from './carte-grise/carte-grise.component';
+import { ConstatDetailsComponent } from './constat-details/constat-details.component';
 
 
 
@@ -63,6 +64,7 @@ import { CarteGriseComponent } from './carte-grise/carte-grise.component';
     HistoriqueContratVieComponent,
     ConstatListComponent,
     CarteGriseComponent,
+    ConstatDetailsComponent,
 
   ],
   imports: [

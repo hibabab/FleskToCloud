@@ -14,11 +14,16 @@ export class ConstatEnCoursComponent implements OnInit {
   showModal = false;
   selectedConstat: any = null;
   
-  // Form Fields
+  selectedConstatId: number | null = null;
+  showDetails = false;// Form Fields
   descriptionDommage = '';
   montantEstime: number | null = null;
   commentaire = '';
   fileToUpload: File | null = null;
+   closeDetails(): void {
+    this.showDetails = false;
+    this.selectedConstatId = null;
+  }
   
   // Validation
   formErrors = {
@@ -197,5 +202,15 @@ export class ConstatEnCoursComponent implements OnInit {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
     return null;
+  }
+  // Méthodes pour gérer les détails
+  viewDetails(constatId: number): void {
+    this.selectedConstatId = constatId;
+    this.showDetails = true;
+  }
+
+  hideConstatDetails(): void {
+    this.showDetails = false;
+    this.selectedConstatId = null;
   }
 }

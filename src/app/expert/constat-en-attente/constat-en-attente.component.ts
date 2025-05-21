@@ -209,4 +209,16 @@ export class ConstatEnAttenteComponent implements OnInit {
     if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
     return null;
   }
+  selectedConstatId: number | null = null;
+  showDetails = false;// Form Fields
+  // Méthodes pour gérer les détails
+  viewDetails(constatId: number): void {
+    this.selectedConstatId = constatId;
+    this.showDetails = true;
+  }
+
+  hideConstatDetails(): void {
+    this.showDetails = false;
+    this.selectedConstatId = null;
+  }
 }

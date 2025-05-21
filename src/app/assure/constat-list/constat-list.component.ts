@@ -37,19 +37,26 @@ export interface Constat {
     };
     specialite: string;
   };
+  conducteur?: any;
+  temoins?: any[];
+  photos?: any[];
 }
 
 @Component({
   selector: 'app-constat-list',
-  standalone:false,
+  standalone: false,
   templateUrl: './constat-list.component.html',
   styleUrls: ['./constat-list.component.css']
 })
 export class ConstatListComponent implements OnInit {
   constats: Constat[] = [];
   filteredConstats: Constat[] = [];
-  selectedStatus: ConstatStatut | 'Tous' = ConstatStatut.EN_ATTENTE;
+  selectedStatus: ConstatStatut | 'Tous' = 'Tous';
   showFilters = false;
+  
+  // Ajout pour les détails
+  selectedConstatId: number | null = null;
+  showDetails = false;
 
   statusFilters = [
     { key: 'Tous' as const, label: 'Tous les statuts' },
@@ -88,8 +95,8 @@ export class ConstatListComponent implements OnInit {
 
   filterByStatus(status: ConstatStatut | 'Tous'): void {
     this.selectedStatus = status;
-    this.filteredConstats = status === 'Tous' 
-      ? [...this.constats] 
+    this.filteredConstats = status === 'Tous'
+      ? [...this.constats]
       : this.constats.filter(c => c.statut === status);
     
     this.sortConstats();
@@ -118,7 +125,7 @@ export class ConstatListComponent implements OnInit {
   private fetchConstats(): void {
     const token = this.getCookie('access_token');
     if (!token) return;
-
+    
     try {
       const decoded = jwtDecode<{ sub: string }>(token);
       const userId = Number(decoded.sub);
@@ -126,12 +133,24 @@ export class ConstatListComponent implements OnInit {
       this.constatService.getConstatsByUser(userId).subscribe({
         next: (data) => {
           this.constats = data;
-          this.filterByStatus(ConstatStatut.EN_ATTENTE);
+          // Changer le statut par défaut pour afficher tous les constats
+          this.filterByStatus('Tous');
         },
         error: (err) => console.error('Erreur de récupération:', err)
       });
     } catch (error) {
       console.error('Erreur de décodage du token:', error);
     }
+  }
+
+  // Méthodes pour gérer les détails
+  viewDetails(constatId: number): void {
+    this.selectedConstatId = constatId;
+    this.showDetails = true;
+  }
+
+  hideConstatDetails(): void {
+    this.showDetails = false;
+    this.selectedConstatId = null;
   }
 }

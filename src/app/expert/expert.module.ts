@@ -12,6 +12,7 @@ import { ConstatTermineeComponent } from './constat-terminee/constat-terminee.co
 import { NotificationComponent } from './notification/notification.component';
 import { AccountComponent } from './account/account.component';
 import { AcceuilComponent } from './acceuil/acceuil.component';
+import { ConstatDetailsComponent } from './constat-details/constat-details.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { AcceuilComponent } from './acceuil/acceuil.component';
     ConstatTermineeComponent,
     NotificationComponent,
     AccountComponent,
-    AcceuilComponent
+    AcceuilComponent,
+    ConstatDetailsComponent
   ],
   imports: [
     CommonModule,

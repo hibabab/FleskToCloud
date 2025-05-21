@@ -36,6 +36,9 @@ export class ConstatListComponent implements OnInit {
     selectedStatut: string | null = null;
     statutOptions = Object.values(ConstatStatut);
     
+  selectedConstatId: number | null = null;
+  showDetails = false;
+    
     // Estimation data
     estimationData = {
       description: '',
@@ -245,4 +248,107 @@ export class ConstatListComponent implements OnInit {
         }
       });
     }
+     viewDetails(constatId: number): void {
+    this.selectedConstatId = constatId;
+    this.showDetails = true;
+  }
+
+  headers = [
+    'N° Police',
+    'Date',
+    'Adresse',
+    'Statut',
+    'Montant',
+    'Résumé',
+    'Détails',
+    'Action'
+  ];
+
+
+  // Typage explicite pour les statuts
+  statusStyles: Record<string, string> = {
+    'En attente': 'bg-amber-100 text-amber-800',
+    'Expert assigné': 'bg-blue-100 text-blue-800',
+    'Expertise en cours': 'bg-indigo-100 text-indigo-800',
+    'ESTIMÉ': 'bg-emerald-100 text-emerald-800',
+    'Clôturé': 'bg-gray-100 text-gray-800',
+    'default': 'bg-gray-100 text-gray-800'
+  };
+ hideConstatDetails(): void {
+    this.showDetails = false;
+    this.selectedConstatId = null;
+  }
+  statusIcons: Record<string, string> = {
+    'En attente': 'fas fa-clock',
+    'Expert assigné': 'fas fa-user-tie',
+    'Expertise en cours': 'fas fa-microscope',
+    'ESTIMÉ': 'fas fa-check-circle',
+    'Clôturé': 'fas fa-lock'
+  };
+  closeDetails(): void {
+    this.showDetails = false;
+    this.selectedConstatId = null;
+  }
+  // Variables pour les filtres, le tri et la sélection
+selectedSpecialite: string = '';
+searchCompetence: string = '';
+sortCriteria: string = 'competenceDesc'; // Tri par défaut
+
+filteredExperts: any[] = []; // Experts après filtrage et tri
+
+// Méthode pour filtrer et trier les experts
+filterExperts(): void {
+  // 1. Filtrage
+  this.filteredExperts = this.experts.filter(expert => {
+    // Filtre par spécialité
+    const matchSpecialite = !this.selectedSpecialite || 
+      expert.specialite === this.selectedSpecialite;
+    
+    // Filtre par mot-clé de compétence
+    const matchCompetence = !this.searchCompetence || 
+      (expert.competences && expert.competences.some((comp: string) => 
+        comp.toLowerCase().includes(this.searchCompetence.toLowerCase())
+      ));
+    
+    return matchSpecialite && matchCompetence;
+  });
+  
+  // 2. Tri
+  this.filteredExperts.sort((a, b) => {
+    switch(this.sortCriteria) {
+      case 'competenceDesc':
+        return b.competence - a.competence;
+      case 'competenceAsc':
+        return a.competence - b.competence;
+      case 'experienceDesc':
+        return b.nbAnneeExperience - a.nbAnneeExperience;
+      case 'experienceAsc':
+        return a.nbAnneeExperience - b.nbAnneeExperience;
+      case 'nom':
+        return (a.user?.nom || '').localeCompare(b.user?.nom || '');
+      default:
+        return 0;
+    }
+  });
+}
+
+// Sélectionner un expert
+selectExpert(expertId: number): void {
+  this.selectedExpertId = expertId;
+}
+
+// Ajouter dans la classe Component
+private readonly specialiteLabels = {
+  vehicule_lourd_et_leger: 'Véhicule lourd et léger',
+  mecanique_generale: 'Mécanique générale',
+  incendie: 'Incendie',
+  medical: 'Médical',
+  evaluation_degats_corpels: 'Dégâts corporels (accidents)',
+  finances: 'Finances',
+  autre: 'Autre'
+};
+
+getSpecialiteLabel(specialite: string): string {
+  return this.specialiteLabels[specialite as keyof typeof this.specialiteLabels] || specialite;
+}
 }

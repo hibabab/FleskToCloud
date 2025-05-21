@@ -37,19 +37,18 @@
           <table class="w-full table-auto text-sm text-left">
             <thead class="bg-gray-200 text-teal-900 uppercase text-xs font-semibold">
               <tr>
-               
                 <th class="px-6 py-3">Immatriculation</th>
                 <th class="px-6 py-3">Date/Heure</th>
                 <th class="px-6 py-3">Lieu</th>
                 <th class="px-6 py-3">Statut</th>
                 <th class="px-6 py-3">Documents</th>
                 <th class="px-6 py-3">Expert</th>
+                <th class="px-6 py-3 text-center">Actions</th>
               </tr>
             </thead>
 
             <tbody class="divide-y divide-gray-200">
               <tr *ngFor="let constat of filteredConstats" class="hover:bg-gray-50 transition-colors">
-               
                 <td class="px-6 py-4 font-mono text-teal-700">
                   {{ constat.vehicule?.Imat || 'N/A' }}
                 </td>
@@ -61,7 +60,7 @@
                 </td>
                 <td class="px-6 py-4 text-gray-600 max-w-xs">
                   <span *ngIf="constat.lieu">
-                    {{ constat.lieu.rue }} , 
+                    {{ constat.lieu.rue }},
                     {{ constat.lieu.codePostal }} {{ constat.lieu.ville }}
                   </span>
                   <span *ngIf="!constat.lieu" class="text-gray-400 italic">Non spécifié</span>
@@ -85,7 +84,6 @@
                       <i class="fas fa-file-pdf text-lg"></i>
                     </a>
                     <a *ngIf="constat.rapport?.pathurl"
-                       
                        class="text-gray-600 hover:text-gray-800 transition"
                        target="_blank"
                        title="Voir le rapport">
@@ -105,6 +103,14 @@
                   </div>
                   <span *ngIf="!constat.expert" class="text-gray-400 italic">En attente</span>
                 </td>
+                <td class="px-6 py-4 text-center">
+                  <button (click)="viewDetails(constat.idConstat)" 
+                          class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-lg transition-colors
+                                 inline-flex items-center text-xs font-medium">
+                    <i class="fas fa-eye mr-2"></i>
+                    Voir détails
+                  </button>
+                </td>
               </tr>
 
               <tr *ngIf="filteredConstats.length === 0">
@@ -123,3 +129,10 @@
     </section>
   </div>
 </div>
+
+<!-- Composant de détails (modal) -->
+<app-constat-details 
+  *ngIf="showDetails" 
+  [constatId]="selectedConstatId!" 
+  (close)="hideConstatDetails()">
+</app-constat-details>

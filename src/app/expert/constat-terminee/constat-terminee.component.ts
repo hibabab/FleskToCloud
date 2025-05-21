@@ -93,4 +93,15 @@ export class ConstatTermineeComponent implements OnInit {
       }
     });
   }
+  selectedConstatId: number | null = null;
+ showDetails = false;// Form Fields // Méthodes pour gérer les détails
+  viewDetails(constatId: number): void {
+    this.selectedConstatId = constatId;
+    this.showDetails = true;
+  }
+
+  hideConstatDetails(): void {
+    this.showDetails = false;
+    this.selectedConstatId = null;
+  }
 }

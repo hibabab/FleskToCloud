@@ -24,6 +24,7 @@ import { HistoriqueContratVieAComponent } from './historique-contrat-vie-a/histo
 import { ResiliationComponent } from './resiliation/resiliation.component';
 import { AccountComponent } from './account/account.component';
 import { CreationCompteComponent } from './creation-compte/creation-compte.component';
+import { ConstatDetailsComponent } from './constat-details/constat-details.component';
 
 
 
@@ -49,6 +50,7 @@ HistoriqueContratVieAComponent,
 ResiliationComponent,
 AccountComponent,
 CreationCompteComponent,
+ConstatDetailsComponent,
 
   ],
   imports: [

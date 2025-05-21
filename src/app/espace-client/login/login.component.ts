@@ -84,7 +84,7 @@ export class LoginComponent {
         this.router.navigate(['/agent/interface']);
         break;
       case 'expert':
-        this.router.navigate(['/dashboard-expert']);
+        this.router.navigate(['/expert']);
         break;
       default:
         this.errorMessage = 'Votre rôle ne permet pas d\'accéder à cette application.';

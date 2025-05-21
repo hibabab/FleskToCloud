@@ -21,193 +21,301 @@
                          [style.width.%]="(currentStep + 1) / steps.length * 100"></div>
                 </div>
             </div>
+<div class="text-center px-8">
+    <div class="flex items-center justify-center mb-6 space-x-3">
+        <div class="p-3 bg-teal-100 rounded-xl">
+            <i class="fas fa-car-crash text-2xl text-teal-700"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-teal-900 tracking-tight">
+            Constat Amiable d'Accident
+            <span class="block text-sm font-normal text-teal-700 mt-1">Document officiel - Assurance Tunisie</span>
+        </h1>
+    </div>
+    
+    <!-- Message d'information -->
+    <div class="bg-teal-50/50 border-l-4 border-teal-700 p-4 rounded-lg mb-6 text-left" *ngIf="currentStep === 0">
+        <p class="text-sm text-teal-800">
+            <span class="font-bold">Important :</span> 
+            Ce constat est valable uniquement pour les accidents survenus en Tunisie, impliquant au maximum deux véhicules et sans blessés.
+        </p>
+    </div>
+</div>
 
-            <!-- En-tête -->
-            <div class="text-center px-8">
-                <div class="flex items-center justify-center mb-6 space-x-3">
-                    <div class="p-3 bg-teal-100 rounded-xl">
-                        <i class="fas fa-car-crash text-2xl text-teal-700"></i>
+<!-- Formulaire -->
+<div class="w-full px-8 pb-8">
+    <!-- Page 1 -->
+    <div *ngIf="currentStep === 0" class="space-y-6">
+        <form [formGroup]="generalInfoForm" class="space-y-6">
+            
+            <!-- Section Date/Heure -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1">
+                    <label class="block text-sm font-medium text-teal-900">
+                        Date de l'accident
+                        <span class="text-red-600">*</span>
+                    </label>
+                    <div class="relative">
+                        <input type="date" formControlName="dateAccident"
+                            class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg"
+                            [ngClass]="{'border-red-500 focus:ring-red-500': formControlInvalid('dateAccident')}">
+                        <i class="fas fa-calendar-alt absolute left-3 top-3.5 text-teal-500 text-sm"></i>
                     </div>
-                    <h1 class="text-2xl font-bold text-teal-900 tracking-tight">
-                        Constat Amiable d'Accident
-                        <span class="block text-sm font-normal text-teal-700 mt-1">Document officiel - Assurance Tunisie</span>
-                    </h1>
+                                           <div *ngIf="formControlInvalid('dateAccident')" class="text-red-500 text-xs mt-1">
+  <span *ngIf="generalInfoForm.get('dateAccident')?.errors?.['required']">
+    Ce champ est requis
+  </span>
+  <span *ngIf="generalInfoForm.get('dateAccident')?.errors?.['dateRangeError']">
+    La date doit être comprise entre J-5 et aujourd'hui
+  </span>
+</div>
                 </div>
                 
-                <!-- Message d'information -->
-                <div class="bg-teal-50/50 border-l-4 border-teal-700 p-4 rounded-lg mb-6 text-left" *ngIf="currentStep === 0">
-                    <p class="text-sm text-teal-800">
-                        <span class="font-bold">Important :</span> 
-                        Ce constat est valable uniquement pour les accidents survenus en Tunisie, impliquant au maximum deux véhicules et sans blessés.
-                    </p>
+                <div class="space-y-1">
+                    <label class="block text-sm font-medium text-teal-900">
+                        Heure
+                        <span class="text-red-600">*</span>
+                    </label>
+                    <div class="relative">
+                        <input type="time" formControlName="heureAccident"
+                            class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg"
+                            [ngClass]="{'border-red-500 focus:ring-red-500': formControlInvalid('heureAccident')}">
+                        <i class="fas fa-clock absolute left-3 top-3.5 text-teal-500 text-sm"></i>
+                    </div>
+                    <div *ngIf="formControlInvalid('heureAccident')" class="text-red-500 text-xs mt-1">
+                        Ce champ est requis
+                    </div>
                 </div>
             </div>
 
-            <!-- Formulaire -->
-            <div class="w-full px-8 pb-8">
-                <!-- Page 1 -->
-                <div *ngIf="currentStep === 0" class="space-y-6">
-                    <form [formGroup]="generalInfoForm" class="space-y-6">
+            <!-- Section Lieu -->
+            <div class="bg-teal-20/30 p-6 rounded-xl border border-teal-100">
+                <h3 class="text-lg font-semibold text-teal-900 mb-4 flex items-center space-x-2">
+                    <i class="fas fa-map-marker-alt text-teal-600"></i>
+                    <span>Localisation de l'accident</span>
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-teal-900">
+                            Gouvernorat
+                            <span class="text-red-600">*</span>
+                        </label>
+                        <input type="text" formControlName="gouvernat"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                            [ngClass]="{'border-red-500 focus:ring-red-500': formControlInvalid('gouvernat')}">
+                        <div *ngIf="formControlInvalid('gouvernat')" class="text-red-500 text-xs mt-1">
+                            Ce champ est requis
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-teal-900">
+                            Ville
+                            <span class="text-red-600">*</span>
+                        </label>
+                        <input type="text" formControlName="ville"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                            [ngClass]="{'border-red-500 focus:ring-red-500': formControlInvalid('ville')}">
+                        <div *ngIf="formControlInvalid('ville')" class="text-red-500 text-xs mt-1">
+                            Ce champ est requis
+                        </div>
+                    </div>
+
+                    
+                    
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-teal-900">
+                            Rue
+                            <span class="text-red-600">*</span>
+                        </label>
+                        <input type="text" formControlName="rue"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                            [ngClass]="{'border-red-500 focus:ring-red-500': formControlInvalid('rue')}">
+                        <div *ngIf="formControlInvalid('rue')" class="text-red-500 text-xs mt-1">
+                            Ce champ est requis
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-teal-900">
+                            Code postal
+                            <span class="text-red-600">*</span>
+                        </label>
+                        <input type="text" formControlName="codePostal"
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                            [ngClass]="{'border-red-500 focus:ring-red-500': formControlInvalid('codePostal')}">
+                        <div *ngIf="formControlInvalid('codePostal')" class="text-red-500 text-xs mt-1">
+                            <span *ngIf="generalInfoForm.get('codePostal')?.errors?.['required']">
+                                Ce champ est requis
+                            </span>
+                            <span *ngIf="generalInfoForm.get('codePostal')?.errors?.['pattern'] || 
+                                        generalInfoForm.get('codePostal')?.errors?.['min'] || 
+                                        generalInfoForm.get('codePostal')?.errors?.['max']">
+                                Le code postal doit contenir exactement 4 chiffres (entre 1000 et 9999)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <label class="flex items-start p-4 space-x-3 border border-gray-300 rounded-xl hover:border-gray-400 cursor-pointer">
+                    <input type="checkbox" formControlName="degatsMateriels"
+                        class="mt-1 w-5 h-5 text-teal-600 border-2 border-gray-300 rounded focus:ring-gray-400">
+                    <div class="space-y-1">
+                        <p class="text-sm font-medium text-teal-900">Dégâts matériels externes</p>
+                        <p class="text-xs text-teal-700">Dommages à l'environnement ou aux infrastructures</p>
+                    </div>
+                </label>
+                
+                <label class="flex items-start p-4 space-x-3 border border-gray-300 rounded-xl hover:border-gray-400 cursor-pointer">
+                    <input type="checkbox" formControlName="blesses"
+                        class="mt-1 w-5 h-5 text-teal-600 border-2 border-gray-300 rounded focus:ring-gray-400">
+                    <div class="space-y-1">
+                        <p class="text-sm font-medium text-teal-900">Personnes blessées</p>
+                        <p class="text-xs text-teal-700">Même légèrement (nécessite un PV officiel)</p>
+                    </div>
+                </label>
+            </div>
+        </form>
+
+        <!-- Section Témoins -->
+        <form [formGroup]="constatForm" class="mt-8">
+            <div class="bg-teal-50/30 p-6 rounded-xl border border-teal-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-semibold text-teal-900 flex items-center space-x-2">
+                        <i class="fas fa-user-check text-teal-600"></i>
+                        <span>Témoins de l'accident</span>
+                    </h3>
+                    <button type="button" (click)="addTemoin()" 
+                            class="flex items-center space-x-2 text-teal-700 hover:text-teal-900 text-sm font-medium">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Ajouter</span>
+                    </button>
+                </div>
+
+                <div *ngIf="temoins.length === 0" class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 text-center">
+                    <p class="text-sm text-yellow-700">
+                        à souligner s'il s'agit d'un passager de A ou B
+                    </p>
+                </div>
+
+                <div formArrayName="temoins" class="space-y-5">
+                    <div *ngFor="let temoin of temoins.controls; let i = index" [formGroupName]="i" 
+                        class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
                         
-                        <!-- Section Date/Heure -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-1">
-                                <label class="block text-sm font-medium text-teal-900">
-                                    Date de l'accident
-                                    <span class="text-red-600">*</span>
-                                </label>
-                                <div class="relative">
-                                    <input type="date" formControlName="dateAccident"
-                                        class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-500 placeholder-gray-400">
-                                    <i class="fas fa-cal-alt absolute left-3 top-3.5 text-teal-500 text-sm"></i>
-                                </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-user-circle text-teal-600"></i>
+                                <span class="text-sm font-medium text-teal-900">Témoin #{{i + 1}}</span>
                             </div>
-                            
-                            <div class="space-y-1">
-                                <label class="block text-sm font-medium text-teal-900">
-                                    Heure
-                                    <span class="text-red-600">*</span>
-                                </label>
-                                <div class="relative">
-                                    <input type="time" formControlName="heureAccident"
-                                        class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-500">
-                                    <i class="fas fa-clock absolute left-3 top-3.5 text-teal-500 text-sm"></i>
-                                </div>
-                            </div>
+                            <button type="button" (click)="removeTemoin(i)" 
+                                    class="text-red-500 hover:text-red-700 text-sm">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
 
-                        <!-- Section Lieu -->
-                        <div class="bg-teal-50/30 p-6 rounded-xl border border-teal-100">
-                            <h3 class="text-lg font-semibold text-teal-900 mb-4 flex items-center space-x-2">
-                                <i class="fas fa-map-marker-alt text-teal-600"></i>
-                                <span>Localisation de l'accident</span>
-                            </h3>
+                        <!-- Formulaire témoin -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="block text-sm font-medium text-teal-900">
+                                    Nom
+                                    <span class="text-red-600">*</span>
+                                </label>
+                                <input type="text" formControlName="nom"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg"
+                                    [ngClass]="{'border-red-500': temoinControlInvalid(i, 'nom')}">
+                                <div *ngIf="temoinControlInvalid(i, 'nom')" class="text-red-500 text-xs mt-1">
+                                    Ce champ est requis
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="block text-sm font-medium text-teal-900">
+                                    Prénom
+                                    <span class="text-red-600">*</span>
+                                </label>
+                                <input type="text" formControlName="prenom"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg"
+                                    [ngClass]="{'border-red-500': temoinControlInvalid(i, 'prenom')}">
+                                <div *ngIf="temoinControlInvalid(i, 'prenom')" class="text-red-500 text-xs mt-1">
+                                    Ce champ est requis
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="block text-sm font-medium text-teal-900">
+                                    Téléphone
+                                    <span class="text-red-600">*</span>
+                                </label>
+                                <input type="tel" formControlName="telephone"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg"
+                                    [ngClass]="{'border-red-500': temoinControlInvalid(i, 'telephone')}">
+                                <div *ngIf="temoinControlInvalid(i, 'telephone')" class="text-red-500 text-xs mt-1">
+                                    <span *ngIf="temoins.at(i).get('telephone')?.errors?.['required']">
+                                        Ce champ est requis
+                                    </span>
+                                    <span *ngIf="temoins.at(i).get('telephone')?.errors?.['pattern']">
+                                        Le numéro doit contenir exactement 8 chiffres
+                                    </span>
+                                </div>
+                            </div>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-1">
-                                    <label class="block text-sm font-medium text-teal-900">Pays</label>
-                                    <div class="flex items-center space-x-3 px-4 py-3 bg-white border border-teal-200 rounded-lg">
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Tunisia.svg" 
-                                            class="w-6 h-6 rounded-full shadow-sm">
-                                        <span class="font-medium text-teal-900">Tunisie</span>
+                            <!-- Adresse -->
+                            <div class="space-y-3 md:col-span-2">
+                                <label class="block text-sm font-medium text-teal-900">
+                                    Adresse complète
+                                    <span class="text-red-600">*</span>
+                                </label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div class="space-y-1">
+                                        <input type="text" formControlName="rueTemoin" placeholder="Rue"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                            [ngClass]="{'border-red-500': temoinControlInvalid(i, 'rueTemoin')}">
+                                        <div *ngIf="temoinControlInvalid(i, 'rueTemoin')" class="text-red-500 text-xs mt-1">
+                                            Ce champ est requis
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <input type="text" formControlName="codePostalTemoin" placeholder="Code postal"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                            [ngClass]="{'border-red-500': temoinControlInvalid(i, 'codePostalTemoin')}">
+                                        <div *ngIf="temoinControlInvalid(i, 'codePostalTemoin')" class="text-red-500 text-xs mt-1">
+                                            <span *ngIf="temoins.at(i).get('codePostalTemoin')?.errors?.['required']">
+                                                Ce champ est requis
+                                            </span>
+                                            <span *ngIf="temoins.at(i).get('codePostalTemoin')?.errors?.['pattern'] || 
+                                                        temoins.at(i).get('codePostalTemoin')?.errors?.['min'] || 
+                                                        temoins.at(i).get('codePostalTemoin')?.errors?.['max']">
+                                                Format: 4 chiffres (1000-9999)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <input type="text" formControlName="villeTemoin" placeholder="Ville"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                            [ngClass]="{'border-red-500': temoinControlInvalid(i, 'villeTemoin')}">
+                                        <div *ngIf="temoinControlInvalid(i, 'villeTemoin')" class="text-red-500 text-xs mt-1">
+                                            Ce champ est requis
+                                        </div>
                                     </div>
                                 </div>
-                                
                                 <div class="space-y-1">
-                                    <label class="block text-sm font-medium text-teal-900">
-                                        Ville
-                                        <span class="text-red-600">*</span>
-                                    </label>
-                                    <input type="text" formControlName="ville"
-                                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-500">
-                                </div>
-                                
-                                <div class="space-y-1">
-                                    <label class="block text-sm font-medium text-teal-900">
-                                        Rue
-                                        <span class="text-red-600">*</span>
-                                    </label>
-                                    <input type="text" formControlName="rue"
-                                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-500">
-                                </div>
-                                
-                                <div class="space-y-1">
-                                    <label class="block text-sm font-medium text-teal-900">
-                                        Code postal
-                                        <span class="text-red-600">*</span>
-                                    </label>
-                                    <input type="text" formControlName="codePostal"
-                                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-500">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Checkboxes -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <label class="flex items-start p-4 space-x-3 border border-teal-100 rounded-xl hover:border-gray-400 cursor-pointer">
-                                <input type="checkbox" formControlName="degatsMateriels"
-                                    class="mt-1 w-5 h-5 text-teal-600 border-2 border-gray-300 rounded focus:ring-gray-400">
-                                <div class="space-y-1">
-                                    <p class="text-sm font-medium text-teal-900">Dégâts matériels externes</p>
-                                    <p class="text-xs text-teal-700">Dommages à l'environnement ou aux infrastructures</p>
-                                </div>
-                            </label>
-                            
-                            <label class="flex items-start p-4 space-x-3 border border-teal-100 rounded-xl hover:border-gray-400 cursor-pointer">
-                                <input type="checkbox" formControlName="blesses"
-                                    class="mt-1 w-5 h-5 text-teal-600 border-2 border-gray-300 rounded focus:ring-gray-400">
-                                <div class="space-y-1">
-                                    <p class="text-sm font-medium text-teal-900">Personnes blessées</p>
-                                    <p class="text-xs text-teal-700">Même légèrement (nécessite un PV officiel)</p>
-                                </div>
-                            </label>
-                        </div>
-                    </form>
-
-                    <!-- Section Témoins -->
-                    <form [formGroup]="constatForm" class="mt-8">
-                        <div class="bg-teal-50/30 p-6 rounded-xl border border-teal-100">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-semibold text-teal-900 flex items-center space-x-2">
-                                    <i class="fas fa-user-check text-teal-600"></i>
-                                    <span>Témoins de l'accident</span>
-                                </h3>
-                                <button type="button" (click)="addTemoin()" 
-                                        class="flex items-center space-x-2 text-teal-700 hover:text-teal-900 text-sm font-medium">
-                                    <i class="fas fa-plus-circle"></i>
-                                    <span>Ajouter</span>
-                                </button>
-                            </div>
-
-                            <div formArrayName="temoins" class="space-y-5">
-                                <div *ngFor="let temoin of temoins.controls; let i = index" [formGroupName]="i" 
-                                    class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
                                     
-                                    <div class="flex justify-between items-center mb-4">
-                                        <div class="flex items-center space-x-2">
-                                            <i class="fas fa-user-circle text-teal-600"></i>
-                                            <span class="text-sm font-medium text-teal-900">Témoin #{{i + 1}}</span>
-                                        </div>
-                                        <button type="button" (click)="removeTemoin(i)" 
-                                                class="text-red-500 hover:text-red-700 text-sm"
-                                                [disabled]="temoins.length <= 1">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-
-                                    <!-- Formulaire témoin -->
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div class="space-y-1">
-                                            <label class="block text-sm font-medium text-teal-900">Nom</label>
-                                            <input type="text" formControlName="nom"
-                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400">
-                                        </div>
-                                        <div class="space-y-1">
-                                            <label class="block text-sm font-medium text-teal-900">Prénom</label>
-                                            <input type="text" formControlName="prenom"
-                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400">
-                                        </div>
-                                        <div class="space-y-1">
-                                            <label class="block text-sm font-medium text-teal-900">Téléphone</label>
-                                            <input type="tel" formControlName="telephone"
-                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400">
-                                        </div>
-                                        <div class="space-y-1">
-                                            <label class="block text-sm font-medium text-teal-900">Adresse</label>
-                                            <div class="grid grid-cols-3 gap-3">
-                                                <input type="text" formControlName="rueTemoin" placeholder="Rue"
-                                                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                                                <input type="text" formControlName="codePostalTemoin" placeholder="CP"
-                                                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                                                <input type="text" formControlName="villeTemoin" placeholder="Ville"
-                                                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                                            </div>
-                                        </div>
+                                    <input type="text" formControlName="gouvernat" placeholder="gouvernat"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                        [ngClass]="{'border-red-500': temoinControlInvalid(i, 'gouvernat')}">
+                                    <div *ngIf="temoinControlInvalid(i, 'gouvernat')" class="text-red-500 text-xs mt-1">
+                                        Ce champ est requis
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
+                </div>
+                
+  
+            </div>
+        </form>
                 </div>
           <!-- Page 2 - Véhicule A -->
           <div *ngIf="currentStep === 1" class="space-y-5 mt-6">
@@ -390,7 +498,7 @@
                 Suivant
             </button>
 
-            <button *ngIf="currentStep === steps.length - 1" 
+            <button *ngIf="currentStep === steps.length - 1" [disabled]="isSubmitting"
             (click) ="submitConstat()"
                     type="button"
                     class="px-4 py-2 bg-teal-800 text-white rounded hover:bg-teal-700">

@@ -1,0 +1,73 @@
+  .filter-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .filter-controls > div {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .expert-card {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .expert-card:hover {
+    border-color: #0e766e;
+    background-color: #f0fdfa;
+  }
+  
+  .expert-card.selected {
+    border-color: #0e766e;
+    background-color: #f0fdfa;
+    box-shadow: 0 0 0 2px rgba(14, 118, 110, 0.2);
+  }
+  
+  .expert-card .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  
+  .expert-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  
+  .expert-card .competences {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+  }
+  
+  .competence-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: #e2e8f0;
+    color: #475569;
+  }
+  
+  .rating-stars {
+    color: #f59e0b;
+    font-size: 0.85rem;
+  }
+  
+  .experience-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: #10b981;
+    color: white;
+    margin-left: 8px;
+  }

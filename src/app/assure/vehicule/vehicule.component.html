@@ -37,11 +37,17 @@
                    'border-gray-300': !vehiculeForm.get('agence')?.touched || vehiculeForm.get('agence')?.valid,
                    'border-red-500': vehiculeForm.get('agence')?.invalid && vehiculeForm.get('agence')?.touched
                  }">
-          <div *ngIf="vehiculeForm.get('agence')?.invalid && vehiculeForm.get('agence')?.touched"
-               class="text-red-500 text-xs mt-1">
-            Ce champ est obligatoire
-          </div>
+          <div *ngIf="vehiculeForm.get('agence')?.errors?.['required'] && vehiculeForm.get('agence')?.touched"
+             class="text-red-500 text-xs mt-1">
+          Ce champ est obligatoire
         </div>
+        <div *ngIf="vehiculeForm.get('agence')?.errors?.['pattern'] && vehiculeForm.get('agence')?.touched"
+             class="text-red-500 text-xs mt-1">
+          Format invalide. Uniquement des chiffres
+        </div>
+      </div>
+
+      
       </div>
       
       <div class="mt-4">
@@ -54,12 +60,18 @@
                  'border-gray-300': !vehiculeForm.get('contratAssurance')?.touched || vehiculeForm.get('contratAssurance')?.valid,
                  'border-red-500': vehiculeForm.get('contratAssurance')?.invalid && vehiculeForm.get('contratAssurance')?.touched
                }">
-        <div *ngIf="vehiculeForm.get('contratAssurance')?.invalid && vehiculeForm.get('contratAssurance')?.touched"
+        <div *ngIf="vehiculeForm.get('contratAssurance')?.errors?.['required'] && vehiculeForm.get('contratAssurance')?.touched"
              class="text-red-500 text-xs mt-1">
           Ce champ est obligatoire
         </div>
+        <div *ngIf="vehiculeForm.get('contratAssurance')?.errors?.['pattern'] && vehiculeForm.get('contratAssurance')?.touched"
+             class="text-red-500 text-xs mt-1">
+          Format invalide. chiffres requis
+        </div>
       </div>
-    </div>
+
+      </div>
+    
     
     <!-- Validité attestation -->
     <div class="mt-4">
@@ -176,32 +188,32 @@
         Ce champ est obligatoire
       </div>
       <div *ngIf="vehiculeForm.get('telAssure')?.errors?.['pattern'] && vehiculeForm.get('telAssure')?.touched"
-           class="text-red-500 text-xs mt-1">
-        Numéro de téléphone invalide
-      </div>
+             class="text-red-500 text-xs mt-1">
+          Numéro de téléphone invalide (8 chiffres requis)
+        </div>
+
     </div>
     <div>
       <label for="emailAssure" class="block mb-1 text-sm font-medium text-gray-700">
         Email <span class="text-red-500">*</span>
       </label>
       <input type="email" id="emailAssure" formControlName="emailAssure"
-             class="w-full p-2 border rounded-lg"
-             [class]="{
-               'border-gray-300': !vehiculeForm.get('emailAssure')?.touched || vehiculeForm.get('emailAssure')?.valid,
-               'border-red-500': vehiculeForm.get('emailAssure')?.invalid && vehiculeForm.get('emailAssure')?.touched
-             }">
-      <div *ngIf="vehiculeForm.get('emailAssure')?.errors?.['required'] && vehiculeForm.get('emailAssure')?.touched"
-           class="text-red-500 text-xs mt-1">
-        Ce champ est obligatoire
+               class="w-full p-2 border rounded-lg"
+               [class]="{
+                 'border-gray-300': !vehiculeForm.get('emailAssure')?.touched || vehiculeForm.get('emailAssure')?.valid,
+                 'border-red-500': vehiculeForm.get('emailAssure')?.invalid && vehiculeForm.get('emailAssure')?.touched
+               }">
+        <div *ngIf="vehiculeForm.get('emailAssure')?.errors?.['required'] && vehiculeForm.get('emailAssure')?.touched"
+             class="text-red-500 text-xs mt-1">
+          Ce champ est obligatoire
+        </div>
+        <div *ngIf="vehiculeForm.get('emailAssure')?.errors?.['email'] && vehiculeForm.get('emailAssure')?.touched"
+             class="text-red-500 text-xs mt-1">
+          Email invalide
+        </div>
       </div>
-      <div *ngIf="vehiculeForm.get('emailAssure')?.errors?.['email'] && vehiculeForm.get('emailAssure')?.touched"
-           class="text-red-500 text-xs mt-1">
-        Email invalide
       </div>
-    </div>
-  </div>
-  
- 
+
   
   <!-- Adresse Assuré -->
   <div class="mt-6">
@@ -348,10 +360,11 @@
         </div>
         <div *ngIf="vehiculeForm.get('telConducteur')?.errors?.['pattern'] && vehiculeForm.get('telConducteur')?.touched"
              class="text-red-500 text-xs mt-1">
-          Numéro de téléphone invalide
+          Numéro de téléphone invalide (8 chiffres requis)
         </div>
       </div>
     </div>
+
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
       <div>
@@ -391,6 +404,7 @@
       </div>
     </div>
     
+
     <!-- Adresse Conducteur -->
     <div class="mt-6">
       <label class="font-medium text-gray-700">Adresse du Conducteur :</label>
@@ -460,63 +474,94 @@
 <div class="mb-8 p-4 border border-teal-200 rounded-lg">
   <label class="font-medium text-gray-700">Identité du véhicule:</label>
   
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-    <div>
-      <label for="numImmatriculation" class="block mb-1 text-sm font-medium text-gray-700">
-        N° d'immatriculation <span class="text-red-500">*</span>
+  <!-- Section Véhicule -->
+<div class="space-y-6">
+  <!-- Numéro d'immatriculation + Type -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Numéro d'immatriculation -->
+    <div class="space-y-2">
+      <label for="numImmatriculation" class="block text-sm font-medium text-gray-700">
+        Numéro d'immatriculation <span class="text-red-500">*</span>
       </label>
-      <input type="text" id="numImmatriculation" formControlName="numImmatriculation"
-             class="w-full p-2 border rounded-lg"
-             [class]="{
-               'border-gray-300': !vehiculeForm.get('numImmatriculation')?.touched || vehiculeForm.get('numImmatriculation')?.valid,
-               'border-red-500': vehiculeForm.get('numImmatriculation')?.invalid && vehiculeForm.get('numImmatriculation')?.touched
-             }">
-      <div *ngIf="vehiculeForm.get('numImmatriculation')?.invalid && vehiculeForm.get('numImmatriculation')?.touched"
-           class="text-red-500 text-xs mt-1">
-        Ce champ est obligatoire
+      <input type="text" 
+             id="numImmatriculation" 
+             formControlName="numImmatriculation"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+             [ngClass]="{
+               'border-gray-300': !hasError('numImmatriculation'),
+               'border-red-500 ring-2 ring-red-100': hasError('numImmatriculation')
+             }"
+             placeholder="ex : 205TU1500">
+      <div *ngIf="hasError('numImmatriculation')" class="text-red-500 text-xs mt-1 pl-1">
+        ℹ️ {{ getControlError('numImmatriculation') }}
       </div>
     </div>
-    
-    <div>
-      <label for="typeVehicule" class="block mb-1 text-sm font-medium text-gray-700">
-        Type <span class="text-red-500">*</span>
+
+    <!-- Type de véhicule -->
+    <div class="space-y-2">
+      <label for="typeVehicule" class="block text-sm font-medium text-gray-700">
+        Type de véhicule <span class="text-red-500">*</span>
       </label>
-      <select id="typeVehicule" formControlName="typeVehicule"
-              class="w-full p-2 border rounded-lg"
-              [class]="{
-                'border-gray-300': !vehiculeForm.get('typeVehicule')?.touched || vehiculeForm.get('typeVehicule')?.valid,
-                'border-red-500': vehiculeForm.get('typeVehicule')?.invalid && vehiculeForm.get('typeVehicule')?.touched
+      <select id="typeVehicule" 
+              formControlName="typeVehicule"
+              class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 appearance-none bg-[url('data:image/svg+xml;base64,PHN2Zy4..')] bg-no-repeat bg-[right:1rem_center] bg-[length:1.5em]"
+              [ngClass]="{
+                'border-gray-300': !hasError('typeVehicule'),
+                'border-red-500 ring-2 ring-red-100': hasError('typeVehicule')
               }">
-        <option value="">Sélectionnez un type</option>
+        <option value="" disabled>Sélectionnez un type</option>
         <option value="Voiture">Voiture</option>
         <option value="Moto">Moto</option>
         <option value="Camion">Camion</option>
         <option value="Autre">Autre</option>
       </select>
-      <div *ngIf="vehiculeForm.get('typeVehicule')?.invalid && vehiculeForm.get('typeVehicule')?.touched"
-           class="text-red-500 text-xs mt-1">
-        Veuillez sélectionner un type
+      <div *ngIf="hasError('typeVehicule')" class="text-red-500 text-xs mt-1 pl-1">
+        ℹ️ Veuillez sélectionner un type
       </div>
     </div>
   </div>
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-    <div>
-      <label for="marqueVehicule" class="block mb-1 text-sm font-medium text-gray-700">
-        Marque <span class="text-red-500">*</span>
+
+  <!-- Marque + Modèle -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Marque -->
+    <div class="space-y-2">
+      <label for="marqueVehicule" class="block text-sm font-medium text-gray-700">
+        Marque du véhicule <span class="text-red-500">*</span>
       </label>
-      <input type="text" id="marqueVehicule" formControlName="marqueVehicule"
-             class="w-full p-2 border rounded-lg"
-             [class]="{
-               'border-gray-300': !vehiculeForm.get('marqueVehicule')?.touched || vehiculeForm.get('marqueVehicule')?.valid,
-               'border-red-500': vehiculeForm.get('marqueVehicule')?.invalid && vehiculeForm.get('marqueVehicule')?.touched
-             }">
-      <div *ngIf="vehiculeForm.get('marqueVehicule')?.invalid && vehiculeForm.get('marqueVehicule')?.touched"
-           class="text-red-500 text-xs mt-1">
-        Ce champ est obligatoire
+      <input type="text" 
+             id="marqueVehicule" 
+             formControlName="marqueVehicule"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+             [ngClass]="{
+               'border-gray-300': !hasError('marqueVehicule'),
+               'border-red-500 ring-2 ring-red-100': hasError('marqueVehicule')
+             }"
+             placeholder="ex : Renault">
+      <div *ngIf="hasError('marqueVehicule')" class="text-red-500 text-xs mt-1 pl-1">
+        ℹ️ Ce champ est obligatoire
       </div>
     </div>
-    
+
+    <!-- Modèle -->
+    <div class="space-y-2">
+      <label for="modeleVehicule" class="block text-sm font-medium text-gray-700">
+        Modèle du véhicule <span class="text-red-500">*</span>
+      </label>
+      <input type="text" 
+             id="modeleVehicule" 
+             formControlName="modeleVehicule"
+             class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+             [ngClass]="{
+               'border-gray-300': !hasError('modeleVehicule'),
+               'border-red-500 ring-2 ring-red-100': hasError('modeleVehicule')
+             }"
+             placeholder="ex : Clio IV">
+      <div *ngIf="hasError('modeleVehicule')" class="text-red-500 text-xs mt-1 pl-1">
+        ℹ️ Ce champ est obligatoire
+      </div>
+    </div>
+  </div>
+</div>
     <div>
       <label for="modeleVehicule" class="block mb-1 text-sm font-medium text-gray-700">
         Modèle <span class="text-red-500">*</span>
@@ -533,7 +578,7 @@
       </div>
     </div>
   </div>
-</div>
+
 
   <!-- Section Sens suivi -->
   <div class="mb-8 p-4 border border-teal-200 rounded-lg">
@@ -582,7 +627,7 @@
   <div class="mb-8 p-4 border border-teal-200 rounded-lg">
     <div class="mt-4">
       <label for="observation" class="block mb-1 text-sm font-medium text-gray-700">
-        Observation <span class="text-red-500">*</span>
+        Observation 
       </label>
       <textarea id="observation" formControlName="observation" rows="4"
                 class="w-full p-2 border rounded-lg"
@@ -598,7 +643,7 @@
     
     <div class="mt-4">
       <label for="degatsApparents" class="block mb-1 text-sm font-medium text-gray-700">
-        Dégâts apparents <span class="text-red-500">*</span>
+        Dégâts apparents 
       </label>
       <textarea id="degatsApparents" formControlName="degatsApparents" rows="4"
                 class="w-full p-2 border rounded-lg"
