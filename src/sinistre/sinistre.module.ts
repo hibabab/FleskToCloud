@@ -31,6 +31,8 @@ import { SmsService } from 'src/notification/services/sms/sms.service';
 
 import { PhotoJustificatif } from './entities/photo.entity';
 import { UserService } from 'src/gestion-utilisateur/services/user/user.service';
+import { UploadController } from './Controller/upload/upload.controller';
+import { S3Service } from './services/s3/s3.service';
 
 @Module({
   imports: [
@@ -53,7 +55,7 @@ import { UserService } from 'src/gestion-utilisateur/services/user/user.service'
     forwardRef(() => GestionUtilisateurModule),
   ],
 
-  controllers: [ConstatController],
+  controllers: [ConstatController, UploadController],
   providers: [
     // Définition des services qui seront utilisés dans ce module
     ConducteurService,
@@ -68,6 +70,7 @@ import { UserService } from 'src/gestion-utilisateur/services/user/user.service'
     AgentServiceService,
     ConstatService,
     SmsService,
+    S3Service,
   ],
 })
 export class SinistreModule {}

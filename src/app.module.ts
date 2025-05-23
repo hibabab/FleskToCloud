@@ -17,7 +17,6 @@ import { SinistreModule } from './sinistre/sinistre.module';
 import { AssuranceVieModule } from './assurance-vie/assurance-vie.module';
 import { ContratvieService } from './assurance-vie/services/contratvie/contratvie.service';
 
-
 @Module({
   imports: [
     // Load environment variables from .env file
@@ -56,6 +55,20 @@ import { ContratvieService } from './assurance-vie/services/contratvie/contratvi
           database: configService.get<string>('DB_NAME'),
           autoLoadEntities: true,
           synchronize: true, // ⚠️ Disable in production
+          // Configuration SSL pour RDS
+          ssl: {
+            rejectUnauthorized: false, // Important pour RDS
+          },
+          // Configuration supplémentaire pour une meilleure compatibilité
+          extra: {
+            connectionLimit: 10,
+            acquireTimeoutMillis: 30000,
+            timeout: 60000,
+            // Force SSL
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          },
         };
       },
       inject: [ConfigService],
@@ -63,17 +76,11 @@ import { ContratvieService } from './assurance-vie/services/contratvie/contratvi
 
     // Import feature modules
     AuthModule,
-
     AssuranceAutoModule,
-
     PaiementModule,
-
     NotificationModule,
-
     GestionUtilisateurModule,
-
     SinistreModule,
-
     AssuranceVieModule,
   ],
   controllers: [AppController],
