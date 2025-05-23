@@ -562,21 +562,7 @@
     </div>
   </div>
 </div>
-    <div>
-      <label for="modeleVehicule" class="block mb-1 text-sm font-medium text-gray-700">
-        Modèle <span class="text-red-500">*</span>
-      </label>
-      <input type="text" id="modeleVehicule" formControlName="modeleVehicule"
-             class="w-full p-2 border rounded-lg"
-             [class]="{
-               'border-gray-300': !vehiculeForm.get('modeleVehicule')?.touched || vehiculeForm.get('modeleVehicule')?.valid,
-               'border-red-500': vehiculeForm.get('modeleVehicule')?.invalid && vehiculeForm.get('modeleVehicule')?.touched
-             }">
-      <div *ngIf="vehiculeForm.get('modeleVehicule')?.invalid && vehiculeForm.get('modeleVehicule')?.touched"
-           class="text-red-500 text-xs mt-1">
-        Ce champ est obligatoire
-      </div>
-    </div>
+   
   </div>
 
 
